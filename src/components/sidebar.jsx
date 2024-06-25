@@ -2,7 +2,7 @@
 
 export default function Sidebar({ children }) {
 return (
-    <aside className="h-full w-[3%%] max-[900px]:h-fit max-[900px]:absolute max-[900px]:z-50 top-[50%] max-[900px]:transform max-[900px]:-translate-y-[50%] max-[900px]:left-1 transition-all duration-500"> 
+    <aside className="h-full w-[3%] max-[900px]:h-fit max-[900px]:absolute max-[900px]:z-50 top-[50%] max-[900px]:transform max-[900px]:-translate-y-[50%] max-[900px]:left-1 transition-all duration-500"> 
     <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <ul className="flex-1 py-2">{children}</ul>
     </nav>

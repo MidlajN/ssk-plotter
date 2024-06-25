@@ -14,25 +14,28 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
     } = useCanvas();
 
     return (
-        <section className={`h-full ${ hideSideBar ? 'w-full' : 'w-[97%]' } flex canvas-section relative overflow-hidden`}>
+        <section className={`h-full ${ hideSideBar ? 'w-full' : 'w-[97%]' } flex canvas-section relative overflow-hidden max-w-[100vw] max-h-[100vh]`}>
             <div className={`canvas ${ expanded ? 'w-[80%]' : 'w-[100%]' } relative overflow-hidden transition-all duration-500`}>
                 <TransformWrapper
-                    initialScale={.1} 
-                    maxScale={1}
+                    // initialScale={.1} 
+                    // maxScale={1}
                     minScale={.1} 
                     limitToBounds={ false }
                     // initialPositionX={'1px'}
+                    panning={{ excluded: 'canvas' }}
+                    // centerOnInit
+                    
                 >
                     <TransformComponent
                         contentStyle={{  margin:'auto'}} 
-                        wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'5rem', top:'5rem' }}
+                        // wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'5rem', top:'5rem' }}
                     >
                         <div className="machine-outer">
                             <div className="machine-inner relative"
                                 onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0], canvas) } } 
                                 onDragOver={ e => { e.preventDefault(); } }
                             >
-                                <canvas ref={ canvasRef } ></canvas>
+                                <canvas ref={ canvasRef } className="fabricCanvas"></canvas>
                             </div>
                         </div>
                    </TransformComponent>

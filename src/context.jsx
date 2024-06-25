@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-'use client';
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
@@ -24,8 +23,8 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.cornerSize = 12;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-            width: fabric.util.parseUnit('250cm'),
-            height: fabric.util.parseUnit('150cm'),
+            width: fabric.util.parseUnit('85cm'),
+            height: fabric.util.parseUnit('60cm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true
