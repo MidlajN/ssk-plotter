@@ -1,0 +1,126 @@
+/* ////////////////////////////////////////////////////////////// */
+/* ------------------------- navbar ------------------------- */
+@font-face {
+    font-family: K2D;
+    src: url('/K2D-Regular.ttf');
+}
+@font-face {
+    font-family: Julee;
+    src: url('/Julee-Regular.ttf');
+}
+@font-face {
+    font-family: MarryWeatherSans;
+    src: url('/MerriweatherSans-Bold.ttf');
+}
+@font-face {
+    font-family: MarryWeatherSansRegular;
+    src: url('/MerriweatherSans-Regular.ttf');
+}
+.navbar .navDiv {
+    border-bottom: 2px solid #F5762E;
+    background-color: #FCFCFF;
+}
+.navbar .navDiv h3 {
+    font-family: K2D;
+    font-size: 2vw;
+    line-height: 36px;
+    letter-spacing: .2em;
+    text-align: left;
+}
+.navbar .navDiv h3 span {
+    font-family: Julee;
+    color: #F5762E;
+    font-size: 2.5vw;
+    line-height: 36px;
+    letter-spacing: 0em;
+    text-align: left;
+}
+.navbar .navDiv .buttonGroup {
+    box-shadow: inset -1px 2px 2px 0px #00000025;
+    background-color: #DFDFDF;
+    border: 1px solid #EDEDED;
+    border-radius: 5rem;
+
+}
+.navbar .navDiv .buttonGroup button {
+    font-family: MarryWeatherSans;
+    text-transform: uppercase;
+    line-height: normal;
+    letter-spacing: 0em;
+    text-align: center;
+    font-size: 0.6vw;
+    color: #1C274C;
+    height: fit-content;
+    min-width: 4.5vw;
+}
+.navbar .navDiv .buttonGroup button.active {
+    background-color: #F5762E;
+    color: white;
+    padding: 0.3rem 1rem;
+    margin-block: .3rem;
+    border-radius: 5rem;
+    box-shadow: 2px 2px 3px 0px #00000025;
+}
+
+
+/* ///////////////////////////////////////////////////////////////// */
+/* ------------------------- container.jsx ------------------------- */
+.canvas-section {
+    background-color: #ebebeb;
+}
+.canvas-section .canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    height: 100%;
+}
+.canvas-section .canvas button {
+    position: absolute;
+    inset-inline: auto;
+    right: 0;
+    /* background-color: #F5762E; */
+    color: white;
+    /* padding: 0.3rem 1rem; */
+    margin-block: .3rem;
+}
+.canvas-section .canvas .machine-outer {
+    padding: 10rem 10rem 0px 10rem;
+    background-color: #ffffff69;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    box-shadow: 0px 0px 3px #a3a3a3;
+}
+.canvas-section .canvas .machine-inner {
+    background-color: #DFDFDF;
+    border-top: 1px solid #ededed;
+    border-left: 1px solid #ededed;
+    border-right: 1px solid #ededed;
+    /* padding: 30px 25px 30px 50px; */
+    padding: 13rem 13rem 6rem 20rem;
+}
+.canvas-section .canvas .machine-inner::before {
+    content: "";
+    position: absolute;
+    bottom: 6rem;
+    left: 0;
+    width: 20rem;
+    height: 27rem;
+    z-index: 1;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="81" viewBox="0 0 60 81" fill="none"><rect width="60" height="81" fill="%238E98BC" fill-opacity="0.15"/><rect x="23" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="61" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="37" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="37" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="9" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="39" y="22" width="13" height="10" rx="3" fill="%239BA7D0" fill-opacity="0.48"/><circle cx="16" cy="16" r="10" fill="%238E0000" fill-opacity="0.16"/><path d="M52 12.5C52 16.0899 49.0899 19 45.5 19C41.9101 19 39 16.0899 39 12.5C39 8.91015 41.9101 6 45.5 6C49.0899 6 52 8.91015 52 12.5Z" fill="%239BA7D0" fill-opacity="0.48"/></svg>');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.canvas-section .footer {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    font-size: 13px;
+}
+.canvas-section .footer div {
+    min-width: 6rem;
+}
