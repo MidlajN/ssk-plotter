@@ -25,7 +25,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                 >
                     <TransformComponent
                         contentStyle={{  margin:'auto'}} 
-                        wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'20rem', top:'8rem' }}
+                        wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'15vw', top:'8rem' }}
                     >
                         <div className="machine-outer">
                             <div className="machine-inner relative"

@@ -9,6 +9,7 @@ import { Default, Elements, FreeDraw, Import, TextBox } from "./components/edito
 import { Cut } from "./components/cut/cut";
 import { split, group, info } from "./components/editor/functions";
 import { Setup } from "./components/setup/setup";
+import './App.css';
 
 
 export default function Home() {
@@ -51,8 +52,8 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
 
   return (
     <nav className="navbar h-[9%]">
-      <div className="px-16 w-full h-full flex justify-between items-center navDiv">
-        <h3 className="py-5">Kochun<span>D</span></h3>
+      <div className="px-8 lg:px-16 w-full h-full flex justify-between items-center navDiv">
+        <h3 className="py-5 text-3xl">Kochun<span className="text-4xl">D</span></h3>
         <div className="buttonGroup px-[0.3rem] flex gap-4 items-center justify-around">
           <button 
             className={ tool !== 'Setup' && tool !== 'Cut' ? 'active' : ''}

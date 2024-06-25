@@ -253,9 +253,9 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
                 <div className="flex w-full items-end justify-between">
                     { !port ? (
-                        <button className="flex items-center justify-center gap-1 bg-[#F5762E] py-1 px-8 rounded-full" onClick={ handleConnection }>
+                        <button className="flex items-center justify-center gap-1 bg-[#0c4653] py-1 px-8 rounded-full" onClick={ handleConnection }>
                             <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                            <span className="text-[#1C274C] font-['MarryWeatherSans'] text-[13px] "> Connect</span>
+                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[13px] "> Connect</span>
                         </button>
                     ) : (
                         <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ closeConnection }>
