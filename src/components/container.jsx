@@ -17,18 +17,15 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
         <section className={`h-full ${ hideSideBar ? 'w-full' : 'w-[97%]' } flex canvas-section relative overflow-hidden max-w-[100vw] max-h-[100vh]`}>
             <div className={`canvas ${ expanded ? 'w-[80%]' : 'w-[100%]' } relative overflow-hidden transition-all duration-500`}>
                 <TransformWrapper
-                    // initialScale={.1} 
-                    // maxScale={1}
+                    initialScale={.2} 
+                    maxScale={1}
                     minScale={.1} 
                     limitToBounds={ false }
-                    // initialPositionX={'1px'}
-                    panning={{ excluded: 'canvas' }}
-                    // centerOnInit
-                    
+                    panning={{ excluded: ['fabricCanvas'] }}
                 >
                     <TransformComponent
                         contentStyle={{  margin:'auto'}} 
-                        // wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'5rem', top:'5rem' }}
+                        wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'20rem', top:'8rem' }}
                     >
                         <div className="machine-outer">
                             <div className="machine-inner relative"
@@ -41,7 +38,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                    </TransformComponent>
                 </TransformWrapper>
 
-                <button onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#F5762E" /> : <ChevronLeft size={30} color="#F5762E" /> }</button>
+                <button onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>
             </div>
 
             <div className={`${ expanded ? 'w-[20%]' : 'w-[0]' } bg-white transition-all duration-500 overflow-hidden`}>

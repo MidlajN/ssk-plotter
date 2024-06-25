@@ -17,7 +17,7 @@
     src: url('/MerriweatherSans-Regular.ttf');
 }
 .navbar .navDiv {
-    border-bottom: 2px solid #F5762E;
+    border-bottom: 2px solid #1c7f969c;
     background-color: #FCFCFF;
 }
 .navbar .navDiv h3 {
@@ -29,7 +29,7 @@
 }
 .navbar .navDiv h3 span {
     font-family: Julee;
-    color: #F5762E;
+    color: #1c8096;
     font-size: 2.5vw;
     line-height: 36px;
     letter-spacing: 0em;
@@ -54,7 +54,7 @@
     min-width: 4.5vw;
 }
 .navbar .navDiv .buttonGroup button.active {
-    background-color: #F5762E;
+    background-color: #1c8096;
     color: white;
     padding: 0.3rem 1rem;
     margin-block: .3rem;
@@ -85,7 +85,7 @@
     margin-block: .3rem;
 }
 .canvas-section .canvas .machine-outer {
-    padding: 10rem 10rem 0px 10rem;
+    padding: 7rem 7rem 0px 7rem;
     background-color: #ffffff69;
     border-top: 1px solid #ffffff;
     border-left: 1px solid #ffffff;
@@ -98,15 +98,15 @@
     border-left: 1px solid #ededed;
     border-right: 1px solid #ededed;
     /* padding: 30px 25px 30px 50px; */
-    padding: 13rem 13rem 6rem 20rem;
+    padding: 8rem 8rem 5rem 15rem;
 }
 .canvas-section .canvas .machine-inner::before {
     content: "";
     position: absolute;
     bottom: 6rem;
     left: 0;
-    width: 20rem;
-    height: 27rem;
+    width: 15rem;
+    height: 18rem;
     z-index: 1;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="81" viewBox="0 0 60 81" fill="none"><rect width="60" height="81" fill="%238E98BC" fill-opacity="0.15"/><rect x="23" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="61" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="37" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="37" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="9" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="39" y="22" width="13" height="10" rx="3" fill="%239BA7D0" fill-opacity="0.48"/><circle cx="16" cy="16" r="10" fill="%238E0000" fill-opacity="0.16"/><path d="M52 12.5C52 16.0899 49.0899 19 45.5 19C41.9101 19 39 16.0899 39 12.5C39 8.91015 41.9101 6 45.5 6C49.0899 6 52 8.91015 52 12.5Z" fill="%239BA7D0" fill-opacity="0.48"/></svg>');
     background-repeat: no-repeat;

@@ -89,20 +89,20 @@ const SideNav = ({ tool, setTool, setExpanded }) => {
   return (
     <Sidebar>
       <SidebarItem 
-        icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
         text={'Select'} 
         setTool={setTool} 
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#F5762E' : '#4b5563'}  /> } 
+        icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
         text={'Elements'} 
         setTool={setTool}
         setExpanded={setExpanded}
         canvasFunction={info}
       />
       <SidebarItem 
-        icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
         text={'Group'} 
         setTool={setTool}
         setExpanded={setExpanded}
@@ -116,31 +116,31 @@ const SideNav = ({ tool, setTool, setExpanded }) => {
         canvasFunction={ () => split(canvas) }
       />
       <SidebarItem 
-        icon={ <Spline size={25} strokeWidth={1.5} color={ tool === 'Curves' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <Spline size={25} strokeWidth={1.5} color={ tool === 'Curves' ? '#1c8096' : '#4b5563'} /> } 
         text={'Curves'} 
         setTool={setTool}
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
         text={'Lines'} 
         setTool={setTool} 
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
         text={'Pen'} 
         setTool={setTool}
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <CaseSensitiveIcon size={25} strokeWidth={1.5} color={ tool === 'Textbox' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <CaseSensitiveIcon size={25} strokeWidth={1.5} color={ tool === 'Textbox' ? '#1c8096' : '#4b5563'} /> } 
         text={'Textbox'} 
         setTool={setTool} 
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#F5762E' : '#4b5563'} /> } 
+        icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
         text={'Import'} 
         setTool={setTool} 
         setExpanded={setExpanded}
