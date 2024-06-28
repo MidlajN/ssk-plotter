@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import {  X, ChevronsDown  } from "lucide-react";
+import useCanvas from "../../context";
 
 import ReactModal from "react-modal";
 ReactModal.setAppElement('#root');
@@ -9,6 +10,7 @@ ReactModal.setAppElement('#root');
 
 export const SetupModal = ({modalOpen, setModalOpen, jobSetUp, setJobSetup, setRightClickEvent , jobToUpdate, setJobToUpdate}) => {
     const [ selected, setSelected ] = useState('thru-cut');
+    const { canvas } = useCanvas();
     const [ thruCutData, setThruCutData ] = useState({
         name: 1,
         properties : {
@@ -297,14 +299,14 @@ export const SetupModal = ({modalOpen, setModalOpen, jobSetUp, setJobSetup, setR
                     transform: 'translate(-50%, -50%)',
                 }, 
                 content: { 
-                    width: 'fit-content', 
+                    // width: 'fit-content', 
                     height: 'fit-content', 
                     top: '50%', 
                     left: '50%', 
                     transform: 'translate(-50%, -50%)',
                     padding: '0px',
                     border: 'none',
-                    // width: '50rem',
+                    width: '50rem',
                     borderRadius: 'none',
                     background: 'transparent'
                 } 

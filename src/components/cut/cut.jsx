@@ -79,12 +79,28 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
     const handleConnection = async () => {
         try {
-            const newPort = await navigator.serial.requestPort();
-            await newPort.open({ baudRate: 115200 });
-            setPort(newPort);
-            console.log('port', newPort)
-            setWriter(newPort.writable.getWriter());
-            setReader(newPort.readable.getReader());
+            const ws = new WebSocket("ws://kochund.local:81", ['arduino']);
+
+            ws.binaryType = 'arraybuffer';
+
+            ws.onopen = () => {
+                console.log('Connected :: ')
+                ws.send("dw")
+            }
+
+            ws.onmessage = (event) => {
+                console.log("EVENT : ", event.data)
+            }
+
+            
+
+            
+            // const newPort = await navigator.serial.requestPort();
+            // await newPort.open({ baudRate: 115200 });
+            // setPort(newPort);
+            // console.log('port', newPort)
+            // setWriter(newPort.writable.getWriter());
+            // setReader(newPort.readable.getReader());
         } catch (err) {
             console.log("Error while connecting", err)
         }
@@ -132,14 +148,23 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
     const sendToMachine = async (gcode) => {
         try {
-            if (!writer) return;
-            await writer.write(new TextEncoder().encode(`${gcode}\n`));
-            console.log('sent: ', gcode)
-            // serialRecieve(reader);
+            const http = new XMLHttpRequest();
+            http.onreadystatechange = () => {
+                if (http.readyState === 4) {
+                    console.log(http);
+                    if (http.status === 200) {
+                        console.log(http.responseText); // Log the response from ESP_GRBL server
+                    }
+                }
+            }
+            http.open("GET", "http://localhost:3000/command?commandText=" + encodeURI(gcode) + "&PAGEID=0", true);
+            http.send(gcode);
+
         } catch (err) {
             console.log(err);
         }
     }
+
 
     useEffect(() => {
         processMsg();
@@ -291,3 +316,4 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         </div>
     )
 }
+
