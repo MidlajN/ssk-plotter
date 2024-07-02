@@ -200,8 +200,8 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
     } 
 };
 
-export const info = () => {
+export const info = (canvas) => {
     const activeObject = canvas.getActiveObject();
-    console.log('info', activeObject, ' stroke-width : ', activeObject.strokeWidth)
+    console.log('SVG ::: ', canvas.toSVG())
     canvas.renderAll();
 }

@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
@@ -27,7 +26,7 @@ export const CanvasProvider = ({ children }) => {
             height: fabric.util.parseUnit('60cm'),
             backgroundColor: "white",
             fireRightClick: true,
-            stopContextMenu: true
+            stopContextMenu: true,
         })
 
         setCanvas(fabricCanvas);

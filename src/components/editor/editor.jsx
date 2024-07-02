@@ -2,6 +2,7 @@
 import { CloudUpload } from "lucide-react";
 import useCanvas from "../../context";
 import './editor.css';
+import { useEffect } from "react";
 
 
 
@@ -18,6 +19,12 @@ export function Elements() {
 }
 
 export function FreeDraw() {
+    const { canvas } = useCanvas();
+    
+    useEffect(() => {
+        canvas.isDrawingMode = true;
+        return () => canvas.isDrawingMode = false
+    },[])
     return (
         <div>CurvedLines</div>
     )

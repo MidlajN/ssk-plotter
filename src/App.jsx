@@ -1,14 +1,12 @@
 /* eslint-disable react/prop-types */
 
 import { useState } from "react";
-import useCanvas from "./context.jsx";
-import Sidebar, { SidebarItem } from "./components/sidebar";
-import { Boxes, CaseSensitiveIcon, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool, Spline } from "lucide-react";
 import Container from "./components/container.jsx";
 import { Default, Elements, FreeDraw, Import, TextBox } from "./components/editor/editor";
 import { Cut } from "./components/cut/cut";
-import { split, group, info } from "./components/editor/functions";
+
 import { Setup } from "./components/setup/setup";
+import { SideNav } from "./components/sidebar";
 import './App.css';
 
 
@@ -85,67 +83,3 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
   )
 }
 
-const SideNav = ({ tool, setTool, setExpanded }) => {
-  const { canvas } = useCanvas();
-  return (
-    <Sidebar>
-      <SidebarItem 
-        icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Select'} 
-        setTool={setTool} 
-        setExpanded={setExpanded}
-      />
-      <SidebarItem 
-        icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
-        text={'Elements'} 
-        setTool={setTool}
-        setExpanded={setExpanded}
-        canvasFunction={info}
-      />
-      <SidebarItem 
-        icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Group'} 
-        setTool={setTool}
-        setExpanded={setExpanded}
-        canvasFunction={ () => group(canvas) }
-      />
-      <SidebarItem 
-        icon={ <img src="/split.svg" alt="" /> } 
-        text={'Split'} 
-        setTool={setTool} 
-        setExpanded={setExpanded}
-        canvasFunction={ () => split(canvas) }
-      />
-      <SidebarItem 
-        icon={ <Spline size={25} strokeWidth={1.5} color={ tool === 'Curves' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Curves'} 
-        setTool={setTool}
-        setExpanded={setExpanded}
-      />
-      <SidebarItem 
-        icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Lines'} 
-        setTool={setTool} 
-        setExpanded={setExpanded}
-      />
-      <SidebarItem 
-        icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Pen'} 
-        setTool={setTool}
-        setExpanded={setExpanded}
-      />
-      <SidebarItem 
-        icon={ <CaseSensitiveIcon size={25} strokeWidth={1.5} color={ tool === 'Textbox' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Textbox'} 
-        setTool={setTool} 
-        setExpanded={setExpanded}
-      />
-      <SidebarItem 
-        icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
-        text={'Import'} 
-        setTool={setTool} 
-        setExpanded={setExpanded}
-      />
-    </Sidebar>
-  )
-}

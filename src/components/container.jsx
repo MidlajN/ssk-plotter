@@ -17,7 +17,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
         <section className={`h-full ${ hideSideBar ? 'w-full' : 'w-[97%]' } flex canvas-section relative overflow-hidden max-w-[100vw] max-h-[100vh]`}>
             <div className={`canvas ${ expanded ? 'w-[80%]' : 'w-[100%]' } relative overflow-hidden transition-all duration-500`}>
                 <TransformWrapper
-                    initialScale={.2} 
+                    initialScale={.3} 
                     maxScale={1}
                     minScale={.1} 
                     limitToBounds={ false }
@@ -25,7 +25,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                 >
                     <TransformComponent
                         contentStyle={{  margin:'auto'}} 
-                        wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'15vw', top:'8rem' }}
+                        wrapperStyle={{  width: '100%', height: '100%', overflow:'visible', display:'flex', left:'8vw', top:'2rem' }}
                     >
                         <div className="machine-outer">
                             <div className="machine-inner relative"
