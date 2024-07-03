@@ -36,6 +36,13 @@ export function Lines() {
         if (canvas) {
             canvas.selection = false;
             canvas.hoverCursor = 'auto';
+            canvas.getObjects().forEach(obj => {
+                // if (obj.id === 'added-line') {
+                    obj.set({
+                        selectable: false
+                    })
+                // }
+            })
             canvas.on('mouse:down', (event) => {
                 let pointer = canvas.getPointer(event.e)
 
@@ -43,7 +50,7 @@ export function Lines() {
                     mouseDown = true
                     line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
                         id: 'added-line',
-                        strokeWidth: 5,
+                        strokeWidth: 3,
                         stroke: 'red',
                         selectable: false
                     })
@@ -71,11 +78,11 @@ export function Lines() {
                 canvas.hoverCursor = 'all-scroll';
 
                 canvas.getObjects().forEach(obj => {
-                    if (obj.id === 'added-line') {
+                    // if (obj.id === 'added-line') {
                         obj.set({
                             selectable: true
                         })
-                    }
+                    // }
                 })
 
                 canvas.off('mouse:down');
