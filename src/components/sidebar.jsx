@@ -96,8 +96,8 @@ export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction }
                     // setTool(null);
                     // setExpanded(true);
                 } else if (simpleTool.includes(text)) {
-                    // setTool(text);
-                    setExpanded(false);
+                    setTool(text);
+                    setExpanded(true);
                 } else {
                     setTool(text);
                     setExpanded(true)

@@ -18,15 +18,74 @@ export function Elements() {
     )
 }
 
-export function FreeDraw() {
+export function FreeDraw({ tool }) {
     const { canvas } = useCanvas();
     
-    useEffect(() => {
-        canvas.isDrawingMode = true;
-        return () => canvas.isDrawingMode = false
-    },[])
+
     return (
         <div>CurvedLines</div>
+    )
+}
+
+export function Lines() {
+    const { canvas } = useCanvas();
+
+    useEffect(() => {
+        let line;
+        let mouseDown = false;
+        if (canvas) {
+            canvas.selection = false;
+            canvas.hoverCursor = 'auto';
+            canvas.on('mouse:down', (event) => {
+                let pointer = canvas.getPointer(event.e)
+
+                if (!mouseDown) {
+                    mouseDown = true
+                    line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+                        id: 'added-line',
+                        strokeWidth: 5,
+                        stroke: 'red',
+                        selectable: false
+                    })
+                    canvas.add(line)
+                    canvas.requestRenderAll()
+                }
+            })
+            canvas.on('mouse:move', (event) => {
+                if (mouseDown) {
+                    let pointer = canvas.getPointer(event.e)
+                    line.set({ 
+                        x2: pointer.x, 
+                        y2: pointer.y 
+                    })
+                    canvas.requestRenderAll()
+                }
+            })
+            canvas.on('mouse:up', (e) => {
+                line.setCoords()
+                mouseDown = false;
+            })
+
+            return () => {
+                canvas.selection = true;
+                canvas.hoverCursor = 'all-scroll';
+
+                canvas.getObjects().forEach(obj => {
+                    if (obj.id === 'added-line') {
+                        obj.set({
+                            selectable: true
+                        })
+                    }
+                })
+
+                canvas.off('mouse:down');
+                canvas.off('mouse:move');
+                canvas.off('mouse:up');
+            }
+        }
+    },[])
+    return (
+        <div>Lines</div>
     )
 }
 

@@ -1,20 +1,28 @@
 /* eslint-disable react/prop-types */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
-import { Default, Elements, FreeDraw, Import, TextBox } from "./components/editor/editor";
+import { Default, Elements, FreeDraw, Import, TextBox, Lines } from "./components/editor/editor";
 import { Cut } from "./components/cut/cut";
-
+import useCanvas from "./context.jsx";
 import { Setup } from "./components/setup/setup";
 import { SideNav } from "./components/sidebar";
 import './App.css';
 
 
 export default function Home() {
+  const { canvas } = useCanvas();
   const [tool, setTool] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
   const [jobSetUp, setJobSetup] = useState([]);
+
+  useEffect(() => {
+    if (canvas) {
+      if (tool === 'Pen') canvas.isDrawingMode = true;
+      return () => canvas.isDrawingMode = false
+    }
+  },[tool])
 
   return (
     <>
@@ -33,7 +41,8 @@ export default function Home() {
             <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
               { tool === 'Select' && <Default /> }
               { tool === 'Elements' && <Elements /> }
-              { tool === 'Pen' && <FreeDraw /> }
+              { tool === 'Pen' && <FreeDraw tool={ tool} /> }
+              { tool === 'Lines' && <Lines /> }
               { tool === 'Textbox' && <TextBox /> }
               { tool === 'Import' && <Import /> }
               { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
