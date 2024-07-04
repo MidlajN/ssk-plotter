@@ -19,7 +19,8 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.cornerStyle = 'circle';
         fabric.Object.prototype.cornerColor = '#7f77eb85';
         fabric.Object.prototype.transparentCorners = false;
-        fabric.Object.prototype.cornerSize = 12;
+        fabric.Object.prototype.cornerSize = 15;
+        fabric.Object.prototype.borderScaleFactor = 3;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
             width: fabric.util.parseUnit('85cm'),

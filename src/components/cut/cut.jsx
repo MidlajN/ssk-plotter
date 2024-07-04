@@ -29,6 +29,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     const [ pause, setPause ] = useState(false);
     const [ index, setIndex ] = useState({jobIndex: 0, arrayIndex: 0});
     const [ isRunning, setIsRunning ] = useState(false);
+    let ws = null;
     const array = [
         // {type: 'thru-cut', gcode: ['G01 X0Y0Z5.25', 'G01 X100Y100', 'G01 X100Y100Z0', 'G01 X100Y200', 'G01 X100Y200Z10.5', 'G01 X200Y200', 'G01 X200Y200Z21', 'G01 X200Y100', 'G01 X200Y100Z31.5', 'G01 X100Y100', 'G01 X100Y100Z25.75', 'G01 X0Y0', 'G01 X0Y0Z0']},
         // {type: 'thru-cut', gcode: ['M10S90', 'M10S140', 'M03S1200', 'M03S1500']},
@@ -64,43 +65,37 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         },
     ];
 
-    const processMsg = async () => {
-        let text = '';
-        if (reader) {
-            const { done, value } = await reader.read();
-            if (done) return;
+    const processMsg = async (msg = null) => {
+        if (ws) {
+            ws.onmessage = (event) => {
+                console.log("EVENT : ", event.data)
+                if (event.data instanceof ArrayBuffer) {
+                    const arrayBuffer = event.data;
+                    const text = `${ msg ? msg + ' -> ': '' }${ new TextDecoder().decode(arrayBuffer) }\n`;
+                    setResponse(prev => ({ ...prev, message: prev.message + text }));
 
-            text += new TextDecoder().decode(value);
-            setResponse(prev => ({ ...prev, message: prev.message + text }));
+                } else {
+                    setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
+                }
+            }
 
-            processMsg();
+            ws.onclose = () => {
+                setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
+            }
         }
     }
 
     const handleConnection = async () => {
         try {
-            const ws = new WebSocket("ws://kochund.local:81", ['arduino']);
+            ws = new WebSocket("ws://kochund.local:81", ['arduino']);
 
             ws.binaryType = 'arraybuffer';
 
             ws.onopen = () => {
-                console.log('Connected :: ')
-                ws.send("dw")
+                setResponse({ visible: true, message: `Socket Connection Successful ... \nSocket URL : ws://kochund.local:81 \n` });
+                processMsg();
             }
 
-            ws.onmessage = (event) => {
-                console.log("EVENT : ", event.data)
-            }
-
-            
-
-            
-            // const newPort = await navigator.serial.requestPort();
-            // await newPort.open({ baudRate: 115200 });
-            // setPort(newPort);
-            // console.log('port', newPort)
-            // setWriter(newPort.writable.getWriter());
-            // setReader(newPort.readable.getReader());
         } catch (err) {
             console.log("Error while connecting", err)
         }
@@ -157,8 +152,8 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
                     }
                 }
             }
-            http.open("GET", "http://localhost:3000/command?commandText=" + encodeURI(gcode) + "&PAGEID=0", true);
-            http.send(gcode);
+            http.open("GET", "http://kochund.local/command?commandText=" + encodeURI(gcode) + "&PAGEID=0", true);
+            http.send();
 
         } catch (err) {
             console.log(err);
@@ -166,9 +161,9 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     }
 
 
-    useEffect(() => {
-        processMsg();
-    }, [reader]);
+    // useEffect(() => {
+    //     processMsg();
+    // }, [reader]);
 
     useEffect(() => {
         if (isRunning && !pause) {
