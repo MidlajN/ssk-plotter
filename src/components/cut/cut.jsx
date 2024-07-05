@@ -13,10 +13,13 @@ import {
     ActivityIcon,
     FileCog,
 } from "lucide-react";
+import useCanvas from "../../context";
+import { Converter } from "svg-to-gcode";
 import './cut.css';
 
 
 export const Cut = ({ jobSetUp, setJobSetup }) => {
+    const { canvas } = useCanvas();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
     const [ port , setPort ] = useState(null);
@@ -127,12 +130,58 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         // }
     }
 
-    const handleJob = () => {
-        if (isRunning) {
-            setIsRunning(false);
-            return;
-        }
-        setIsRunning(true);
+    const handleJob = async () => {
+
+        const svgElements = jobSetUp.map((job) => {
+            const obj = job.objects.toSVG();
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+            svg.innerHTML = obj;
+            const element = {
+                type: job.type,
+                svg: svg.outerHTML
+            }
+
+            return element;
+        })
+
+        let commands = ''
+        const converter = new Converter();
+        console.log('svgElements', svgElements)
+        svgElements.forEach((element) => {
+            converter.convert(element.svg).then((gcode) => {
+                commands = commands + gcode + '\n';
+                // console.log('gcode', gcode)
+                // console.log('commands', commands)
+            })
+        })
+
+        const gcodes = await Promise.all(svgElements.map((element) => converter.convert(element.svg)));
+
+        console.log('gcodes', gcodes.join('\n'));
+        
+        
+        // converter.convert()
+
+        
+
+        // jobSetUp.forEach((job) => {
+        //     console.log('job', job)
+        //     const obj = job.objects.toSVG();
+        //     // console.log('obj', obj)
+        //     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        //     svg.viewBox = `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`;
+        //     svg.innerHTML = obj;
+        //     console.log('svg', svg)
+        // })
+
+
+
+        // if (isRunning) {
+        //     setIsRunning(false);
+        //     return;
+        // }
+        // setIsRunning(true);
     }
 
 
