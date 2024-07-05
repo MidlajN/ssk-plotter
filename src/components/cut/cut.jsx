@@ -65,6 +65,21 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         },
     ];
 
+
+    useEffect(() => {
+        console.log("Setup :: ", jobSetUp);
+    }, [jobSetUp]);
+
+
+
+
+
+
+
+
+
+
+
     const processMsg = async (msg = null) => {
         if (ws) {
             ws.onmessage = (event) => {
@@ -102,13 +117,14 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     }
 
     const closeConnection = async () => {
-        if (port) {
-            await reader.releaseLock();
-            await writer.releaseLock();
-            await port.close();
-            console.log('Port Closed Successfully >>>')
-            setPort(null);
-        }
+        ws.close();
+        // if (port) {
+        //     await reader.releaseLock();
+        //     await writer.releaseLock();
+        //     await port.close();
+        //     console.log('Port Closed Successfully >>>')
+        //     setPort(null);
+        // }
     }
 
     const handleJob = () => {
