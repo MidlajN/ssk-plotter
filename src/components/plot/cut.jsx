@@ -23,8 +23,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
     const [ port , setPort ] = useState(null);
-    const [ writer, setWriter ] = useState(null);
-    const [ reader, setReader ] = useState(null);
     const [ controllers, setControllers ] = useState({x: 0, y: 0});
     const [ response, setResponse ] = useState({ visible: false, message: '' });
 
@@ -119,16 +117,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         }
     }
 
-    const closeConnection = async () => {
-        ws.close();
-        // if (port) {
-        //     await reader.releaseLock();
-        //     await writer.releaseLock();
-        //     await port.close();
-        //     console.log('Port Closed Successfully >>>')
-        //     setPort(null);
-        // }
-    }
 
     const handleJob = async () => {
 
@@ -145,43 +133,11 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
             return element;
         })
 
-        let commands = ''
         const converter = new Converter();
-        console.log('svgElements', svgElements)
-        svgElements.forEach((element) => {
-            converter.convert(element.svg).then((gcode) => {
-                commands = commands + gcode + '\n';
-                // console.log('gcode', gcode)
-                // console.log('commands', commands)
-            })
-        })
-
         const gcodes = await Promise.all(svgElements.map((element) => converter.convert(element.svg)));
 
         console.log('gcodes', gcodes.join('\n'));
         
-        
-        // converter.convert()
-
-        
-
-        // jobSetUp.forEach((job) => {
-        //     console.log('job', job)
-        //     const obj = job.objects.toSVG();
-        //     // console.log('obj', obj)
-        //     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        //     svg.viewBox = `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`;
-        //     svg.innerHTML = obj;
-        //     console.log('svg', svg)
-        // })
-
-
-
-        // if (isRunning) {
-        //     setIsRunning(false);
-        //     return;
-        // }
-        // setIsRunning(true);
     }
 
 
@@ -226,9 +182,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     }
 
 
-    // useEffect(() => {
-    //     processMsg();
-    // }, [reader]);
 
     useEffect(() => {
         if (isRunning && !pause) {
@@ -248,7 +201,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
             <div className="mt-4 h-full bg-[#EBEBEB] cut">
                 <div className="w-full h-[10%] bg-[#1e263f] flex items-end justify-end gap-3 p-3">
-                <FileCog size={20} strokeWidth={2} color={'#ffffff'}  />
+                    <FileCog size={20} strokeWidth={2} color={'#ffffff'}  />
                     <ActivityIcon 
                         size={20} 
                         strokeWidth={2} 
@@ -343,7 +296,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
                             <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[13px] "> Connect</span>
                         </button>
                     ) : (
-                        <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ closeConnection }>
+                        <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ () => ws.close() }>
                             <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                             <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] "> Disconnect</span>
                         </button>

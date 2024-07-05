@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
 import { Default, Elements, FreeDraw, Import, TextBox, Lines } from "./components/editor/editor";
-import { Cut } from "./components/cut/cut";
+import { Cut } from "./components/plot/cut.jsx";
 import useCanvas from "./context.jsx";
-import { Setup } from "./components/setup/setup";
+// import { Setup } from "./components/setup/setup";
 import { SideNav } from "./components/sidebar";
 import './App.css';
 
@@ -70,14 +70,14 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
               setHideSideBar(false);   
             }}
           > Editor </button>
-          <button 
+          {/* <button 
             className={ tool === 'Setup' ? 'active' : ''}
             onClick={() => {
               setTool('Setup');
               setExpanded(true);
               setHideSideBar(true);
             }}
-          > Setup </button>
+          > Setup </button> */}
           <button
             className={ tool === 'Cut' ? 'active' : ''}
             onClick={() => {
@@ -85,7 +85,7 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
               setHideSideBar(true);
               setTool('Cut')
             }}
-          > Cut </button>
+          > Plot </button>
         </div>
       </div>
     </nav>
