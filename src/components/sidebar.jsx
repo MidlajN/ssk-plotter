@@ -52,12 +52,12 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
           setTool={setTool}
           setExpanded={setExpanded}
         />
-        <SidebarItem 
+        {/* <SidebarItem 
           icon={ <CaseSensitiveIcon size={25} strokeWidth={1.5} color={ tool === 'Textbox' ? '#1c8096' : '#4b5563'} /> } 
           text={'Textbox'} 
           setTool={setTool} 
           setExpanded={setExpanded}
-        />
+        /> */}
         <SidebarItem 
           icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
           text={'Import'} 

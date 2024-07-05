@@ -43,7 +43,7 @@ export default function Home() {
               { tool === 'Elements' && <Elements /> }
               { tool === 'Pen' && <FreeDraw tool={ tool} /> }
               { tool === 'Lines' && <Lines /> }
-              { tool === 'Textbox' && <TextBox /> }
+              {/* { tool === 'Textbox' && <TextBox /> } */}
               { tool === 'Import' && <Import /> }
               { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
               { tool === 'Cut' && <Cut jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }

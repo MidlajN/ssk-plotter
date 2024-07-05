@@ -119,25 +119,37 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
 
     const handleJob = async () => {
-
-        const svgElements = jobSetUp.map((job) => {
-            const obj = job.objects.toSVG();
+        const objects = canvas.getObjects();
+        const colorCommand = {
+            "red" : "M01 S255",
+            "green" : "M01 S0",
+            "blue" : "M01 S128",
+            "yellow" : "M01 S255",
+            "orange" : "M01 S128",
+            "purple" : "M01 S0",
+            "black" : "M01 S0",
+            "white" : "M01 S255"
+        }
+        
+        const svgElements = objects.map(obj => {
+            const objSvg = obj.toSVG();
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-            svg.innerHTML = obj;
-            const element = {
-                type: job.type,
+            svg.innerHTML = objSvg;
+            return {
+                color: obj.stroke,
                 svg: svg.outerHTML
             }
-
-            return element;
         })
 
         const converter = new Converter();
-        const gcodes = await Promise.all(svgElements.map((element) => converter.convert(element.svg)));
-
+        const gcodes = await Promise.all(svgElements.map(async (element) => {
+            const [ code ] = await converter.convert(element.svg);
+            const gCodeLines = code.split('\n');
+            const cleanedGcodeLines = gCodeLines.slice(0, -5);
+            return [colorCommand[element.color] + cleanedGcodeLines.join('\n')];
+        }));
         console.log('gcodes', gcodes.join('\n'));
-        
     }
 
 
@@ -201,49 +213,25 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
             <div className="mt-4 h-full bg-[#EBEBEB] cut">
                 <div className="w-full h-[10%] bg-[#1e263f] flex items-end justify-end gap-3 p-3">
-                    <FileCog size={20} strokeWidth={2} color={'#ffffff'}  />
-                    <ActivityIcon 
-                        size={20} 
-                        strokeWidth={2} 
-                        color={'#ffffff'} 
-                        onClick={ () => { setResponse(prev => ({ ...prev, visible: !response.visible })) }} />
+                <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
                 </div>
-                { response.visible ? 
-                    <div className="text-sm responses h-[90%] relative">
-                        <textarea ref={textareaRef} defaultValue={ response.message } ></textarea>
-                        <div className="absolute w-full bottom-0 left-0 p-3">
-                            <input 
-                                ref={ gcodeRef }
-                                className="w-full bg-[#1e263f] p-2 border border-[#ffffff69] outline-none text-sm" 
-                                placeholder="Enter You G-Code here" 
-                                onKeyDown={ (e) => {
-                                    if (e.key === 'Enter') {
-                                        const value = gcodeRef.current.value;
-                                        sendToMachine(value)
-                                        gcodeRef.current.value = '';
-                                    }
-                                }}
-                            />
-                        </div>
+                <div className="text-sm responses h-[90%] relative">
+                    <textarea ref={textareaRef} defaultValue={ response.message } ></textarea>
+                    <div className="absolute w-full bottom-0 left-0 p-3">
+                        <input 
+                            ref={ gcodeRef }
+                            className="w-full bg-[#1e263f] p-2 border border-[#ffffff69] outline-none text-sm" 
+                            placeholder="Enter You G-Code here" 
+                            onKeyDown={ (e) => {
+                                if (e.key === 'Enter') {
+                                    const value = gcodeRef.current.value;
+                                    sendToMachine(value)
+                                    gcodeRef.current.value = '';
+                                }
+                            }}
+                        />
                     </div>
-                 : 
-                    jobSetUp.map((item, index) => {
-                        return (
-                            <div key={index} className={ `flex justify-between items-end py-1 px-3 border-b border-b-[#1c274c28] hover:bg-[#d6d6d6ab] ${ item.selected ? ' opacity-100' : 'opacity-50'}` } >
-                                <p className="font-['MarryWeatherSansRegular'] text-[13px]">{ item.name }</p>
-                                <div className="flex gap-3 py-1">
-                                    <Trash2 
-                                        size={15} 
-                                        strokeWidth={2} 
-                                        onClick={ () => setJobSetup(jobSetUp.filter((item, i) => i !== index)) }
-                                        cursor={'pointer'}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    })
-                }
-                
+                </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-5">
                 <div className="flex flex-col items-center justify-center gap-3 pb-10">
