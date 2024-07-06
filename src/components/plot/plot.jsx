@@ -27,24 +27,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     const [ response, setResponse ] = useState({ visible: false, message: '' });
     const [ ws, setWs ] = useState(null);
 
-    useEffect(() => {
-        if (ws) {
-            ws.onmessage = (event) => {
-                if (event.data instanceof ArrayBuffer) {
-                    const arrayBuffer = event.data;
-                    const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
-                    setResponse(prev => ({ ...prev, message: prev.message + text }));
-
-                } else {
-                    setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
-                }
-            }
-
-            ws.onclose = () => {
-                setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
-            }
-        }
-    }, [ws])
 
     const processMsg = async (msg = null) => {
         // if (ws) {
@@ -79,6 +61,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
             }
 
         } catch (err) {
+            setWs(null);
             console.log("Error while connecting", err)
         }
     }
@@ -86,7 +69,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
     const handleJob = async () => {
         const objects = canvas.getObjects();
-        // Todo : Change to Hex Code
         const colorCommand = {
             "#ff0000" : "M01 S255",
             "#00ff00" : "M01 S0",
@@ -134,13 +116,33 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
                     }
                 }
             }
-            http.open("GET", "http://kochund.local/command?commandText=" + encodeURI(gcode) + "&PAGEID=0", true);
+            http.open("GET", "http://kochund.local/command?commandText=" + encodeURI(gcode), true);
             http.send();
 
         } catch (err) {
             console.log(err);
         }
     }
+
+    useEffect(() => {
+        if (ws) {
+            ws.onmessage = (event) => {
+                if (event.data instanceof ArrayBuffer) {
+                    const arrayBuffer = event.data;
+                    const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
+                    setResponse(prev => ({ ...prev, message: prev.message + text }));
+
+                } else {
+                    setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
+                }
+            }
+
+            ws.onclose = () => {
+                setWs(null);
+                setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
+            }
+        }
+    }, [ws])
 
     useEffect(() => {
         canvas.selection = false;

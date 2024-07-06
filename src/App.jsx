@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
 import { Default, Elements, FreeDraw, Import, TextBox, Lines } from "./components/editor/editor";
-import { Cut } from "./components/plot/cut.jsx";
+import { Cut } from "./components/plot/plot.jsx";
 import useCanvas from "./context.jsx";
 // import { Setup } from "./components/setup/setup";
 import { SideNav } from "./components/sidebar";
@@ -42,7 +42,7 @@ export default function Home() {
               { tool === 'Select' && <Default /> }
               { tool === 'Elements' && <Elements /> }
               { tool === 'Pen' && <FreeDraw tool={ tool} /> }
-              { tool === 'Lines' && <Lines /> }
+              { tool === 'Lines' && <Lines /> }``
               {/* { tool === 'Textbox' && <TextBox /> } */}
               { tool === 'Import' && <Import /> }
               { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
