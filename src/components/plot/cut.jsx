@@ -25,15 +25,14 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     const gcodeRef = useRef(null)
     const [ controllers, setControllers ] = useState({x: 0, y: 0});
     const [ response, setResponse ] = useState({ visible: false, message: '' });
-    let ws = null;
+    const [ ws, setWs ] = useState(null);
 
-    const processMsg = async (msg = null) => {
+    useEffect(() => {
         if (ws) {
             ws.onmessage = (event) => {
-                console.log("EVENT : ", event.data)
                 if (event.data instanceof ArrayBuffer) {
                     const arrayBuffer = event.data;
-                    const text = `${ msg ? msg + ' -> ': '' }${ new TextDecoder().decode(arrayBuffer) }\n`;
+                    const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
                     setResponse(prev => ({ ...prev, message: prev.message + text }));
 
                 } else {
@@ -45,16 +44,37 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
                 setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
             }
         }
+    }, [ws])
+
+    const processMsg = async (msg = null) => {
+        // if (ws) {
+        //     ws.onmessage = (event) => {
+        //         console.log("EVENT : ", event.data)
+        //         if (event.data instanceof ArrayBuffer) {
+        //             const arrayBuffer = event.data;
+        //             const text = `${ msg ? msg + ' -> ': '' }${ new TextDecoder().decode(arrayBuffer) }\n`;
+        //             setResponse(prev => ({ ...prev, message: prev.message + text }));
+
+        //         } else {
+        //             setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
+        //         }
+        //     }
+
+        //     ws.onclose = () => {
+        //         setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
+        //     }
+        // }
     }
 
     const handleConnection = async () => {
         try {
-            ws = new WebSocket("ws://kochund.local:81", ['arduino']);
+            const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
 
-            ws.binaryType = 'arraybuffer';
+            socket.binaryType = 'arraybuffer';
 
-            ws.onopen = () => {
+            socket.onopen = () => {
                 setResponse({ visible: true, message: `Socket Connection Successful ... \nSocket URL : ws://kochund.local:81 \n` });
+                setWs(socket);
                 processMsg();
             }
 
@@ -68,14 +88,14 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         const objects = canvas.getObjects();
         // Todo : Change to Hex Code
         const colorCommand = {
-            "red" : "M01 S255",
-            "green" : "M01 S0",
-            "blue" : "M01 S128",
-            "yellow" : "M01 S255",
-            "orange" : "M01 S128",
-            "purple" : "M01 S0",
-            "black" : "M01 S0",
-            "white" : "M01 S255",
+            "#ff0000" : "M01 S255",
+            "#00ff00" : "M01 S0",
+            "#ffff00" : "M01 S128",
+            "#0000ff" : "M01 S255",
+            "#00ffff" : "M01 S128",
+            "#ffffff" : "M01 S0",
+            "#000000" : "M01 S0",
+            "#808080" : "M01 S255",
         }
         
         const svgElements = objects.map(obj => {
@@ -104,6 +124,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
     const sendToMachine = async (gcode) => {
         try {
+
             const http = new XMLHttpRequest();
             http.onreadystatechange = () => {
                 if (http.readyState === 4) {
@@ -121,6 +142,15 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         }
     }
 
+    useEffect(() => {
+        canvas.selection = false;
+        canvas.getObjects().forEach((obj) => {
+            obj.set({
+                selectable: false
+            })
+        })
+        canvas.requestRenderAll();
+    }, []);
 
      // Scroll the textarea to the bottom when it overflows
     useEffect(() => {
