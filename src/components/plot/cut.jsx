@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import useCanvas from "../../context";
 import { Converter } from "svg-to-gcode";
+import tinycolor from "tinycolor2";
 import './cut.css';
 
 
@@ -22,64 +23,9 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     const { canvas } = useCanvas();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
-    const [ port , setPort ] = useState(null);
     const [ controllers, setControllers ] = useState({x: 0, y: 0});
     const [ response, setResponse ] = useState({ visible: false, message: '' });
-
-
-    const [ pause, setPause ] = useState(false);
-    const [ index, setIndex ] = useState({jobIndex: 0, arrayIndex: 0});
-    const [ isRunning, setIsRunning ] = useState(false);
     let ws = null;
-    const array = [
-        // {type: 'thru-cut', gcode: ['G01 X0Y0Z5.25', 'G01 X100Y100', 'G01 X100Y100Z0', 'G01 X100Y200', 'G01 X100Y200Z10.5', 'G01 X200Y200', 'G01 X200Y200Z21', 'G01 X200Y100', 'G01 X200Y100Z31.5', 'G01 X100Y100', 'G01 X100Y100Z25.75', 'G01 X0Y0', 'G01 X0Y0Z0']},
-        // {type: 'thru-cut', gcode: ['M10S90', 'M10S140', 'M03S1200', 'M03S1500']},
-        {
-            type: 'thru-cut', 
-            gcode: [
-                'G28',
-                'G00 X300Y20Z0', 
-                'M10S90', 
-                'G00 X300Y20Z25.5', 
-                'M10S140', 
-                'G00 X300Y20Z0', 
-                'G00 X221Y14Z0', 
-                'G00 X221Y14Z15', 
-                'G00 X221Y14Z0',
-                'G00 X43Y51Z0',
-                'M03 S1800',
-                'G00 X43Y51Z20',
-                'G01 X126Y51Z20F2000',
-                'G01 X126Y134Z20F2000',
-                'G01 X43Y134Z20F2000', 
-                'G01 X43Y51Z20F2000',
-                'G00 X43Y51Z0',
-                'M05',
-                // 'G28',
-                'G00 X330Y19.5Z0', 
-                'G00 X330Y19.5Z25.5',
-                'M10S90', 
-                'G00 X330Y19.5Z0', 
-                'M10S140', 
-                'G00 X0Y0Z0'
-            ]
-        },
-    ];
-
-
-    useEffect(() => {
-        console.log("Setup :: ", jobSetUp);
-    }, [jobSetUp]);
-
-
-
-
-
-
-
-
-
-
 
     const processMsg = async (msg = null) => {
         if (ws) {
@@ -120,6 +66,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
 
     const handleJob = async () => {
         const objects = canvas.getObjects();
+        // Todo : Change to Hex Code
         const colorCommand = {
             "red" : "M01 S255",
             "green" : "M01 S0",
@@ -128,7 +75,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
             "orange" : "M01 S128",
             "purple" : "M01 S0",
             "black" : "M01 S0",
-            "white" : "M01 S255"
+            "white" : "M01 S255",
         }
         
         const svgElements = objects.map(obj => {
@@ -136,8 +83,10 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
             svg.innerHTML = objSvg;
+            const color = tinycolor(obj.stroke)
+
             return {
-                color: obj.stroke,
+                color: color.toHexString(),
                 svg: svg.outerHTML
             }
         })
@@ -152,27 +101,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         console.log('gcodes', gcodes.join('\n'));
     }
 
-
-    const sendGCode = () => {
-        const current = index.arrayIndex;
-        if (!pause) {
-            setTimeout(() => {
-                console.log('current',array[index.jobIndex], current, index)
-                if ( current == array[index.jobIndex]['gcode'].length) {
-                    if ( index.jobIndex === array.length - 1) {
-                        setIsRunning(false);
-                        setIndex({jobIndex: 0, arrayIndex: 0});
-                    } else {
-                        setIndex({jobIndex: index.jobIndex + 1, arrayIndex: 0});
-                    }
-                } else {
-                    sendToMachine(array[index.jobIndex]['gcode'][current])
-                    setIndex({jobIndex: index.jobIndex, arrayIndex: current + 1});
-                }
-                console.log('array \n index: ', index)
-            }, 1000);
-        }
-    }
 
     const sendToMachine = async (gcode) => {
         try {
@@ -193,13 +121,6 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
         }
     }
 
-
-
-    useEffect(() => {
-        if (isRunning && !pause) {
-            sendGCode()
-        }
-    },[isRunning, pause, index])
 
      // Scroll the textarea to the bottom when it overflows
     useEffect(() => {
@@ -278,7 +199,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
                 </div>
 
                 <div className="flex w-full items-end justify-between">
-                    { !port ? (
+                    { !ws ? (
                         <button className="flex items-center justify-center gap-1 bg-[#0c4653] py-1 px-8 rounded-full" onClick={ handleConnection }>
                             <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                             <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[13px] "> Connect</span>
@@ -290,25 +211,20 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
                         </button>
                     )}
                     <p className="flex items-center gap-1">
-                        <Dot size={20} strokeWidth={4} className={!port ? 'text-[#d41d1d]' : 'text-[#2c944f]'} /> 
-                        <span className={`text-[12px] ${!port ? 'text-[#d41d1d]' : 'text-[#2c944f]'}`}>{ port ? 'Device Connected' : 'No Device Connected'}</span>
+                        <Dot size={20} strokeWidth={4} className={!ws ? 'text-[#d41d1d]' : 'text-[#2c944f]'} /> 
+                        <span className={`text-[12px] ${!ws ? 'text-[#d41d1d]' : 'text-[#2c944f]'}`}>{ ws ? 'Device Connected' : 'No Device Connected'}</span>
                     </p>
                 </div>
 
                 <div className="flex justify-between w-full">
-                    <button className="flex items-center justify-center gap-1 bg-[#027200] py-1 px-5 rounded text-nowrap"  onClick={ handleJob }>
+                    <button className="flex items-center justify-center gap-1 bg-[#027200] py-1 px-5 rounded text-nowrap" onClick={handleJob}>
                         <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[12px] tracking-wide"> Start Job</span>
                     </button>
-                    <button className="flex items-center justify-center gap-1 bg-[#1C274C] py-1 px-5 rounded" onClick={ () => { setPause(!pause) }}>
+                    <button className="flex items-center justify-center gap-1 bg-[#1C274C] py-1 px-5 rounded">
                         <Pause size={18} strokeWidth={2} fill="#FFFFFF" color="#FFFFFF" /> 
                         <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] tracking-wide"> Pause</span>
                     </button>
-                    <button 
-                        className="flex items-center justify-center gap-1 bg-[#BE0A0A] py-1 px-5 rounded-full"  
-                        onClick={ () => {
-                            setIsRunning(false);
-                            setIndex({jobIndex: 0, arrayIndex: 0});
-                        }}>
+                    <button className="flex items-center justify-center gap-1 bg-[#BE0A0A] py-1 px-5 rounded-full" >
                         <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                         <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] tracking-wide"> Stop</span>
                     </button>
