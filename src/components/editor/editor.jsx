@@ -6,9 +6,8 @@ import './editor.css';
 
 
 
-export function Default() {
+export function Default({ strokeColor, setStrokeColor }) {
     const { canvas } = useCanvas();
-    const [strokeColor, setStrokeColor] = useState('black');
 
     const handleColor = (e) => {
         const activeObject = canvas.getActiveObjects();
@@ -29,6 +28,7 @@ export function Default() {
                     const color = activeObject[0].get('stroke');
                     setStrokeColor(color);
                 } else {
+                    if (canvas.isDrawingMode === true) return;
                     setStrokeColor('black');
                 }
             })

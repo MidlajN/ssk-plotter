@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
 import { Default, Elements, FreeDraw, Import, TextBox } from "./components/editor/editor";
-import { Cut } from "./components/plot/plot.jsx";
+import { Plot } from "./components/plot/plot.jsx";
 import useCanvas from "./context.jsx";
 // import { Setup } from "./components/setup/setup";
 import { SideNav } from "./components/sidebar";
@@ -16,11 +16,20 @@ export default function Home() {
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
   const [jobSetUp, setJobSetup] = useState([]);
+  const [strokeColor, setStrokeColor] = useState('black');
 
   useEffect(() => {
     if (canvas) {
       if (tool === 'Pen') {
         canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = strokeColor;
+        canvas.freeDrawingBrush.width = 3;
+        // canvas.freeDrawingBrush.shadow = new fabric.Shadow({
+        //     color: 'black',
+        //     blur: 5,
+        //     offsetX: 5,
+        //     offsetY: 5
+        // });
         return () => canvas.isDrawingMode = false
       }
 
@@ -31,11 +40,9 @@ export default function Home() {
         canvas.selection = false;
         canvas.hoverCursor = 'auto';
         canvas.getObjects().forEach(obj => {
-          // if (obj.id === 'added-line') {
-            obj.set({
-              selectable: false
-            })
-          // }
+          obj.set({
+            selectable: false
+          })
         })
         canvas.on('mouse:down', (event) => {
             let pointer = canvas.getPointer(event.e)
@@ -45,7 +52,7 @@ export default function Home() {
               line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
                 id: 'added-line',
                 strokeWidth: 3,
-                stroke: 'red',
+                stroke: strokeColor,
                 selectable: false
               })
               canvas.add(line)
@@ -72,11 +79,9 @@ export default function Home() {
           canvas.hoverCursor = 'all-scroll';
 
           canvas.getObjects().forEach(obj => {
-              // if (obj.id === 'added-line') {
-                  obj.set({
-                      selectable: true
-                  })
-              // }
+            obj.set({
+              selectable: true
+            })
           })
 
           canvas.off('mouse:down');
@@ -85,7 +90,7 @@ export default function Home() {
         }
       }
     }
-  },[tool])
+  },[tool, strokeColor])
 
   return (
     <>
@@ -102,14 +107,14 @@ export default function Home() {
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
             <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
-              { tool === 'Select' && <Default /> }
+              { tool === 'Select' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> }
               { tool === 'Elements' && <Elements /> }
-              { tool === 'Pen' && <Default /> }
-              { tool === 'Lines' && <Default /> }
+              { tool === 'Pen' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> }
+              { tool === 'Lines' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> }
               {/* { tool === 'Textbox' && <TextBox /> } */}
               { tool === 'Import' && <Import /> }
               { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
-              { tool === 'Cut' && <Cut jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
+              { tool === 'Plot' && <Plot jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
             </div>
           </Container>
         </div>
@@ -126,7 +131,7 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
         <h3 className="py-5 text-3xl">Kochun<span className="text-4xl">D</span></h3>
         <div className="buttonGroup px-[0.3rem] flex gap-4 items-center justify-around">
           <button 
-            className={ tool !== 'Setup' && tool !== 'Cut' ? 'active' : ''}
+            className={ tool !== 'Setup' && tool !== 'Plot' ? 'active' : ''}
             onClick={() => {
               setTool('Select');
               setExpanded(true);
@@ -142,11 +147,11 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
             }}
           > Setup </button> */}
           <button
-            className={ tool === 'Cut' ? 'active' : ''}
+            className={ tool === 'Plot' ? 'active' : ''}
             onClick={() => {
               setExpanded(true);
               setHideSideBar(true);
-              setTool('Cut')
+              setTool('Plot')
             }}
           > Plot </button>
         </div>

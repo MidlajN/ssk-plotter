@@ -19,7 +19,7 @@ import tinycolor from "tinycolor2";
 import './cut.css';
 
 
-export const Cut = ({ jobSetUp, setJobSetup }) => {
+export const Plot = ({ jobSetUp, setJobSetup }) => {
     const { canvas } = useCanvas();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
@@ -70,14 +70,14 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
     const handleJob = async () => {
         const objects = canvas.getObjects();
         const colorCommand = {
-            "#ff0000" : "M01 S255",
-            "#00ff00" : "M01 S0",
-            "#ffff00" : "M01 S128",
-            "#0000ff" : "M01 S255",
-            "#00ffff" : "M01 S128",
-            "#ffffff" : "M01 S0",
-            "#000000" : "M01 S0",
-            "#808080" : "M01 S255",
+            "#ff0000" : "M01 S255", // Red
+            "#0000ff" : "M01 S430", // Blue
+            "#008000" : "M01 S128", // Green
+            "#ffff00" : "M01 S255", // Yellow
+            "#ffa500" : "M01 S128", // Orange
+            "#800080" : "M01 S120", // Purple
+            "#000000" : "M01 S000", // Black
+            "#ffc0cb" : "M01 S255", // Pink
         }
         
         const svgElements = objects.map(obj => {
@@ -86,6 +86,7 @@ export const Cut = ({ jobSetUp, setJobSetup }) => {
             svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
             svg.innerHTML = objSvg;
             const color = tinycolor(obj.stroke)
+            console.log('COLOR : ' + color + ' -> ' + color.toHexString());
 
             return {
                 color: color.toHexString(),
