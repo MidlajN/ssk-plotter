@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
-import { Default, Elements, FreeDraw, Import, TextBox, Lines } from "./components/editor/editor";
+import { Default, Elements, FreeDraw, Import, TextBox } from "./components/editor/editor";
 import { Cut } from "./components/plot/plot.jsx";
 import useCanvas from "./context.jsx";
 // import { Setup } from "./components/setup/setup";
@@ -19,8 +19,71 @@ export default function Home() {
 
   useEffect(() => {
     if (canvas) {
-      if (tool === 'Pen') canvas.isDrawingMode = true;
-      return () => canvas.isDrawingMode = false
+      if (tool === 'Pen') {
+        canvas.isDrawingMode = true;
+        return () => canvas.isDrawingMode = false
+      }
+
+      if (tool === 'Lines') {
+        let line;
+        let mouseDown = false;
+
+        canvas.selection = false;
+        canvas.hoverCursor = 'auto';
+        canvas.getObjects().forEach(obj => {
+          // if (obj.id === 'added-line') {
+            obj.set({
+              selectable: false
+            })
+          // }
+        })
+        canvas.on('mouse:down', (event) => {
+            let pointer = canvas.getPointer(event.e)
+
+            if (!mouseDown) {
+              mouseDown = true
+              line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+                id: 'added-line',
+                strokeWidth: 3,
+                stroke: 'red',
+                selectable: false
+              })
+              canvas.add(line)
+              canvas.requestRenderAll()
+            }
+        })
+        canvas.on('mouse:move', (event) => {
+          if (mouseDown) {
+            let pointer = canvas.getPointer(event.e)
+            line.set({ 
+              x2: pointer.x, 
+              y2: pointer.y 
+            })
+            canvas.requestRenderAll()
+          }
+        })
+        canvas.on('mouse:up', (e) => {
+          line.setCoords()
+          mouseDown = false;
+        })
+
+        return () => {
+          canvas.selection = true;
+          canvas.hoverCursor = 'all-scroll';
+
+          canvas.getObjects().forEach(obj => {
+              // if (obj.id === 'added-line') {
+                  obj.set({
+                      selectable: true
+                  })
+              // }
+          })
+
+          canvas.off('mouse:down');
+          canvas.off('mouse:move');
+          canvas.off('mouse:up');
+        }
+      }
     }
   },[tool])
 
@@ -41,8 +104,8 @@ export default function Home() {
             <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
               { tool === 'Select' && <Default /> }
               { tool === 'Elements' && <Elements /> }
-              { tool === 'Pen' && <FreeDraw tool={ tool} /> }
-              { tool === 'Lines' && <Lines /> }``
+              { tool === 'Pen' && <Default /> }
+              { tool === 'Lines' && <Default /> }
               {/* { tool === 'Textbox' && <TextBox /> } */}
               { tool === 'Import' && <Import /> }
               { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }

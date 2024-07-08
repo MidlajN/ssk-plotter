@@ -1,14 +1,65 @@
 /* eslint-disable no-undef */
+import { useEffect, useState } from "react";
 import { CloudUpload } from "lucide-react";
 import useCanvas from "../../context";
 import './editor.css';
-import { useEffect } from "react";
 
 
 
 export function Default() {
+    const { canvas } = useCanvas();
+    const [strokeColor, setStrokeColor] = useState('black');
+
+    const handleColor = (e) => {
+        const activeObject = canvas.getActiveObjects();
+        if (activeObject) {
+            activeObject.forEach(obj => {
+                obj.set('stroke', e.target.value);
+            })
+            canvas.renderAll();
+        }
+        setStrokeColor(e.target.value);
+    }
+
+    useEffect(() => {
+        if (canvas) {
+            canvas.on('mouse:down', () => {
+                const activeObject = canvas.getActiveObjects();
+                if (activeObject.length > 0) {
+                    const color = activeObject[0].get('stroke');
+                    setStrokeColor(color);
+                } else {
+                    setStrokeColor('black');
+                }
+            })
+        }
+    }, [canvas])
     return (
-        <div>Default</div>
+        <>
+            <div>
+                <div className="border-b-2 border-[#1c274c1c] py-1 mb-4">
+                    <h1>Settings</h1>
+                </div>
+
+                <div className="py-4 flex justify-between">
+                    <p>Pen</p>
+                    <div className="flex ">
+                        <div className="w-7 h-full rounded-s-md" style={{ backgroundColor: strokeColor }}></div>
+                        <select name="color" id="color" className="h-full px-2 rounded-e-md" onChange={handleColor} value={strokeColor}>
+                            <option value="black">Black</option>
+                            <option value="red">Red</option>
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="yellow">Yellow</option>
+                            <option value="orange">Orange</option>
+                            <option value="purple">Purple</option>
+                            <option value="pink">Pink</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </>
     )
 }
 
@@ -27,74 +78,74 @@ export function FreeDraw({ tool }) {
     )
 }
 
-export function Lines() {
-    const { canvas } = useCanvas();
+// export function Lines() {
+//     const { canvas } = useCanvas();
 
-    useEffect(() => {
-        let line;
-        let mouseDown = false;
-        if (canvas) {
-            canvas.selection = false;
-            canvas.hoverCursor = 'auto';
-            canvas.getObjects().forEach(obj => {
-                // if (obj.id === 'added-line') {
-                    obj.set({
-                        selectable: false
-                    })
-                // }
-            })
-            canvas.on('mouse:down', (event) => {
-                let pointer = canvas.getPointer(event.e)
+//     useEffect(() => {
+//         let line;
+//         let mouseDown = false;
+//         if (canvas) {
+//             canvas.selection = false;
+//             canvas.hoverCursor = 'auto';
+//             canvas.getObjects().forEach(obj => {
+//                 // if (obj.id === 'added-line') {
+//                     obj.set({
+//                         selectable: false
+//                     })
+//                 // }
+//             })
+//             canvas.on('mouse:down', (event) => {
+//                 let pointer = canvas.getPointer(event.e)
 
-                if (!mouseDown) {
-                    mouseDown = true
-                    line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
-                        id: 'added-line',
-                        strokeWidth: 3,
-                        stroke: 'red',
-                        selectable: false
-                    })
-                    canvas.add(line)
-                    canvas.requestRenderAll()
-                }
-            })
-            canvas.on('mouse:move', (event) => {
-                if (mouseDown) {
-                    let pointer = canvas.getPointer(event.e)
-                    line.set({ 
-                        x2: pointer.x, 
-                        y2: pointer.y 
-                    })
-                    canvas.requestRenderAll()
-                }
-            })
-            canvas.on('mouse:up', (e) => {
-                line.setCoords()
-                mouseDown = false;
-            })
+//                 if (!mouseDown) {
+//                     mouseDown = true
+//                     line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+//                         id: 'added-line',
+//                         strokeWidth: 3,
+//                         stroke: 'red',
+//                         selectable: false
+//                     })
+//                     canvas.add(line)
+//                     canvas.requestRenderAll()
+//                 }
+//             })
+//             canvas.on('mouse:move', (event) => {
+//                 if (mouseDown) {
+//                     let pointer = canvas.getPointer(event.e)
+//                     line.set({ 
+//                         x2: pointer.x, 
+//                         y2: pointer.y 
+//                     })
+//                     canvas.requestRenderAll()
+//                 }
+//             })
+//             canvas.on('mouse:up', (e) => {
+//                 line.setCoords()
+//                 mouseDown = false;
+//             })
 
-            return () => {
-                canvas.selection = true;
-                canvas.hoverCursor = 'all-scroll';
+//             return () => {
+//                 canvas.selection = true;
+//                 canvas.hoverCursor = 'all-scroll';
 
-                canvas.getObjects().forEach(obj => {
-                    // if (obj.id === 'added-line') {
-                        obj.set({
-                            selectable: true
-                        })
-                    // }
-                })
+//                 canvas.getObjects().forEach(obj => {
+//                     // if (obj.id === 'added-line') {
+//                         obj.set({
+//                             selectable: true
+//                         })
+//                     // }
+//                 })
 
-                canvas.off('mouse:down');
-                canvas.off('mouse:move');
-                canvas.off('mouse:up');
-            }
-        }
-    },[])
-    return (
-        <div>Lines</div>
-    )
-}
+//                 canvas.off('mouse:down');
+//                 canvas.off('mouse:move');
+//                 canvas.off('mouse:up');
+//             }
+//         }
+//     },[])
+//     return (
+//         <div>Lines</div>
+//     )
+// }
 
 export function TextBox() {
     return (
@@ -111,8 +162,16 @@ export function Import() {
         reader.onload = (e) => {
             const svg = e.target.result;
             fabric.loadSVGFromString(svg, (objects, options) => {
+                objects.forEach(object => {
+                    object.set({
+                        stroke: 'black',
+                        strokeWidth: 1,
+                        fill: 'transparent'
+                    })
+                })
                 const svgObj = fabric.util.groupSVGElements(objects, options);
-                svgObj.set({ selectable: true, hasControls: true });
+                svgObj.set({ selectable: true, hasControls: true, });
+                console.log("RUN RUN RUN",objects, options, svgObj)
                 canvas.add(svgObj);
                 canvas.renderAll();
             })

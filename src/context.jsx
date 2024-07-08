@@ -21,7 +21,7 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.transparentCorners = false;
         fabric.Object.prototype.cornerSize = 15;
         fabric.Object.prototype.borderScaleFactor = 3;
-        fabric.Object.prototype.noScaleCache = false;
+        fabric.Object.prototype.noScaleCache = true;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
             width: fabric.util.parseUnit('85cm'),

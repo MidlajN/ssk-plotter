@@ -8,21 +8,25 @@
  */
 export const handleFile = (file, canvas) => {
     if (file.type !== 'image/svg+xml') return;
-
+  
     const reader = new FileReader();
     reader.onload = (e) => {
-        const svg = e.target.result;
-
-        fabric.loadSVGFromString(svg, (objects, options) => {
-            const obj = fabric.util.groupSVGElements(objects, options);
-            obj.set({ selectable: true, hasControls: true });
-            canvas.add(obj);
-            canvas.renderAll();
-        })
-    }
+      const svg = e.target.result;
+  
+      fabric.loadSVGFromString(svg, (objects, options) => {
+        const obj = fabric.util.groupSVGElements(objects, options);
+        console.log("RUN RUN RUN",objects, options, obj)
+  
+        // Set styles after object is loaded
+        obj.set({ selectable: true, hasControls: true, strokeWidth: 1, stroke: '#fff', fill: '#fff' });
+  
+        canvas.add(obj);
+        canvas.renderAll();
+      });
+    };
     reader.readAsText(file);
-}
-
+  };
+  
 
 /**
  * Splits the active object into individual paths and creates separate fabric paths for each.

@@ -11,6 +11,7 @@
     align-items: center;
     flex-wrap: wrap;
     height: 100%;
+    /* background: radial-gradient(#878787 0%, transparent 0%) 0% 0% / 0em 0em, repeating-linear-gradient(0deg, transparent 0%, #F9F9FF 7%, #F9F9FF 9%, transparent 10%) 0% 0% / 3em 3em, linear-gradient(45deg, transparent 49%, #ffffff 49%, #878787 51%, transparent 51%) 0% 0% / 3em 3em, linear-gradient(-45deg, transparent 49%, #ffffff 49%, #919191 51%, transparent 51%) 0% 0% / 3em 3em #ffffff; */
 }
 .canvas-section .canvas button {
     position: absolute;
