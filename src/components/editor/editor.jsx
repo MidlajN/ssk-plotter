@@ -64,6 +64,69 @@ export function Default({ strokeColor, setStrokeColor }) {
 }
 
 export function Elements() {
+    const { canvas } = useCanvas();
+
+    useEffect(() => {
+        let circle;
+        let mouseDown = false;
+        let initialPointer;
+        if (canvas) {
+            canvas.selection = false;
+            canvas.hoverCursor = 'auto';
+            canvas.getObjects().forEach(obj => {
+                obj.set({
+                    selectable: false
+                })
+            })
+
+            canvas.on('mouse:down', (event) => {
+                mouseDown = true;
+                initialPointer = canvas.getPointer(event.e);
+
+                circle = new fabric.Circle({
+                    radius: 10,
+                    stroke: 'black',
+                    strokeWidth: 3,
+                    fill: 'transparent',
+                    left: initialPointer.x,
+                    top: initialPointer.y,
+                    originX: 'center',
+                    originY: 'center',
+                    selectable: false
+                });
+                canvas.add(circle);
+            })
+
+            canvas.on('mouse:move', (event) => {
+                if (mouseDown) {
+                    const pointer = canvas.getPointer(event.e);
+                    const radius = Math.sqrt(Math.pow(pointer.x - initialPointer.x, 2) + Math.pow(pointer.y - initialPointer.y, 2));
+                    circle.set({ radius: radius });
+                    canvas.renderAll();
+                }
+            })
+
+            canvas.on('mouse:up', (event) => {
+                circle.setCoords();
+                mouseDown = false;
+            })
+
+            return () => {
+                canvas.selection = true;
+                canvas.hoverCursor = 'all-scroll';
+                canvas.getObjects().forEach(obj => {
+                    obj.set({
+                        selectable: true
+                    })
+                })
+
+                canvas.off('mouse:down');
+                canvas.off('mouse:move');
+                canvas.off('mouse:up');
+                canvas.renderAll();
+            }
+        }
+    }, [canvas])
     return (
         <div>Elements</div>
     )

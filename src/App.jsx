@@ -128,7 +128,7 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
   return (
     <nav className="navbar h-[9%]">
       <div className="px-8 lg:px-16 w-full h-full flex justify-between items-center navDiv">
-        <h3 className="py-5 text-3xl">Kochun<span className="text-4xl">D</span></h3>
+        <h3 className="py-5 text-3xl">Tinker<span className="text-4xl">Plot</span></h3>
         <div className="buttonGroup px-[0.3rem] flex gap-4 items-center justify-around">
           <button 
             className={ tool !== 'Setup' && tool !== 'Plot' ? 'active' : ''}
@@ -138,14 +138,6 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
               setHideSideBar(false);   
             }}
           > Editor </button>
-          {/* <button 
-            className={ tool === 'Setup' ? 'active' : ''}
-            onClick={() => {
-              setTool('Setup');
-              setExpanded(true);
-              setHideSideBar(true);
-            }}
-          > Setup </button> */}
           <button
             className={ tool === 'Plot' ? 'active' : ''}
             onClick={() => {
