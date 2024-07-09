@@ -1,23 +1,26 @@
-const prebuiltComponents = {
+import { fabric } from "fabric";
+
+export const prebuiltComponents = {
     rectangle: new fabric.Rect({
-        width: 50,
-        height: 50,
-        fill: 'red',
+        width: 0,
+        height: 0,
+        fill: 'transparent',
         stroke: 'black',
-        strokeWidth: 2,
+        strokeWidth: 3,
     }),
     circle: new fabric.Circle({
-        radius: 25,
-        fill: 'green',
+        radius: 10,
+        fill: 'transparent',
         stroke: 'black',
-        strokeWidth: 2,
+        strokeWidth:3,
     }),
     triangle: new fabric.Triangle({
         width: 50,
         height: 50,
-        fill: 'blue',
+        fill: 'transparent',
         stroke: 'black',
-        strokeWidth: 2,
+        strokeWidth: 3,
     }),
 };
   
+
