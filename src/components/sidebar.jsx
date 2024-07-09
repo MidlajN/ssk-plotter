@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import useCanvas from "../context";
-import { Boxes, CaseSensitiveIcon, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool, Spline } from "lucide-react";
+import { Boxes, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
 import { split, group, info } from "../components/editor/functions";
 
 export const SideNav = ({ tool, setTool, setExpanded }) => {

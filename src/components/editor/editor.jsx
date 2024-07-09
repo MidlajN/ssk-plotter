@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
-import { CloudUpload } from "lucide-react";
+import { CloudUpload, Square, Circle, Triangle, Hexagon, Bolt, ArrowBigRight, Star, Octagon, Shell, Cross, Smile, Flame } from "lucide-react";
 import useCanvas from "../../context";
 import './editor.css';
 
@@ -128,7 +128,50 @@ export function Elements() {
         }
     }, [canvas])
     return (
-        <div>Elements</div>
+        <>
+            <div className="py-1 mb-4">
+                <h1>Shapes</h1>
+            </div>
+
+            <div className="grid grid-cols-3 gap-[1px] w-full overflow-hidden rounded-md">
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Square width={20} height={20} />
+                </div>  
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Circle width={20} height={20}/>
+                </div>  
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Triangle width={20} height={20} />
+                </div>  
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Hexagon width={20} height={20} />
+                </div>
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Bolt width={20} height={20} />
+                </div>
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <ArrowBigRight width={20} height={20} />
+                </div>  
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Star width={20} height={20} />
+                </div>  
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Octagon width={20} height={20} />
+                </div>  
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Shell width={20} height={20} />
+                </div>
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Cross width={20} height={20} />
+                </div>
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Smile width={20} height={20} />
+                </div>
+                <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer py-6 px-6 flex justify-center items-center">
+                    <Flame width={20} height={20} />
+                </div>
+            </div>
+        </>
     )
 }
 
