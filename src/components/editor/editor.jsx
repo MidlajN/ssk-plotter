@@ -1,13 +1,16 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
-import { CloudUpload, Square, Circle, Triangle, Hexagon, Bolt, ArrowBigRight, Star, Octagon, Shell, Cross, Smile, Flame } from "lucide-react";
+import { 
+    CloudUpload, Square, Circle, Triangle, 
+    // Hexagon, Bolt, ArrowBigRight, Star, Octagon, Shell, Cross, Smile, Flame 
+} from "lucide-react";
 import useCanvas from "../../context";
 import './editor.css';
 import { prebuiltComponents } from "./components";
 
 
-export function Default({ strokeColor, setStrokeColor }) {
+export function Default({ strokeColor, setStrokeColor, tool }) {
     const { canvas } = useCanvas();
 
     const handleColor = (e) => {
@@ -59,6 +62,12 @@ export function Default({ strokeColor, setStrokeColor }) {
                     </div>
                 </div>
 
+                <div 
+                    className="overflow-hidden" 
+                    style={{ maxHeight: `${ tool === 'Elements' ? '30rem' : '0' }`, transition: 'all 0.5s ease'}}>
+                    <Elements />
+                </div>
+
             </div>
         </>
     )
@@ -68,133 +77,82 @@ export function Elements() {
     const { canvas } = useCanvas();
     const [element, setElement] = useState(null)
 
-    // useEffect(() => {
-    //     let circle;
-    //     let mouseDown = false;
-    //     let initialPointer;
-    //     if (canvas) {
-    //         canvas.selection = false;
-    //         canvas.hoverCursor = 'auto';
-    //         canvas.getObjects().forEach(obj => {
-    //             obj.set({
-    //                 selectable: false
-    //             })
-    //         })
-
-    //         canvas.on('mouse:down', (event) => {
-    //             mouseDown = true;
-    //             initialPointer = canvas.getPointer(event.e);
-
-    //             circle = new fabric.Circle({
-    //                 radius: 10,
-    //                 stroke: 'black',
-    //                 strokeWidth: 3,
-    //                 fill: 'transparent',
-    //                 left: initialPointer.x,
-    //                 top: initialPointer.y,
-    //                 originX: 'center',
-    //                 originY: 'center',
-    //                 selectable: false
-    //             });
-    //             canvas.add(circle);
-    //         })
-
-    //         canvas.on('mouse:move', (event) => {
-    //             if (mouseDown) {
-    //                 const pointer = canvas.getPointer(event.e);
-    //                 const radius = Math.sqrt(Math.pow(pointer.x - initialPointer.x, 2) + Math.pow(pointer.y - initialPointer.y, 2));
-    //                 circle.set({ radius: radius });
-    //                 canvas.renderAll();
-    //             }
-    //         })
-
-    //         canvas.on('mouse:up', (event) => {
-    //             circle.setCoords();
-    //             mouseDown = false;
-    //         })
-
-    //         return () => {
-    //             canvas.selection = true;
-    //             canvas.hoverCursor = 'all-scroll';
-    //             canvas.getObjects().forEach(obj => {
-    //                 obj.set({
-    //                     selectable: true
-    //                 })
-    //             })
-
-    //             canvas.off('mouse:down');
-    //             canvas.off('mouse:move');
-    //             canvas.off('mouse:up');
-    //             canvas.renderAll();
-    //         }
-    //     }
-    // }, [canvas])
-
     useEffect(() => {
         let object;
         let mouseDown = false;
         let startPointer;
 
-        canvas.selection = false;
-        canvas.hoverCursor = 'auto';
-        canvas.getObjects().forEach(obj => {
-            obj.set({
-                selectable: false
-            })
-        })
-
-        canvas.on('mouse:down', (event) => {
-            mouseDown = true;
-            startPointer = canvas.getPointer(event.e)
-
-            object = new prebuiltComponents[element].constructor({
-                ...prebuiltComponents[element].toObject(),
-                left: startPointer.x,
-                top: startPointer.y,
-                selectable: false
-            });
-
-            canvas.add(object);
-        })
-
-        canvas.on('mouse:move', (event) => {
-            if (mouseDown && object) {
-                const pointer = canvas.getPointer(event.e);
-                const width = Math.abs(pointer.x - startPointer.x);
-                const height = Math.abs(pointer.y - startPointer.y);
-                
-                if (object.type === 'rect' || object.type === 'triangle') {
-                    object.set({ width: width, height: height });
-                    if (pointer.x < startPointer.x) object.set({ left: pointer.x });
-                    if (pointer.y < startPointer.y) object.set({ top: pointer.y });
-                } else if (object.type === 'circle') {
-                    let radius = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / 2;
-                    object.set({ radius: radius });
-                    if (pointer.x < startPointer.x) object.set({ left: pointer.x });
-                    if (pointer.y < startPointer.y) object.set({ top: pointer.y });
-                }
-                canvas.renderAll();
-            }
-        })
-
-        canvas.on('mouse:up', (event) => {
-            object.setCoords();
-            mouseDown = false;
-        })
-
-        return () => {
-            canvas.selection = true,
-            canvas.hoverCursor = 'all-scroll';
+        if (canvas) {
+            canvas.selection = false;
+            canvas.hoverCursor = 'auto';
             canvas.getObjects().forEach(obj => {
                 obj.set({
-                    selectable: true
+                    selectable: false
                 })
             })
 
-            canvas.off('mouse:down');
-            canvas.off('mouse:move');
-            canvas.off('mouse:up');
-        };
+            canvas.on('mouse:down', (event) => {
+                mouseDown = true;
+                startPointer = canvas.getPointer(event.e)
+
+                object = new prebuiltComponents[element].constructor({
+                    ...prebuiltComponents[element].toObject(),
+                    left: startPointer.x,
+                    top: startPointer.y,
+                    selectable: false
+                });
+
+
+
+                console.log(object, ' -> ', element)
+
+                canvas.add(object);
+            })
+
+            canvas.on('mouse:move', (event) => {
+                if (mouseDown && object) {
+                    const pointer = canvas.getPointer(event.e);
+                    const width = Math.abs(pointer.x - startPointer.x);
+                    const height = Math.abs(pointer.y - startPointer.y);
+                    if (object.type === 'rect' || object.type === 'triangle') {
+                        object.set({ width: width, height: height });
+                        if (pointer.x < startPointer.x) object.set({ left: pointer.x });
+                        if (pointer.y < startPointer.y) object.set({ top: pointer.y });
+                    } else if (object.type === 'ellipse') {
+                        // let radius = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / 2;
+                        object.set({ rx: width / 2, ry: height / 2 });
+                        if (pointer.x < startPointer.x) object.set({ left: pointer.x });
+                        if (pointer.y < startPointer.y) object.set({ top: pointer.y });
+                    } else if (object.type === 'polygon') {
+                        console.log(object, 'here.......')
+                        const radius = Math.sqrt(Math.pow(pointer.x - startPointer.x, 2) + Math.pow(pointer.y - startPointer.y, 2));
+                        object.set({
+                            points: createHexagon(startPointer, radius).points
+                        });    
+                    }
+                    canvas.renderAll();
+                }
+            })
+
+            canvas.on('mouse:up', (event) => {
+                object.setCoords();
+                mouseDown = false;
+            })
+
+            return () => {
+                canvas.selection = true,
+                canvas.hoverCursor = 'all-scroll';
+                canvas.getObjects().forEach(obj => {
+                    obj.set({
+                        selectable: true
+                    })
+                })
+
+                canvas.off('mouse:down');
+                canvas.off('mouse:move');
+                canvas.off('mouse:up');
+            };
+        }
     }, [element, canvas])
 
 
@@ -222,7 +180,7 @@ export function Elements() {
                 <Component Icon={Square} object={'rectangle'} />
                 <Component Icon={Circle} object={'circle'} />
                 <Component Icon={Triangle} object={'triangle'} />
-                <Component Icon={Hexagon} object={'hexagon'} />
+                {/* <Component Icon={Hexagon} object={'hexagon'} />
                 <Component Icon={Bolt} object={'bolt'} />
                 <Component Icon={ArrowBigRight} object={'arrow'} />
                 <Component Icon={Star} object={'star'} />
@@ -230,7 +188,7 @@ export function Elements() {
                 <Component Icon={Shell} object={'shell'} />
                 <Component Icon={Cross} object={'cross'} />
                 <Component Icon={Smile} object={'smile'} />
-                <Component Icon={Flame} object={'flame'} />
+                <Component Icon={Flame} object={'flame'} /> */}
             </div>
         </>
     )

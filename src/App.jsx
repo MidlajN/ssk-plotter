@@ -107,13 +107,15 @@ export default function Home() {
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
             <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
-              { tool === 'Select' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> }
-              { tool === 'Elements' && <Elements /> }
-              { tool === 'Pen' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> }
-              { tool === 'Lines' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> }
+              { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool}/>}
+              {/* { tool === 'Select' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> } */}
+              {/* { tool === 'Elements' && <Elements /> } */}
+              {/* { tool === 'Elements' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={'Elements'}/> } */}
+              {/* { tool === 'Pen' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> } */}
+              {/* { tool === 'Lines' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> } */}
               {/* { tool === 'Textbox' && <TextBox /> } */}
               { tool === 'Import' && <Import /> }
-              { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
+              {/* { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> } */}
               { tool === 'Plot' && <Plot jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
             </div>
           </Container>
