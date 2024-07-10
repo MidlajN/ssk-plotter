@@ -1,10 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
-import { 
-    CloudUpload, Square, Circle, Triangle, 
-    // Hexagon, Bolt, ArrowBigRight, Star, Octagon, Shell, Cross, Smile, Flame 
-} from "lucide-react";
+import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
 import useCanvas from "../../context";
 import './editor.css';
 import { prebuiltComponents } from "./components";
@@ -12,6 +9,7 @@ import { prebuiltComponents } from "./components";
 
 export function Default({ strokeColor, setStrokeColor, tool }) {
     const { canvas } = useCanvas();
+    const [ renderElements, setRenderElements ] = useState(false);
 
     const handleColor = (e) => {
         const activeObject = canvas.getActiveObjects();
@@ -37,7 +35,19 @@ export function Default({ strokeColor, setStrokeColor, tool }) {
                 }
             })
         }
-    }, [canvas])
+    }, [canvas, setStrokeColor])
+
+    useEffect(() => {
+        if (tool === 'Elements') {
+            setRenderElements(true);
+        }
+    }, [tool])
+
+    const handleTransitionEnd = () => {
+        if (tool !== 'Elements') {
+            setRenderElements(false);
+        }
+    };
     return (
         <>
             <div>
@@ -63,9 +73,11 @@ export function Default({ strokeColor, setStrokeColor, tool }) {
                 </div>
 
                 <div 
-                    className="overflow-hidden" 
-                    style={{ maxHeight: `${ tool === 'Elements' ? '30rem' : '0' }`, transition: 'all 0.5s ease'}}>
-                    <Elements />
+                    className="overflow-hidden mt-4" 
+                    style={{ height: `${ tool === 'Elements' ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
+                    onTransitionEnd={handleTransitionEnd}
+                >
+                    { renderElements && <Elements />}
                 </div>
 
             </div>
@@ -75,7 +87,7 @@ export function Default({ strokeColor, setStrokeColor, tool }) {
 
 export function Elements() {
     const { canvas } = useCanvas();
-    const [element, setElement] = useState(null)
+    const [element, setElement] = useState('rectangle')
 
     useEffect(() => {
         let object;
@@ -134,7 +146,7 @@ export function Elements() {
                 }
             })
 
-            canvas.on('mouse:up', (event) => {
+            canvas.on('mouse:up', () => {
                 object.setCoords();
                 mouseDown = false;
             })
@@ -180,26 +192,8 @@ export function Elements() {
                 <Component Icon={Square} object={'rectangle'} />
                 <Component Icon={Circle} object={'circle'} />
                 <Component Icon={Triangle} object={'triangle'} />
-                {/* <Component Icon={Hexagon} object={'hexagon'} />
-                <Component Icon={Bolt} object={'bolt'} />
-                <Component Icon={ArrowBigRight} object={'arrow'} />
-                <Component Icon={Star} object={'star'} />
-                <Component Icon={Octagon} object={'octagon'} />
-                <Component Icon={Shell} object={'shell'} />
-                <Component Icon={Cross} object={'cross'} />
-                <Component Icon={Smile} object={'smile'} />
-                <Component Icon={Flame} object={'flame'} /> */}
             </div>
         </>
-    )
-}
-
-export function FreeDraw({ tool }) {
-    const { canvas } = useCanvas();
-    
-
-    return (
-        <div>CurvedLines</div>
     )
 }
 

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
-import { Default, Elements, FreeDraw, Import, TextBox } from "./components/editor/editor";
+import { Default, Import } from "./components/editor/editor";
 import { Plot } from "./components/plot/plot.jsx";
 import useCanvas from "./context.jsx";
-// import { Setup } from "./components/setup/setup";
 import { SideNav } from "./components/sidebar";
+import { fabric } from "fabric";
 import './App.css';
 
 
@@ -24,13 +24,10 @@ export default function Home() {
         canvas.isDrawingMode = true;
         canvas.freeDrawingBrush.color = strokeColor;
         canvas.freeDrawingBrush.width = 3;
-        // canvas.freeDrawingBrush.shadow = new fabric.Shadow({
-        //     color: 'black',
-        //     blur: 5,
-        //     offsetX: 5,
-        //     offsetY: 5
-        // });
-        return () => canvas.isDrawingMode = false
+        
+        return () => {
+          canvas.isDrawingMode = false;
+        }
       }
 
       if (tool === 'Lines') {
@@ -69,7 +66,7 @@ export default function Home() {
             canvas.requestRenderAll()
           }
         })
-        canvas.on('mouse:up', (e) => {
+        canvas.on('mouse:up', () => {
           line.setCoords()
           mouseDown = false;
         })

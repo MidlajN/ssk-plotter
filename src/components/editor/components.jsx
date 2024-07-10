@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 
-const createHexagon = (center, radius) => {
+export const createHexagon = (center, radius) => {
     const points = [];
     for (let i = 0; i < 6; i++) {
         points.push({
