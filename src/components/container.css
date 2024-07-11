@@ -27,13 +27,18 @@
     .canvas-section .canvas button {
         bottom: 0;
         left: 50%;
+        translate: -50%;
         right: auto;
         rotate: 90deg;
+        background-color: rgb(203, 213, 225);
+        padding: 10px;
+        border-radius: 100%;
+        transition: all 0.5s ease;
+    }
+    .canvas-section .canvas button:hover {
+        background-color: rgb(176, 191, 209);
     }
 }
-
-
-
 
 .canvas-section .canvas .machine-outer {
     padding: 7rem 7rem 0px 7rem;
@@ -71,6 +76,11 @@
     align-items: center;
     justify-content: end;
     font-size: 13px;
+}
+@media (max-width: 768px) {
+    .canvas-section .footer {
+        justify-content: space-between;
+    }
 }
 .canvas-section .footer div {
     min-width: 6rem;

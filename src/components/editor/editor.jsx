@@ -49,8 +49,8 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
     };
     return (
         <>
-            <div>
-                <div className="border-b-2 border-[#1c274c1c] py-1 mb-4">
+            <div className="pb-6">
+                <div className="border-b-2 border-[#1c274c1c] py-1 mb-4 hidden md:block">
                     <h1>Settings</h1>
                 </div>
 

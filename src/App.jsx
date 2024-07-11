@@ -121,7 +121,7 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
     <nav className="navbar h-[9%]">
       <div className="px-8 lg:px-16 w-full h-full flex justify-between items-center navDiv">
         <h3 className="py-5 text-3xl">Tinker<span className="text-4xl">Plot</span></h3>
-        <div className="buttonGroup px-[0.3rem] flex gap-4 items-center justify-around">
+        <div className="buttonGroup px-[0.3rem] md:flex gap-4 items-center justify-around">
           <button 
             className={ tool !== 'Setup' && tool !== 'Plot' ? 'active' : ''}
             onClick={() => {
