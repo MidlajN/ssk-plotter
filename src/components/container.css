@@ -22,6 +22,19 @@
     /* padding: 0.3rem 1rem; */
     margin-block: .3rem;
 }
+
+@media (max-width: 767px) {
+    .canvas-section .canvas button {
+        bottom: 0;
+        left: 50%;
+        right: auto;
+        rotate: 90deg;
+    }
+}
+
+
+
+
 .canvas-section .canvas .machine-outer {
     padding: 7rem 7rem 0px 7rem;
     background-color: #ffffff69;

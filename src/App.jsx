@@ -9,6 +9,9 @@ import { SideNav } from "./components/sidebar";
 import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import './App.css';
+import { SidebarItem } from "./components/sidebar";
+import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool,  } from "lucide-react";
+import { split, group, info } from "./components/editor/functions.jsx";
 // import { selectAllObject } from "./components/editor/functions.jsx";
 
 
@@ -17,7 +20,6 @@ export default function Home() {
   const [tool, setTool] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
-  const [jobSetUp, setJobSetup] = useState([]);
   const [strokeColor, setStrokeColor] = useState('black');
   const [element, setElement] = useState('rectangle')
 
@@ -34,13 +36,78 @@ export default function Home() {
         />
 
         <div className="flex h-[91%]"> 
-          { !hideSideBar && <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } /> }
+          <div className={`hidden md:block ${ hideSideBar ? 'md:hidden' : '' }`}>
+            <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
+          </div>
+          {/* { !hideSideBar && <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } /> } */}
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
+            <div className="p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center md:hidden">
+              <div className="bg-slate-300 rounded-s-md">
+                <SidebarItem 
+                  icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Select'} 
+                  setTool={setTool} 
+                  setExpanded={setExpanded}
+                />
+              </div>
+              <div className="bg-slate-200">
+                <SidebarItem 
+                  icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
+                  text={'Elements'} 
+                  setTool={setTool}
+                  setExpanded={setExpanded}
+                  canvasFunction={ () => info(canvas) }
+                />
+              </div>
+              <div className="bg-slate-200">
+                <SidebarItem 
+                  icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Group'} 
+                  setTool={setTool}
+                  setExpanded={setExpanded}
+                  canvasFunction={ () => group(canvas) }
+                />
+              </div>
+              <div className="bg-slate-200">
+                <SidebarItem 
+                  icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Split'} 
+                  setTool={setTool} 
+                  setExpanded={setExpanded}
+                  canvasFunction={ () => split(canvas) }
+                />
+              </div>
+              <div className="bg-slate-200">
+                <SidebarItem 
+                  icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Lines'} 
+                  setTool={setTool} 
+                  setExpanded={setExpanded}
+                />
+              </div>
+
+              <div className="bg-slate-200">
+                <SidebarItem 
+                  icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Pen'} 
+                  setTool={setTool}
+                  setExpanded={setExpanded}
+                />
+              </div>
+              <div className="bg-slate-200 rounded-e-md">
+                <SidebarItem 
+                  icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Import'} 
+                  setTool={setTool} 
+                  setExpanded={setExpanded}
+                />
+              </div>
+            </div>
             <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
               { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement}/>}
               { tool === 'Import' && <Import /> }
-              { tool === 'Plot' && <Plot jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
+              { tool === 'Plot' && <Plot /> }
             </div>
           </Container>
         </div>
@@ -167,7 +234,8 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
           ...prebuiltComponents[element].toObject(),
           left: startPointer.x,
           top: startPointer.y,
-          selectable: false
+          selectable: false,
+          stroke: strokeColor
         });
 
         canvas.add(object);

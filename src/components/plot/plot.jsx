@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import { 
-    Trash2, 
     ChevronLeft,
     ChevronRight,
     ChevronUp,
@@ -10,7 +9,6 @@ import {
     Power,
     Dot,
     Pause,
-    ActivityIcon,
     FileCog,
 } from "lucide-react";
 import useCanvas from "../../context";
@@ -19,7 +17,7 @@ import tinycolor from "tinycolor2";
 import './cut.css';
 
 
-export const Plot = ({ jobSetUp, setJobSetup }) => {
+export const Plot = () => {
     const { canvas } = useCanvas();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
@@ -27,26 +25,6 @@ export const Plot = ({ jobSetUp, setJobSetup }) => {
     const [ response, setResponse ] = useState({ visible: false, message: '' });
     const [ ws, setWs ] = useState(null);
 
-
-    const processMsg = async (msg = null) => {
-        // if (ws) {
-        //     ws.onmessage = (event) => {
-        //         console.log("EVENT : ", event.data)
-        //         if (event.data instanceof ArrayBuffer) {
-        //             const arrayBuffer = event.data;
-        //             const text = `${ msg ? msg + ' -> ': '' }${ new TextDecoder().decode(arrayBuffer) }\n`;
-        //             setResponse(prev => ({ ...prev, message: prev.message + text }));
-
-        //         } else {
-        //             setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
-        //         }
-        //     }
-
-        //     ws.onclose = () => {
-        //         setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
-        //     }
-        // }
-    }
 
     const handleConnection = async () => {
         try {
@@ -57,7 +35,6 @@ export const Plot = ({ jobSetUp, setJobSetup }) => {
             socket.onopen = () => {
                 setResponse({ visible: true, message: `Socket Connection Successful ... \nSocket URL : ws://kochund.local:81 \n` });
                 setWs(socket);
-                processMsg();
             }
 
         } catch (err) {
@@ -153,7 +130,16 @@ export const Plot = ({ jobSetUp, setJobSetup }) => {
             })
         })
         canvas.requestRenderAll();
-    }, []);
+
+        return () => {
+            canvas.selection = true;
+            canvas.getObjects().forEach(obj => {
+                obj.set({
+                    selectable: true
+                })
+            })
+        }
+    }, [canvas]);
 
      // Scroll the textarea to the bottom when it overflows
     useEffect(() => {
