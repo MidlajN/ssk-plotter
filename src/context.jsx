@@ -5,6 +5,7 @@ import { handleKeyDown } from "./components/editor/functions";
 
 const CanvasContext = createContext(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default function useCanvas() {
     return useContext(CanvasContext);
 }

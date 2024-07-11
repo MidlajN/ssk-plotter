@@ -109,14 +109,16 @@ export const group = (canvas) => {
  * @param {Function} setCopiedObject - A function to set the copied object.
  */
 export const copyObject = (setCopiedObject, canvas) => {
-    const activeObject = canvas.getActiveObject();
-    if (activeObject) {
-        activeObject.clone((clonedObject) => {
-            setCopiedObject(clonedObject);
-            console.log('Object copied');
-        });
-    } else {
-        console.log('No object selected to copy');
+    if (canvas) {
+        const activeObject = canvas.getActiveObject();
+        if (activeObject) {
+            activeObject.clone((clonedObject) => {
+                setCopiedObject(clonedObject);
+                console.log('Object copied');
+            });
+        } else {
+            console.log('No object selected to copy');
+        }
     }
 };
 
@@ -160,9 +162,8 @@ export const pasteObject = (copiedObject, canvas) => {
  * Deletes the active object on the canvas if present.
  */
 export const deleteObject = (canvas) => {
-
-    const activeObject = canvas.getActiveObject();
-    if (activeObject) {
+    if (canvas && canvas.getActiveObject()) {
+        const activeObject = canvas.getActiveObject();
         if (activeObject.get('type') === 'activeSelection') {
             activeObject.forEachObject((obj) => {
                 canvas.remove(obj);
