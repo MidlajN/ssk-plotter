@@ -7,6 +7,7 @@ import { Plot } from "./components/plot/plot.jsx";
 import useCanvas from "./context.jsx";
 import { SideNav } from "./components/sidebar";
 import { fabric } from "fabric";
+import { prebuiltComponents } from "./components/editor/components.jsx";
 import './App.css';
 
 
@@ -17,6 +18,7 @@ export default function Home() {
   const [ hideSideBar, setHideSideBar ] = useState(false);
   const [jobSetUp, setJobSetup] = useState([]);
   const [strokeColor, setStrokeColor] = useState('black');
+  const [element, setElement] = useState('rectangle')
 
   useEffect(() => {
     if (canvas) {
@@ -30,7 +32,8 @@ export default function Home() {
         }
       }
 
-      if (tool === 'Lines') {
+      else if (tool === 'Lines') {
+        console.log('Toole Is SELECTED')
         let line;
         let mouseDown = false;
 
@@ -86,8 +89,77 @@ export default function Home() {
           canvas.off('mouse:up');
         }
       }
+
+      else if (tool === 'Elements') {
+        let object;
+        let mouseDown = false;
+        let startPointer;
+
+        if (canvas && tool === 'Elements') {
+            console.log('Effect : Elements -> Mounted..')
+            canvas.selection = false;
+            canvas.hoverCursor = 'auto';
+            canvas.getObjects().forEach(obj => {
+                obj.set({
+                    selectable: false
+                })
+            })
+
+            canvas.on('mouse:down', (event) => {
+                mouseDown = true;
+                startPointer = canvas.getPointer(event.e)
+
+                object = new prebuiltComponents[element].constructor({
+                    ...prebuiltComponents[element].toObject(),
+                    left: startPointer.x,
+                    top: startPointer.y,
+                    selectable: false
+                });
+
+                canvas.add(object);
+            })
+
+            canvas.on('mouse:move', (event) => {
+                if (mouseDown && object) {
+                    const pointer = canvas.getPointer(event.e);
+                    const width = Math.abs(pointer.x - startPointer.x);
+                    const height = Math.abs(pointer.y - startPointer.y);
+                    if (object.type === 'rect' || object.type === 'triangle') {
+                        object.set({ width: width, height: height });
+                        if (pointer.x < startPointer.x) object.set({ left: pointer.x });
+                        if (pointer.y < startPointer.y) object.set({ top: pointer.y });
+                    } else if (object.type === 'ellipse') {
+                        object.set({ rx: width / 2, ry: height / 2 });
+                        if (pointer.x < startPointer.x) object.set({ left: pointer.x });
+                        if (pointer.y < startPointer.y) object.set({ top: pointer.y });
+                    } 
+                    canvas.renderAll();
+                }
+            })
+
+            canvas.on('mouse:up', () => {
+                object.setCoords();
+                mouseDown = false;
+            })
+
+            return () => {
+                console.log('EFFECT UNMOUNT')
+                canvas.selection = true,
+                canvas.hoverCursor = 'all-scroll';
+                canvas.getObjects().forEach(obj => {
+                    obj.set({
+                        selectable: true
+                    })
+                })
+
+                canvas.off('mouse:do|wn');
+                canvas.off('mouse:move');
+                canvas.off('mouse:up');
+            };
+        }
+      }
     }
-  },[tool, strokeColor])
+  },[tool, strokeColor, canvas, element])
 
   return (
     <>
@@ -104,15 +176,8 @@ export default function Home() {
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
             <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
-              { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool}/>}
-              {/* { tool === 'Select' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> } */}
-              {/* { tool === 'Elements' && <Elements /> } */}
-              {/* { tool === 'Elements' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={'Elements'}/> } */}
-              {/* { tool === 'Pen' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> } */}
-              {/* { tool === 'Lines' && <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor}/> } */}
-              {/* { tool === 'Textbox' && <TextBox /> } */}
+              { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement}/>}
               { tool === 'Import' && <Import /> }
-              {/* { tool === 'Setup' && <Setup jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> } */}
               { tool === 'Plot' && <Plot jobSetUp={jobSetUp} setJobSetup={setJobSetup} /> }
             </div>
           </Container>

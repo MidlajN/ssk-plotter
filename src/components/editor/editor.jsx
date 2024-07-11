@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
 import useCanvas from "../../context";
 import './editor.css';
-import { prebuiltComponents } from "./components";
 
 
-export function Default({ strokeColor, setStrokeColor, tool }) {
+export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
     const { canvas } = useCanvas();
     const [ renderElements, setRenderElements ] = useState(false);
 
@@ -77,7 +76,7 @@ export function Default({ strokeColor, setStrokeColor, tool }) {
                     style={{ height: `${ tool === 'Elements' ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
                     onTransitionEnd={handleTransitionEnd}
                 >
-                    { renderElements && <Elements />}
+                    { renderElements && <Elements element={element} setElement={setElement}/>}
                 </div>
 
             </div>
@@ -85,88 +84,7 @@ export function Default({ strokeColor, setStrokeColor, tool }) {
     )
 }
 
-export function Elements() {
-    const { canvas } = useCanvas();
-    const [element, setElement] = useState('rectangle')
-
-    useEffect(() => {
-        let object;
-        let mouseDown = false;
-        let startPointer;
-
-        if (canvas) {
-            canvas.selection = false;
-            canvas.hoverCursor = 'auto';
-            canvas.getObjects().forEach(obj => {
-                obj.set({
-                    selectable: false
-                })
-            })
-
-            canvas.on('mouse:down', (event) => {
-                mouseDown = true;
-                startPointer = canvas.getPointer(event.e)
-
-                object = new prebuiltComponents[element].constructor({
-                    ...prebuiltComponents[element].toObject(),
-                    left: startPointer.x,
-                    top: startPointer.y,
-                    selectable: false
-                });
-
-
-
-                console.log(object, ' -> ', element)
-
-                canvas.add(object);
-            })
-
-            canvas.on('mouse:move', (event) => {
-                if (mouseDown && object) {
-                    const pointer = canvas.getPointer(event.e);
-                    const width = Math.abs(pointer.x - startPointer.x);
-                    const height = Math.abs(pointer.y - startPointer.y);
-                    if (object.type === 'rect' || object.type === 'triangle') {
-                        object.set({ width: width, height: height });
-                        if (pointer.x < startPointer.x) object.set({ left: pointer.x });
-                        if (pointer.y < startPointer.y) object.set({ top: pointer.y });
-                    } else if (object.type === 'ellipse') {
-                        // let radius = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / 2;
-                        object.set({ rx: width / 2, ry: height / 2 });
-                        if (pointer.x < startPointer.x) object.set({ left: pointer.x });
-                        if (pointer.y < startPointer.y) object.set({ top: pointer.y });
-                    } else if (object.type === 'polygon') {
-                        console.log(object, 'here.......')
-                        const radius = Math.sqrt(Math.pow(pointer.x - startPointer.x, 2) + Math.pow(pointer.y - startPointer.y, 2));
-                        object.set({
-                            points: createHexagon(startPointer, radius).points
-                        });    
-                    }
-                    canvas.renderAll();
-                }
-            })
-
-            canvas.on('mouse:up', () => {
-                object.setCoords();
-                mouseDown = false;
-            })
-
-            return () => {
-                canvas.selection = true,
-                canvas.hoverCursor = 'all-scroll';
-                canvas.getObjects().forEach(obj => {
-                    obj.set({
-                        selectable: true
-                    })
-                })
-
-                canvas.off('mouse:down');
-                canvas.off('mouse:move');
-                canvas.off('mouse:up');
-            };
-        }
-    }, [element, canvas])
-
+export function Elements({element, setElement}) {
 
     const Component = ({Icon, object}) => {
         return (
@@ -197,11 +115,11 @@ export function Elements() {
     )
 }
 
-export function TextBox() {
-    return (
-        <div>TextBox</div>
-    )
-}
+// export function TextBox() {
+//     return (
+//         <div>TextBox</div>
+//     )
+// }
 
 export function Import() {
     const { canvas } = useCanvas();

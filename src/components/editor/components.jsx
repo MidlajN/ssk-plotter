@@ -9,7 +9,6 @@ export const createHexagon = (center, radius) => {
         });
     }
 
-    console.log('NEW OBJECT : ', points)
     return new fabric.Polygon(points, {
         fill: 'yellow',
         stroke: 'black',

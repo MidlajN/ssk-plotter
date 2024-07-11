@@ -7,25 +7,25 @@
  * @return {void} 
  */
 export const handleFile = (file, canvas) => {
-    if (file.type !== 'image/svg+xml') return;
+    if (file && file.type !== 'image/svg+xml') return;
   
     const reader = new FileReader();
     reader.onload = (e) => {
-      const svg = e.target.result;
-  
-      fabric.loadSVGFromString(svg, (objects, options) => {
-        const obj = fabric.util.groupSVGElements(objects, options);
-        console.log("RUN RUN RUN",objects, options, obj)
-  
-        // Set styles after object is loaded
-        obj.set({ selectable: true, hasControls: true, strokeWidth: 1, stroke: '#fff', fill: '#fff' });
-  
-        canvas.add(obj);
-        canvas.renderAll();
-      });
+        const svg = e.target.result;
+    
+        fabric.loadSVGFromString(svg, (objects, options) => {
+            const obj = fabric.util.groupSVGElements(objects, options);
+            console.log("RUN RUN RUN",objects, options, obj)
+    
+            // Set styles after object is loaded
+            obj.set({ selectable: true, hasControls: true, strokeWidth: 1, stroke: '#fff', fill: '#fff' });
+    
+            canvas.add(obj);
+            canvas.renderAll();
+        });
     };
     reader.readAsText(file);
-  };
+};
   
 
 /**
@@ -205,7 +205,7 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
 };
 
 export const info = (canvas) => {
-    const activeObject = canvas.getActiveObject();
+    // const activeObject = canvas.getActiveObject();
     console.log('SVG ::: ', canvas.toSVG())
     canvas.renderAll();
 }
