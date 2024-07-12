@@ -15,6 +15,7 @@ import useCanvas from "../../context";
 import { Converter } from "svg-to-gcode";
 import tinycolor from "tinycolor2";
 import './cut.css';
+import { SetupModal } from "../modal";
 
 
 export const Plot = () => {
@@ -24,23 +25,25 @@ export const Plot = () => {
     const [ controllers, setControllers ] = useState({x: 0, y: 0});
     const [ response, setResponse ] = useState({ visible: false, message: '' });
     const [ ws, setWs ] = useState(null);
+    const [ setupModal, setSetupModal ] = useState(false);
 
 
     const handleConnection = async () => {
-        try {
-            const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
+        setSetupModal(true)
+        // try {
+        //     const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
 
-            socket.binaryType = 'arraybuffer';
+        //     socket.binaryType = 'arraybuffer';
 
-            socket.onopen = () => {
-                setResponse({ visible: true, message: `Socket Connection Successful ... \nSocket URL : ws://kochund.local:81 \n` });
-                setWs(socket);
-            }
+        //     socket.onopen = () => {
+        //         setResponse({ visible: true, message: `Socket Connection Successful ... \nSocket URL : ws://kochund.local:81 \n` });
+        //         setWs(socket);
+        //     }
 
-        } catch (err) {
-            setWs(null);
-            console.log("Error while connecting", err)
-        }
+        // } catch (err) {
+        //     setWs(null);
+        //     console.log("Error while connecting", err)
+        // }
     }
 
 
@@ -219,9 +222,9 @@ export const Plot = () => {
 
                 <div className="flex w-full items-end justify-between">
                     { !ws ? (
-                        <button className="flex items-center justify-center gap-1 bg-[#0c4653] py-1 px-8 rounded-full" onClick={ handleConnection }>
+                        <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
                             <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[13px] "> Connect</span>
+                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px] "> Ready &nbsp;</span>
                         </button>
                     ) : (
                         <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ () => ws.close() }>
@@ -235,7 +238,7 @@ export const Plot = () => {
                     </p>
                 </div>
 
-                <div className="flex justify-between w-full">
+                {/* <div className="flex justify-between w-full">
                     <button className="flex items-center justify-center gap-1 bg-[#027200] py-1 px-5 rounded text-nowrap" onClick={handleJob}>
                         <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[12px] tracking-wide"> Start Job</span>
                     </button>
@@ -247,8 +250,17 @@ export const Plot = () => {
                         <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                         <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] tracking-wide"> Stop</span>
                     </button>
-                </div>
+                </div> */}
             </div>
+
+            { setupModal &&
+                <SetupModal 
+                    modalOpen={setupModal} 
+                    setModalOpen={setSetupModal}
+                    setWs={setWs}
+                    ws={ws}
+                /> 
+            }
         </div>
     )
 }

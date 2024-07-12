@@ -2,7 +2,7 @@
 // import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { handleFile } from "./editor/functions";
-import './container.css';
+import './style.css';
 import  useCanvas  from "../context";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
