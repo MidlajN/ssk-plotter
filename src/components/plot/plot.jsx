@@ -154,7 +154,7 @@ export const Plot = () => {
 
     return (
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
-            <div className="mt-4 h-full bg-[#EBEBEB] cut">
+            <div className="mt-4 h-full bg-[#EBEBEB] cut hidden md:block">
                 <div className="w-full h-[10%] bg-[#1e263f] flex items-end justify-end gap-3 p-3">
                 <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
                 </div>

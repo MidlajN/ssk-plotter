@@ -99,7 +99,11 @@
     color: #4b5563;
     min-width: 20rem;
 }
-
+@media (max-width: 500px) {
+    .setupModal .config {
+        min-width: 10rem;
+    }
+}
 .setupModal .config .dots {
     transition: all 0.5s ease;
 }

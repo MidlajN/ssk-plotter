@@ -41,7 +41,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                 <button onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>
             </div>
 
-            <div className={`${ expanded ? 'lg:w-[20%] md:w-[40%] h-[60%]' : 'md:w-[0] h-[2rem]' } md:h-full bg-white transition-all duration-500 md:overflow-hidden`}>
+            <div className={`${ expanded ? 'lg:w-[20%] md:w-[40%] h-[82%]' : 'md:w-[0] h-[2rem]' } md:h-full bg-white transition-all duration-500 md:overflow-hidden`}>
                 { children } 
             </div>
             <div className={`absolute bottom-0 ${ expanded ? 'md:w-[80%]' : 'w-full' } w-full py-2 px-4 footer transition-all duration-500 overflow-scroll no-scrollbar`}>
