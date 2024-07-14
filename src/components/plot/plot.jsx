@@ -8,12 +8,9 @@ import {
     Home,
     Power,
     Dot,
-    Pause,
     FileCog,
 } from "lucide-react";
 import useCanvas from "../../context";
-import { Converter } from "svg-to-gcode";
-import tinycolor from "tinycolor2";
 import './cut.css';
 import { SetupModal } from "../modal";
 
@@ -30,58 +27,6 @@ export const Plot = () => {
 
     const handleConnection = async () => {
         setSetupModal(true)
-        // try {
-        //     const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
-
-        //     socket.binaryType = 'arraybuffer';
-
-        //     socket.onopen = () => {
-        //         setResponse({ visible: true, message: `Socket Connection Successful ... \nSocket URL : ws://kochund.local:81 \n` });
-        //         setWs(socket);
-        //     }
-
-        // } catch (err) {
-        //     setWs(null);
-        //     console.log("Error while connecting", err)
-        // }
-    }
-
-
-    const handleJob = async () => {
-        const objects = canvas.getObjects();
-        const colorCommand = {
-            "#ff0000" : "M01 S255", // Red
-            "#0000ff" : "M01 S430", // Blue
-            "#008000" : "M01 S128", // Green
-            "#ffff00" : "M01 S255", // Yellow
-            "#ffa500" : "M01 S128", // Orange
-            "#800080" : "M01 S120", // Purple
-            "#000000" : "M01 S000", // Black
-            "#ffc0cb" : "M01 S255", // Pink
-        }
-        
-        const svgElements = objects.map(obj => {
-            const objSvg = obj.toSVG();
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-            svg.innerHTML = objSvg;
-            const color = tinycolor(obj.stroke)
-            console.log('COLOR : ' + color + ' -> ' + color.toHexString());
-
-            return {
-                color: color.toHexString(),
-                svg: svg.outerHTML
-            }
-        })
-
-        const converter = new Converter();
-        const gcodes = await Promise.all(svgElements.map(async (element) => {
-            const [ code ] = await converter.convert(element.svg);
-            const gCodeLines = code.split('\n');
-            const cleanedGcodeLines = gCodeLines.slice(0, -5);
-            return [colorCommand[element.color] + cleanedGcodeLines.join('\n')];
-        }));
-        console.log('gcodes', gcodes.join('\n'));
     }
 
 
@@ -224,7 +169,7 @@ export const Plot = () => {
                     { !ws ? (
                         <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
                             <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px] "> Ready &nbsp;</span>
+                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px] "> Ready</span>
                         </button>
                     ) : (
                         <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ () => ws.close() }>

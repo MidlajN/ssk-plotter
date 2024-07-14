@@ -3,11 +3,15 @@ import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
 import { useEffect, useState, useCallback } from "react";
 import { Webhook } from "lucide-react";
+import useCanvas from "../context";
+import tinycolor from "tinycolor2";
+import { Converter } from "svg-to-gcode";
 ReactModal.setAppElement('#root');
 
 
 export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
     const [ socket, setSocket ] = useState({ connecting: false, connected: false })
+    const { canvas } = useCanvas();
     
     const openSocket = useCallback(() => {
         if (ws) return;
@@ -17,6 +21,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
             socket.binaryType = 'arraybuffer';
 
             socket.onerror = (error) => {
+                console.log('Error Occured White Opening Socket -> \n', error);
                 setSocket({ connecting: false, connected: false })
             }
 
@@ -33,7 +38,44 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
 
     useEffect(() => {
         openSocket();
-    }, [])
+    }, []);
+
+    const plot =  async () => {
+        const objects = canvas.getObjects();
+        const colorCommand = {
+            "#ff0000" : "M01 S255", // Red
+            "#0000ff" : "M01 S430", // Blue
+            "#008000" : "M01 S128", // Green
+            "#ffff00" : "M01 S255", // Yellow
+            "#ffa500" : "M01 S128", // Orange
+            "#800080" : "M01 S120", // Purple
+            "#000000" : "M01 S000", // Black
+            "#ffc0cb" : "M01 S255", // Pink
+        }
+
+        const svgElements = objects.map(obj => {
+            const objSvg = obj.toSVG();
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+            svg.innerHTML = objSvg;
+            const color = tinycolor(obj.stroke);
+
+            return {
+                color: color.toHexString(),
+                svg: svg.outerHTML
+            }
+        });
+
+        const converter = new Converter();
+        const gcodes = await Promise.all(svgElements.map( async (element) => {
+            const [ code ] = await converter.convert(element.svg);
+            const gCodeLines = code.split('\n');
+            const cleanedGcodeLines = gCodeLines.slice(0, -5);
+            return [ colorCommand[element.color] + cleanedGcodeLines.join('\n')];
+        }));
+
+        console.log('Converted GCode -> \n', gcodes);
+    }
 
 
     return (
@@ -64,7 +106,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
             <div className="setupModal" >
                 
                 <div className="bg-white py-3 px-6">
-                { !socket.connected ?
+                { socket.connected ?
                     <div className="flex items-center gap-6 p-5">
                         <Triangle visible={true} width={40} height={40} color={ socket.connecting ? '#1c7f969c' : '#831414'} ariaLabel="infinity-spin-loading" />
                         <div className="config">
@@ -73,7 +115,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
                                     Connecting <span className="dots"></span>
                                 </p> : 
                                 <p className="sm:text-[25px] text-[20px] text-[#831414]">
-                                    Couldn't Connect
+                                    Couldn&apos;t Connect
                                 </p>
                             }
                             <p className="text-[15px]">URL : <span className=" text-slate-400">ws://kochund.local:86</span></p>
@@ -96,6 +138,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
                                     <span className="text-[#092f61]">Plot</span> 
                                     <span className="text-[30px] font-extrabold text-[#092f61]">!</span>
                                 </p>
+                                {/* eslint-disable-next-line react/no-unescaped-entities */}
                                 <p className="sm:text-[13px] text-[11px] pr-3">Click the <span className="font-semibold">'Plot'</span> Button to draw the pictures in from the canvas.</p>
                             </div>
                             <img className="object-contain w-[45%] mt-auto" src="/plot.svg" alt="" />
@@ -115,12 +158,14 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
                         { socket.connected && 
                             <button 
                                 className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
+                                onClick={plot}
                             >Plot</button>
                         }
-
                         <button 
                             className="transition-all duration-300 bg-[#23325cbb] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                            onClick={ () => { setModalOpen(false) } }
+                            onClick={ () => { 
+                                setModalOpen(false) ;
+                            }}
                         > Cancel
                         </button>
                     </div>
