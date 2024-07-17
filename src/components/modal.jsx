@@ -43,14 +43,14 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
     const plot =  async () => {
         const objects = canvas.getObjects();
         const colorCommand = {
-            "#ff0000" : "M01 S255", // Red
-            "#0000ff" : "M01 S430", // Blue
-            "#008000" : "M01 S128", // Green
-            "#ffff00" : "M01 S255", // Yellow
-            "#ffa500" : "M01 S128", // Orange
-            "#800080" : "M01 S120", // Purple
-            "#000000" : "M01 S000", // Black
-            "#ffc0cb" : "M01 S255", // Pink
+            "#ff0000" : "M03 S1", // Red
+            "#0000ff" : "M03 S2", // Blue
+            "#008000" : "M03 S3", // Green
+            "#ffff00" : "M03 S4", // Yellow
+            "#ffa500" : "M03 S5", // Orange
+            "#800080" : "M03 S6", // Purple
+            "#000000" : "M03 S7", // Black
+            "#ffc0cb" : "M03 S8", // Pink
         }
 
         const svgElements = objects.map(obj => {
@@ -75,6 +75,25 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
         }));
 
         console.log('Converted GCode -> \n', gcodes);
+
+        // Send to Machine
+        const blob = new Blob([gcodes.join('\n')], { type: 'text/plain' });
+        const file = new File([blob], 'job.gcode', { type: 'text/plain' });
+
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const response = await fetch('http://localhost:5000/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+            console.log('File Upload Finished -> ', result);
+        } catch (err) {
+            console.log('Error While Uploading -> ', err);
+        }
     }
 
 
@@ -149,7 +168,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
                 
                 <div className="content" >
                     <div className="flex justify-end gap-4 mt-10">
-                        { !socket.connecting && 
+                        { !socket.connecting && !socket.connected && 
                             <button 
                                 className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
                                 onClick={openSocket}

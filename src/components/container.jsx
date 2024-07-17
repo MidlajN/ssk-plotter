@@ -19,7 +19,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                 <TransformWrapper
                     initialScale={.3} 
                     maxScale={1}
-                    minScale={.1} 
+                    minScale={.25} 
                     limitToBounds={ false }
                     panning={{ excluded: ['fabricCanvas'] }}
                 >
