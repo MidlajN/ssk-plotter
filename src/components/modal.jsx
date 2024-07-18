@@ -9,32 +9,58 @@ import { Converter } from "svg-to-gcode";
 ReactModal.setAppElement('#root');
 
 
-export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
+export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) => {
     const [ socket, setSocket ] = useState({ connecting: false, connected: false })
     const { canvas } = useCanvas();
     
     const openSocket = useCallback(() => {
-        if (ws) return;
+        if (ws !== null) return;
         try {
             setSocket({ connecting: true, connected: false })
-            const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
-            socket.binaryType = 'arraybuffer';
-
-            socket.onerror = (error) => {
-                console.log('Error Occured White Opening Socket -> \n', error);
-                setSocket({ connecting: false, connected: false })
-            }
-
-            socket.onopen = () => {
-                setWs(socket);
-                setSocket({ connecting: false, connected: true })
-            }
+            // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
+            setWs(new WebSocket('ws://localhost:5000'));
 
         } catch (err) {
             setWs(null);
             console.log("Error while connecting", err)
         }
-    }, [setWs, ws])
+    }, [])
+
+    useEffect(() => {
+        if (!ws) return;
+        ws.onopen = () => {
+            console.log('Socket opened ->')
+
+            // For Test
+            const sendPing = () => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    console.log('Socket Still Running ->', socket)
+                    ws.send('Ping');
+                    setTimeout(sendPing, 2000);
+                }
+            };
+            sendPing();
+
+            setSocket({ connecting: false, connected: true })
+        }
+        
+        ws.onmessage = (event) => {
+            if (event.data instanceof ArrayBuffer) {
+                const arrayBuffer = event.data;
+                const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
+                setResponse(prev => ({ ...prev, message: prev.message + text }));
+
+            } else {
+                setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
+            }
+        }
+
+        ws.onclose = () => {
+            setWs(null);
+            setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://localhost:5000 \n` }));
+        }
+    }, [setResponse, setWs, socket, ws])
+
 
     useEffect(() => {
         openSocket();
@@ -90,7 +116,13 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
             });
 
             const result = await response.json();
-            console.log('File Upload Finished -> ', result);
+            console.log('File Upload Finished -> ', result, response.status);
+
+            if (response.status === 200) {
+                const response = await fetch(`http://localhost:5000/command?commandText=[ESP220]/${file.name}`)
+
+                console.log(response)
+            }
         } catch (err) {
             console.log('Error While Uploading -> ', err);
         }
@@ -125,7 +157,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs}) => {
             <div className="setupModal" >
                 
                 <div className="bg-white py-3 px-6">
-                { socket.connected ?
+                { !socket.connected ?
                     <div className="flex items-center gap-6 p-5">
                         <Triangle visible={true} width={40} height={40} color={ socket.connecting ? '#1c7f969c' : '#831414'} ariaLabel="infinity-spin-loading" />
                         <div className="config">

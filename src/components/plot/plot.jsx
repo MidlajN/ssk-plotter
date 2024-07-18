@@ -29,6 +29,11 @@ export const Plot = () => {
         setSetupModal(true)
     }
 
+    const closeConnection = () => {
+        ws.close();
+        setWs(null);
+    }
+
 
     const sendToMachine = async (gcode) => {
         try {
@@ -42,33 +47,13 @@ export const Plot = () => {
                     }
                 }
             }
-            http.open("GET", "http://kochund.local/command?commandText=" + encodeURI(gcode), true);
+            http.open("GET", "http://localhost:5000/command?commandText=" + encodeURI(gcode), true);
             http.send();
 
         } catch (err) {
             console.log(err);
         }
     }
-
-    useEffect(() => {
-        if (ws) {
-            ws.onmessage = (event) => {
-                if (event.data instanceof ArrayBuffer) {
-                    const arrayBuffer = event.data;
-                    const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
-                    setResponse(prev => ({ ...prev, message: prev.message + text }));
-
-                } else {
-                    setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
-                }
-            }
-
-            ws.onclose = () => {
-                setWs(null);
-                setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://kochund.local:81 \n` }));
-            }
-        }
-    }, [ws])
 
     useEffect(() => {
         canvas.selection = false;
@@ -88,6 +73,7 @@ export const Plot = () => {
             })
         }
     }, [canvas]);
+    
 
      // Scroll the textarea to the bottom when it overflows
     useEffect(() => {
@@ -172,7 +158,7 @@ export const Plot = () => {
                             <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px] "> Ready</span>
                         </button>
                     ) : (
-                        <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ () => ws.close() }>
+                        <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ closeConnection }>
                             <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                             <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] "> Disconnect</span>
                         </button>
@@ -204,6 +190,7 @@ export const Plot = () => {
                     setModalOpen={setSetupModal}
                     setWs={setWs}
                     ws={ws}
+                    setResponse={setResponse}
                 /> 
             }
         </div>

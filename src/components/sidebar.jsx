@@ -8,20 +8,20 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
     return (
       <Sidebar>
         <SidebarItem 
-          icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
+          icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563' } /> } 
           text={'Select'} 
           setTool={setTool} 
           setExpanded={setExpanded}
         />
         <SidebarItem 
-          icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
+          icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563' }  /> } 
           text={'Elements'} 
           setTool={setTool}
           setExpanded={setExpanded}
           canvasFunction={ () => info(canvas) }
         />
         <SidebarItem 
-          icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
+          icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563' } /> } 
           text={'Group'} 
           setTool={setTool}
           setExpanded={setExpanded}
