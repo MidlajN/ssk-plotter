@@ -95,8 +95,12 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
 
 
     useEffect(() => {
-        if (ws) return;
-
+        if (ws) {
+            setSocket({ connected: true, connecting: false })
+            setTimeout(() => {
+                setModalOpen(false);
+            }, 3000)
+        }
         openSocket();
 
         return () =>{
@@ -104,68 +108,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
         }
     }, []);
 
-    const plot =  async () => {
-        const objects = canvas.getObjects();
-        const colorCommand = {
-            "#ff0000" : "M03 S1", // Red
-            "#0000ff" : "M03 S2", // Blue
-            "#008000" : "M03 S3", // Green
-            "#ffff00" : "M03 S4", // Yellow
-            "#ffa500" : "M03 S5", // Orange
-            "#800080" : "M03 S6", // Purple
-            "#000000" : "M03 S7", // Black
-            "#ffc0cb" : "M03 S8", // Pink
-        }
-
-        const svgElements = objects.map(obj => {
-            const objSvg = obj.toSVG();
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-            svg.innerHTML = objSvg;
-            const color = tinycolor(obj.stroke);
-
-            return {
-                color: color.toHexString(),
-                svg: svg.outerHTML
-            }
-        });
-
-        const converter = new Converter();
-        const gcodes = await Promise.all(svgElements.map( async (element) => {
-            const [ code ] = await converter.convert(element.svg);
-            const gCodeLines = code.split('\n');
-            const cleanedGcodeLines = gCodeLines.slice(0, -5);
-            return [ colorCommand[element.color] + cleanedGcodeLines.join('\n')];
-        }));
-
-        console.log('Converted GCode -> \n', gcodes);
-
-        // Send to Machine
-        const blob = new Blob([gcodes.join('\n')], { type: 'text/plain' });
-        const file = new File([blob], 'job.gcode', { type: 'text/plain' });
-
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        try {
-            const response = await fetch('http://192.168.0.1/upload', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const result = await response.json();
-            console.log('File Upload Finished -> ', result, response.status);
-
-            if (response.status === 200) {
-                const response = await fetch(`http://localhost:5000/command?commandText=[ESP220]/${file.name}`);
-                setJobStarted(true);
-                console.log(response);
-            }
-        } catch (err) {
-            console.log('Error While Uploading -> ', err);
-        }
-    }
-
+    
 
     return (
         <ReactModal 
