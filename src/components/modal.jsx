@@ -11,6 +11,7 @@ ReactModal.setAppElement('#root');
 
 export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) => {
     const [ socket, setSocket ] = useState({ connecting: false, connected: false })
+    const [ jobStarted, setJobStarted ] = useState(false);
     const { canvas } = useCanvas();
     
     const openSocket = useCallback(() => {
@@ -18,52 +19,89 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
         try {
             setSocket({ connecting: true, connected: false })
             // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
-            setWs(new WebSocket('ws://localhost:5000'));
+            setTimeout(() => {
+                // setWs(new WebSocket('ws://192.168.0.1:81'));
+                setWs(new WebSocket('ws://localhost:5000'));
+            }, 3000)
 
         } catch (err) {
             setWs(null);
             console.log("Error while connecting", err)
         }
-    }, [])
+    }, [setWs, ws])
 
     useEffect(() => {
         if (!ws) return;
+        console.log('Socket IS REady : ', socket)
         ws.onopen = () => {
             console.log('Socket opened ->')
-
+            
             // For Test
             const sendPing = () => {
                 if (ws.readyState === WebSocket.OPEN) {
-                    console.log('Socket Still Running ->', socket)
+                    // console.log('Socket Still Running ->', socket)
                     ws.send('Ping');
-                    setTimeout(sendPing, 2000);
+                    setTimeout(sendPing, 5000);
                 }
             };
             sendPing();
 
             setSocket({ connecting: false, connected: true })
+
+            setTimeout(() => {
+                setModalOpen(false);
+            }, 3000);
         }
         
         ws.onmessage = (event) => {
+            if (event.data instanceof Blob) {
+                console.log('Blob ', event.data)
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const text = reader.result;
+                    console.log('Blob as Text: ', text);
+                    // You can also update your response state here
+                    setResponse(prev => ({ ...prev, message: prev.message + text + "\n" }));
+                };
+                reader.readAsText(event.data);
+            }
             if (event.data instanceof ArrayBuffer) {
                 const arrayBuffer = event.data;
                 const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
                 setResponse(prev => ({ ...prev, message: prev.message + text }));
 
             } else {
+                console.log('Response :', event)
                 setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
             }
         }
 
         ws.onclose = () => {
             setWs(null);
-            setResponse(prev => ({ ...prev, message: `Socket Connection Closed ... \nSocket URL : ws://localhost:5000 \n` }));
+            if (jobStarted) setJobStarted(false);
+            setResponse(prev => ({ ...prev, message: prev.message +`Socket Connection Closed ... \nSocket URL : ws://localhost:5000 \n` }));
+            if (socket.connected) setModalOpen(false);
+        }
+
+        ws.onerror = (err) => {
+            console.log('Socket error -> ', err);
+            setSocket({ connected: false, connecting: false })
+        }
+
+        return () => {
+            console.log('Socket Check : ', socket)
         }
     }, [setResponse, setWs, socket, ws])
 
 
     useEffect(() => {
+        if (ws) return;
+
         openSocket();
+
+        return () =>{
+            console.log('Socket : ', socket)
+        }
     }, []);
 
     const plot =  async () => {
@@ -110,7 +148,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
         formData.append('file', file);
         
         try {
-            const response = await fetch('http://localhost:5000/upload', {
+            const response = await fetch('http://192.168.0.1/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -119,9 +157,9 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
             console.log('File Upload Finished -> ', result, response.status);
 
             if (response.status === 200) {
-                const response = await fetch(`http://localhost:5000/command?commandText=[ESP220]/${file.name}`)
-
-                console.log(response)
+                const response = await fetch(`http://localhost:5000/command?commandText=[ESP220]/${file.name}`);
+                setJobStarted(true);
+                console.log(response);
             }
         } catch (err) {
             console.log('Error While Uploading -> ', err);
@@ -183,44 +221,72 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
                             </div>
                         </div> 
                         <div className="flex justify-between sm:items-start items-baseline sm:pt-12 pt-5">
-                            <div>
-                                <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">
-                                    <span>Ready To</span> 
-                                    <span className="text-[#092f61]">Plot</span> 
-                                    <span className="text-[30px] font-extrabold text-[#092f61]">!</span>
-                                </p>
-                                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                                <p className="sm:text-[13px] text-[11px] pr-3">Click the <span className="font-semibold">'Plot'</span> Button to draw the pictures in from the canvas.</p>
-                            </div>
+                            { jobStarted ? 
+                                <div>
+                                    <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">
+                                        <span className="text-[#15af7c]">Job Started</span>
+                                        <span className="text-[30px] font-extrabold text-[#15a528]">!</span>
+                                    </p>
+                                    {/* eslint-disable-next-line react/no-unescaped-entities */}
+                                    <p className="sm:text-[13px] text-[11px] pr-3">Click the <span className="font-semibold">'Refresh'</span> Button to re-plot or plot from the beginning.</p>
+                                </div> :
+                                <div>
+                                    <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">
+                                        <span>Ready To</span> 
+                                        <span className="text-[#092f61]">Plot</span> 
+                                        <span className="text-[30px] font-extrabold text-[#092f61]">!</span>
+                                    </p>
+                                    {/* eslint-disable-next-line react/no-unescaped-entities */}
+                                    <p className="sm:text-[13px] text-[11px] pr-3">Click the <span className="font-semibold">'Plot'</span> Button to draw the pictures in from the canvas.</p>
+                                </div>
+                            }
                             <img className="object-contain w-[45%] mt-auto" src="/plot.svg" alt="" />
                         </div>
                     </div>
                 }
                 </div>
-                
+                { !socket.connecting && !socket.connected && 
                 <div className="content" >
                     <div className="flex justify-end gap-4 mt-10">
-                        { !socket.connecting && !socket.connected && 
+                        
+                            <button 
+                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
+                                onClick={openSocket}
+                            >Retry</button>
+                        
+
+                        {/* { !socket.connecting && !socket.connected && 
                             <button 
                                 className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
                                 onClick={openSocket}
                             >Retry</button>
                         }
-                        { socket.connected && 
+                        { !socket.connected && !jobStarted && 
                             <button 
                                 className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
                                 onClick={plot}
                             >Plot</button>
                         }
+                        { socket.connected && jobStarted && 
+                            <button 
+                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
+                                onClick={ () => {
+                                    setJobStarted(false);
+                                }}
+                            >Refresh</button>
+                        }
                         <button 
                             className="transition-all duration-300 bg-[#23325cbb] hover:bg-[#1C274C] px-8 py-[2px] text-white"
                             onClick={ () => { 
+                                ws.close();
+                                setWs(null);
                                 setModalOpen(false) ;
                             }}
                         > Cancel
-                        </button>
+                        </button> */}
                     </div>
                 </div>
+                }
             </div>
         </ReactModal>
     )

@@ -9,6 +9,7 @@ import {
     Power,
     Dot,
     FileCog,
+    Plug
 } from "lucide-react";
 import useCanvas from "../../context";
 import './cut.css';
@@ -47,7 +48,7 @@ export const Plot = () => {
                     }
                 }
             }
-            http.open("GET", "http://localhost:5000/command?commandText=" + encodeURI(gcode), true);
+            http.open("GET", "http://192.168.0.1/command?commandText=" + encodeURI(gcode), true);
             http.send();
 
         } catch (err) {
@@ -73,7 +74,7 @@ export const Plot = () => {
             })
         }
     }, [canvas]);
-    
+
 
      // Scroll the textarea to the bottom when it overflows
     useEffect(() => {
@@ -112,7 +113,8 @@ export const Plot = () => {
                     <button 
                         className="p-3 bg-[#1C274C] rounded"
                         onClick={ () => {
-                            sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                            // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                            sendToMachine(`G91 G21  F4000 Y10`);
                             setControllers({...controllers, y: controllers.y + 10});
                         }}
                         >
@@ -122,7 +124,8 @@ export const Plot = () => {
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
                             onClick={ () => {
-                                sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                                // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                                sendToMachine(`G91 G21  F4000 X-10`);
                                 setControllers({...controllers, x: (controllers.x - 10) < 0 ? 0 : controllers.x - 10});
                             }}>
                             <ChevronLeft size={20} strokeWidth={4} color={'#F5762E'}/>
@@ -135,7 +138,8 @@ export const Plot = () => {
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
                             onClick={ () => {
-                                sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                                // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                                sendToMachine(`G91 G21  F4000 X10`);
                                 setControllers({...controllers, x: controllers.x + 10});
                             }}>
                             <ChevronRight size={20} strokeWidth={4} color={'#F5762E'}/>
@@ -144,7 +148,8 @@ export const Plot = () => {
                     <button 
                         className="p-3 bg-[#1C274C] rounded"
                         onClick={ () => {
-                            sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                            // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
+                            sendToMachine(`G91 G21  F4000 Y-10`);
                             setControllers({...controllers, y: (controllers.y - 10) < 0 ? 0 : controllers.y - 10});
                         }}>
                         <ChevronDown size={20} strokeWidth={4} color={'#F5762E'}/>
@@ -154,19 +159,25 @@ export const Plot = () => {
                 <div className="flex w-full items-end justify-between">
                     { !ws ? (
                         <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
-                            <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px] "> Ready</span>
+                            <Plug size={18} strokeWidth={2} color="#FFFFFF"/>
+                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Ready</span>
                         </button>
                     ) : (
-                        <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-1 px-6 rounded-full" onClick={ closeConnection }>
-                            <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                            <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] "> Disconnect</span>
-                        </button>
+                        <>
+                            <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
+                                <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
+                                <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Plot</span>
+                            </button>
+                            <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-3 px-8 rounded-md" onClick={ closeConnection }>
+                                <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
+                                <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Disconnect</span>
+                            </button>
+                        </>
                     )}
-                    <p className="flex items-center gap-1">
+                    {/* <p className="flex items-center gap-1">
                         <Dot size={20} strokeWidth={4} className={!ws ? 'text-[#d41d1d]' : 'text-[#2c944f]'} /> 
                         <span className={`text-[12px] ${!ws ? 'text-[#d41d1d]' : 'text-[#2c944f]'}`}>{ ws ? 'Device Connected' : 'No Device Connected'}</span>
-                    </p>
+                    </p> */}
                 </div>
 
                 {/* <div className="flex justify-between w-full">
