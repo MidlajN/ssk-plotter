@@ -7,7 +7,6 @@ import {
     ChevronDown,
     Home,
     Power,
-    // Dot,
     FileCog,
     Plug
 } from "lucide-react";
@@ -87,10 +86,6 @@ export const Plot = () => {
         formData.append('file', file);
         
         try {
-            // const response = await fetch(`http://${ machineUrl }/upload`, {
-            //     method: 'POST',
-            //     body: formData,
-            // });
             const http = new XMLHttpRequest();
             http.onreadystatechange = () => {
                 console.log(http)
@@ -107,16 +102,6 @@ export const Plot = () => {
             }
             http.open("POST", `http://${ machineUrl }/upload`, true);
             http.send(formData);
-
-            // const result = await response.json();
-            // console.log('File Upload Finished -> ', result, response.status);
-
-            // if (response.status === 200) {
-            //     const response = await fetch(`http://${ machineUrl }/command?commandText=[ESP220]/${file.name}`);
-            //     setJob({ connecting: false, connected: true, started:  true})
-            //     setSetupModal(true)
-            //     console.log(response);
-            // }
         } catch (err) {
             console.log('Error While Uploading -> ', err);
         }

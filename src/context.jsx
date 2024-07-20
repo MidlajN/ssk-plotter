@@ -102,7 +102,7 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
-    const [ response, setResponse ] = useState({ visible: false, line: 0, message: '' });
+    const [ response, setResponse ] = useState({ visible: false, message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
@@ -160,7 +160,7 @@ export const CommunicationProvider = ({ children }) => {
                     setResponse(prev => ({ 
                         ...prev, 
                         line: prev.line + 1, 
-                        message: `${ prev.message }${prev.line + 1}   ${ text } \n`
+                        message: prev.message + text + "\n"
                     }));
                 };
                 reader.readAsText(event.data);
@@ -170,7 +170,7 @@ export const CommunicationProvider = ({ children }) => {
                 setResponse(prev => ({ 
                     ...prev, 
                     line: prev.line + 1, 
-                    message: `${ prev.message }${prev.line + 1}   ${ text } \n`
+                    message: prev.message + text + "\n"
                 }));
 
             } else {
@@ -178,7 +178,7 @@ export const CommunicationProvider = ({ children }) => {
                 setResponse(prev => ({ 
                     ...prev, 
                     line: prev.line + 1, 
-                    message: `${ prev.message }${prev.line + 1}   ${ event.data } \n`
+                    message: prev.message + event.data + "\n"
                 }));
             }
         }
@@ -190,7 +190,7 @@ export const CommunicationProvider = ({ children }) => {
             setResponse(prev => ({ 
                 ...prev, 
                 line: prev.line + 1, 
-                message: `${prev.message}${ prev.line + 1 } Socket Connection Closed ... \n`
+                message: prev.message + 'Socket Connection Closed ... \n'
             }));
         }
 
