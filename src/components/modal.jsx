@@ -3,111 +3,35 @@
 /* eslint-disable react/prop-types */
 import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { Webhook } from "lucide-react";
 import { useCom } from "../context";
 ReactModal.setAppElement('#root');
 
 
-export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse, job, setJob}) => {
-    // const { machineUrl, port } = useCanvas();
-    const { machineUrl } = useCom();
-    
-    const openSocket = useCallback(() => {
-        if (ws !== null) return;
-        try {
-            setJob({ connecting: true, connected: false, started: false })
-            // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
-            setTimeout(() => {
-                // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
-                setWs(new WebSocket(`ws://${machineUrl}`));
-            }, 3000)
-
-        } catch (err) {
-            setWs(null);
-        }
-    }, [])
-
-    useEffect(() => {
-        if (!ws) return;
-        ws.onopen = () => {
-            
-            // For Test
-            const sendPing = () => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send('Ping');
-                    setTimeout(sendPing, 5000);
-                }
-            };
-            sendPing();
-
-            setJob({ connecting: false, connected: true, started: false })
-
-            setTimeout(() => {
-                setModalOpen(false);
-            }, 3000);
-        }
-        
-        ws.onmessage = (event) => {
-            if (event.data instanceof Blob) {
-                console.log('Blob ', event.data)
-                const reader = new FileReader();
-                reader.onload = function() {
-                    const text = reader.result;
-                    console.log('Blob as Text: ', text);
-                    setResponse(prev => ({ ...prev, message: prev.message + text + "\n" }));
-                };
-                reader.readAsText(event.data);
-            } else if (event.data instanceof ArrayBuffer) {
-                const arrayBuffer = event.data;
-                const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
-                setResponse(prev => ({ ...prev, message: prev.message + text }));
-
-            } else {
-                console.log('Response :', event)
-                setResponse(prev => ({ ...prev, message: prev.message + event.data + "\n" }));
-            }
-        }
-
-        ws.onclose = () => {
-            setWs(null);
-            if (job.started) setJob({ connected: false, connecting: false, started: false });
-            setResponse(prev => ({ ...prev, message: prev.message +`Socket Connection Closed ... \nSocket URL : ws://localhost:5000 \n` }));
-            if (job.connected) setModalOpen(false);
-        }
-
-        ws.onerror = (err) => {
-            console.log('Socket error -> ', err);
-            setJob({ connected: false, connecting: false, started: false })
-        }
-
-        return () => {
-            // console.log('Socket Check : ', job)
-        }
-    }, [job, ws])
-
+export const SetupModal = () => {
+    const { 
+        ws,
+        job,
+        openSocket,
+        setupModal,
+        setSetupModal
+    } = useCom();
 
     useEffect(() => {
         if (ws || job.connected) {
             setTimeout(() => {
-                setModalOpen(false);
+                setSetupModal(false);
             }, 3000)
             return
         } else {
-            console.log('Function execution from useEffect ->')
             openSocket();
         }
-        
-        // return () =>{
-        //     console.log('Socket : ', job)
-        // }
-    }, [setModalOpen]);
-
-    
+    }, [setupModal]);
 
     return (
         <ReactModal 
-            isOpen={modalOpen} 
+            isOpen={setupModal} 
             style={{ 
                 overlay: { 
                     width: 'fit-content',
@@ -166,7 +90,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse, job
                                         <span className="text-[30px] font-extrabold text-[#15a528]">!</span>
                                     </p>
                                     {/* eslint-disable-next-line react/no-unescaped-entities */}
-                                    <p className="sm:text-[13px] text-[11px] pr-3">Click the <span className="font-semibold">'Refresh'</span> Button to re-plot or plot from the beginning.</p>
+                                    <p className="sm:text-[13px] text-[11px] pr-3">The machine will start to plot in your canvas</p>
                                 </div> :
                                 <div>
                                     <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">

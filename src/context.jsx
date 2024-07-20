@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
 
@@ -102,8 +102,9 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
-    const [ response, setResponse ] = useState({ visible: false, message: '' });
+    const [ response, setResponse ] = useState({ visible: false, line: 0, message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
+    const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [ machineUrl, port ] = [ 'localhost:5000', '5000'];
     // const [ machineUrl, port ] = [ '192.168.0.1', '81']
@@ -111,6 +112,98 @@ export const CommunicationProvider = ({ children }) => {
     // const port = '5000'
     // const machineUrl = '192.168.0.1'
     // const port = '192.168.0.1'
+
+
+    const openSocket = useCallback(() => {
+        if (ws !== null) return;
+        try {
+            setJob({ connecting: true, connected: false, started: false })
+            // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
+            setTimeout(() => {
+                // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
+                setWs(new WebSocket(`ws://${machineUrl}`));
+            }, 3000)
+
+        } catch (err) {
+            setWs(null);
+        }
+    }, [])
+
+
+    useEffect(() => {
+        if (!ws) return;
+        ws.onopen = () => {
+            
+            // For Test
+            const sendPing = () => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send('Ping');
+                    setTimeout(sendPing, 5000);
+                }
+            };
+            sendPing();
+
+            setJob({ connecting: false, connected: true, started: false })
+
+            setTimeout(() => {
+                setSetupModal(false);
+            }, 3000);
+        }
+        
+        ws.onmessage = (event) => {
+            if (event.data instanceof Blob) {
+                console.log('Blob ', event.data)
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const text = reader.result;
+                    console.log('Blob as Text: ', text);
+                    setResponse(prev => ({ 
+                        ...prev, 
+                        line: prev.line + 1, 
+                        message: `${ prev.message }${prev.line + 1}   ${ text } \n`
+                    }));
+                };
+                reader.readAsText(event.data);
+            } else if (event.data instanceof ArrayBuffer) {
+                const arrayBuffer = event.data;
+                const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
+                setResponse(prev => ({ 
+                    ...prev, 
+                    line: prev.line + 1, 
+                    message: `${ prev.message }${prev.line + 1}   ${ text } \n`
+                }));
+
+            } else {
+                console.log('Response :', event)
+                setResponse(prev => ({ 
+                    ...prev, 
+                    line: prev.line + 1, 
+                    message: `${ prev.message }${prev.line + 1}   ${ event.data } \n`
+                }));
+            }
+        }
+
+        ws.onclose = () => {
+            setWs(null);
+            setJob({ connected: false, connecting: false, started: false });
+
+            setResponse(prev => ({ 
+                ...prev, 
+                line: prev.line + 1, 
+                message: `${prev.message}${ prev.line + 1 } Socket Connection Closed ... \n`
+            }));
+        }
+
+        ws.onerror = (err) => {
+            console.log('Socket error -> ', err);
+            setJob({ connected: false, connecting: false, started: false })
+        }
+
+        return () => {
+            // console.log('Socket Check : ', job)
+        }
+    }, [job, ws])
+
 
     return (
         <ComContext.Provider 
@@ -122,7 +215,10 @@ export const CommunicationProvider = ({ children }) => {
                 ws,
                 setWs,
                 machineUrl,
-                port
+                port,
+                setupModal, 
+                setSetupModal,
+                openSocket
             }}
         >
             { children }

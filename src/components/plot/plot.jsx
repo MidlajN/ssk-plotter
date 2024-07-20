@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { 
     ChevronLeft,
     ChevronRight,
@@ -22,21 +22,16 @@ export const Plot = () => {
     const { canvas } = useCanvas();
     const {
         response,
-        setResponse, 
         ws, 
         setWs,
         job,
         setJob,
-        machineUrl
+        machineUrl,
+        setupModal, 
+        setSetupModal
     } = useCom();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
-    // const [ controllers, setControllers ] = useState({x: 0, y: 0});
-    // const [ response, setResponse ] = useState({ visible: false, message: '' });
-    // const [ ws, setWs ] = useState(null);
-    const [ setupModal, setSetupModal ] = useState(false);
-    // const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
-
 
     const handleConnection = async () => {
         setSetupModal(true)
@@ -48,6 +43,7 @@ export const Plot = () => {
     }
 
     const plot =  async () => {
+        if (job.started) return
         const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : "M03 S1", // Red
@@ -120,7 +116,7 @@ export const Plot = () => {
                 if (http.readyState === 4) {
                     console.log(http);
                     if (http.status === 200) {
-                        console.log(http.responseText); // Log the response from ESP_GRBL server
+                        console.log(http.responseText);
                     }
                 }
             }
@@ -151,8 +147,7 @@ export const Plot = () => {
         }
     }, [canvas]);
 
-
-     // Scroll the textarea to the bottom when it overflows
+    // Scroll the textarea to the bottom when it overflows
     useEffect(() => {
         if ( textareaRef.current ) {
             textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
@@ -167,7 +162,7 @@ export const Plot = () => {
                 <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
                 </div>
                 <div className="text-sm responses h-[90%] relative">
-                    <textarea ref={textareaRef} defaultValue={ response.message } ></textarea>
+                    <textarea ref={textareaRef} value={ response.message } className="pointer-events-none" readOnly></textarea>
                     <div className="absolute w-full bottom-0 left-0 p-3">
                         <input 
                             ref={ gcodeRef }
@@ -189,9 +184,7 @@ export const Plot = () => {
                     <button 
                         className="p-3 bg-[#1C274C] rounded"
                         onClick={ () => {
-                            // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                             sendToMachine(`G91 G21  F4000 Y10`);
-                            // setControllers({...controllers, y: controllers.y + 10});
                         }}
                         >
                         <ChevronUp size={20} strokeWidth={4} color={'#F5762E'}/>
@@ -200,9 +193,7 @@ export const Plot = () => {
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
                             onClick={ () => {
-                                // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                                 sendToMachine(`G91 G21  F4000 X-10`);
-                                // setControllers({...controllers, x: (controllers.x - 10) < 0 ? 0 : controllers.x - 10});
                             }}>
                             <ChevronLeft size={20} strokeWidth={4} color={'#F5762E'}/>
                         </button>
@@ -214,9 +205,7 @@ export const Plot = () => {
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
                             onClick={ () => {
-                                // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                                 sendToMachine(`G91 G21  F4000 X10`);
-                                // setControllers({...controllers, x: controllers.x + 10});
                             }}>
                             <ChevronRight size={20} strokeWidth={4} color={'#F5762E'}/>
                         </button>
@@ -224,9 +213,7 @@ export const Plot = () => {
                     <button 
                         className="p-3 bg-[#1C274C] rounded"
                         onClick={ () => {
-                            // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                             sendToMachine(`G91 G21  F4000 Y-10`);
-                            // setControllers({...controllers, y: (controllers.y - 10) < 0 ? 0 : controllers.y - 10});
                         }}>
                         <ChevronDown size={20} strokeWidth={4} color={'#F5762E'}/>
                     </button>
@@ -250,38 +237,10 @@ export const Plot = () => {
                             </button>
                         </>
                     )}
-                    {/* <p className="flex items-center gap-1">
-                        <Dot size={20} strokeWidth={4} className={!ws ? 'text-[#d41d1d]' : 'text-[#2c944f]'} /> 
-                        <span className={`text-[12px] ${!ws ? 'text-[#d41d1d]' : 'text-[#2c944f]'}`}>{ ws ? 'Device Connected' : 'No Device Connected'}</span>
-                    </p> */}
                 </div>
-
-                {/* <div className="flex justify-between w-full">
-                    <button className="flex items-center justify-center gap-1 bg-[#027200] py-1 px-5 rounded text-nowrap" onClick={handleJob}>
-                        <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[12px] tracking-wide"> Start Job</span>
-                    </button>
-                    <button className="flex items-center justify-center gap-1 bg-[#1C274C] py-1 px-5 rounded">
-                        <Pause size={18} strokeWidth={2} fill="#FFFFFF" color="#FFFFFF" /> 
-                        <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] tracking-wide"> Pause</span>
-                    </button>
-                    <button className="flex items-center justify-center gap-1 bg-[#BE0A0A] py-1 px-5 rounded-full" >
-                        <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                        <span className="text-[#FFFFFF] font-['MarryWeatherSans'] text-[14px] tracking-wide"> Stop</span>
-                    </button>
-                </div> */}
             </div>
 
-            { setupModal &&
-                <SetupModal 
-                    modalOpen={setupModal} 
-                    setModalOpen={setSetupModal}
-                    setWs={setWs}
-                    ws={ws}
-                    setResponse={setResponse}
-                    job={job}
-                    setJob={setJob}
-                /> 
-            }
+            { setupModal && <SetupModal /> }
         </div>
     )
 }
