@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
@@ -78,9 +79,54 @@ export const CanvasProvider = ({ children }) => {
     }, [canvas, copiedObject]);
 
     return (
-        <CanvasContext.Provider value={{ canvas, canvasRef, objectValues, setObjectValues, copiedObject, setCopiedObject }}>
+        <CanvasContext.Provider 
+            value={{ 
+                canvas, 
+                canvasRef, 
+                objectValues, 
+                setObjectValues, 
+                copiedObject, 
+                setCopiedObject, 
+            }}
+        >
             { children }
         </CanvasContext.Provider>
     );
 };
 
+
+const ComContext = createContext(null);
+
+export function useCom() {
+    return useContext(ComContext);
+}
+
+export const CommunicationProvider = ({ children }) => {
+    const [ response, setResponse ] = useState({ visible: false, message: '' });
+    const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
+    const [ ws, setWs ] = useState(null);
+    const [ machineUrl, port ] = [ 'localhost:5000', '5000'];
+    // const [ machineUrl, port ] = [ '192.168.0.1', '81']
+    // const machineUrl = 'localhost'
+    // const port = '5000'
+    // const machineUrl = '192.168.0.1'
+    // const port = '192.168.0.1'
+
+    return (
+        <ComContext.Provider 
+            value={{
+                response,
+                setResponse,
+                job,
+                setJob,
+                ws,
+                setWs,
+                machineUrl,
+                port
+            }}
+        >
+            { children }
+        </ComContext.Provider>
+    )
+
+}

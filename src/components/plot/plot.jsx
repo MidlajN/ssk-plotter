@@ -7,11 +7,11 @@ import {
     ChevronDown,
     Home,
     Power,
-    Dot,
+    // Dot,
     FileCog,
     Plug
 } from "lucide-react";
-import useCanvas from "../../context";
+import useCanvas, { useCom } from "../../context";
 import './cut.css';
 import { SetupModal } from "../modal";
 import tinycolor from "tinycolor2";
@@ -20,12 +20,22 @@ import { Converter } from "svg-to-gcode";
 
 export const Plot = () => {
     const { canvas } = useCanvas();
+    const {
+        response,
+        setResponse, 
+        ws, 
+        setWs,
+        job,
+        setJob,
+        machineUrl
+    } = useCom();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
-    const [ controllers, setControllers ] = useState({x: 0, y: 0});
-    const [ response, setResponse ] = useState({ visible: false, message: '' });
-    const [ ws, setWs ] = useState(null);
+    // const [ controllers, setControllers ] = useState({x: 0, y: 0});
+    // const [ response, setResponse ] = useState({ visible: false, message: '' });
+    // const [ ws, setWs ] = useState(null);
     const [ setupModal, setSetupModal ] = useState(false);
+    // const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
 
 
     const handleConnection = async () => {
@@ -81,7 +91,7 @@ export const Plot = () => {
         formData.append('file', file);
         
         try {
-            const response = await fetch('http://192.168.0.1/upload', {
+            const response = await fetch(`http://${ machineUrl }/upload`, {
                 method: 'POST',
                 body: formData,
             });
@@ -90,8 +100,9 @@ export const Plot = () => {
             console.log('File Upload Finished -> ', result, response.status);
 
             if (response.status === 200) {
-                const response = await fetch(`http://localhost:5000/command?commandText=[ESP220]/${file.name}`);
-                setJobStarted(true);
+                const response = await fetch(`http://${ machineUrl }/command?commandText=[ESP220]/${file.name}`);
+                setJob({ connecting: false, connected: true, started:  true})
+                setSetupModal(true)
                 console.log(response);
             }
         } catch (err) {
@@ -113,7 +124,7 @@ export const Plot = () => {
                     }
                 }
             }
-            http.open("GET", "http://192.168.0.1/command?commandText=" + encodeURI(gcode), true);
+            http.open("GET", `http://${ machineUrl }/command?commandText=` + encodeURI(gcode), true);
             http.send();
 
         } catch (err) {
@@ -180,7 +191,7 @@ export const Plot = () => {
                         onClick={ () => {
                             // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                             sendToMachine(`G91 G21  F4000 Y10`);
-                            setControllers({...controllers, y: controllers.y + 10});
+                            // setControllers({...controllers, y: controllers.y + 10});
                         }}
                         >
                         <ChevronUp size={20} strokeWidth={4} color={'#F5762E'}/>
@@ -191,13 +202,13 @@ export const Plot = () => {
                             onClick={ () => {
                                 // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                                 sendToMachine(`G91 G21  F4000 X-10`);
-                                setControllers({...controllers, x: (controllers.x - 10) < 0 ? 0 : controllers.x - 10});
+                                // setControllers({...controllers, x: (controllers.x - 10) < 0 ? 0 : controllers.x - 10});
                             }}>
                             <ChevronLeft size={20} strokeWidth={4} color={'#F5762E'}/>
                         </button>
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
-                            onClick={ () => sendToMachine('G28')} >
+                            onClick={ () => sendToMachine('$H')} >
                             <Home size={20} strokeWidth={2} color={'#ffffff'}/>
                         </button>
                         <button 
@@ -205,7 +216,7 @@ export const Plot = () => {
                             onClick={ () => {
                                 // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                                 sendToMachine(`G91 G21  F4000 X10`);
-                                setControllers({...controllers, x: controllers.x + 10});
+                                // setControllers({...controllers, x: controllers.x + 10});
                             }}>
                             <ChevronRight size={20} strokeWidth={4} color={'#F5762E'}/>
                         </button>
@@ -215,7 +226,7 @@ export const Plot = () => {
                         onClick={ () => {
                             // sendToMachine(`G00 X${controllers.x} Y${controllers.y}`);
                             sendToMachine(`G91 G21  F4000 Y-10`);
-                            setControllers({...controllers, y: (controllers.y - 10) < 0 ? 0 : controllers.y - 10});
+                            // setControllers({...controllers, y: (controllers.y - 10) < 0 ? 0 : controllers.y - 10});
                         }}>
                         <ChevronDown size={20} strokeWidth={4} color={'#F5762E'}/>
                     </button>
@@ -229,7 +240,7 @@ export const Plot = () => {
                         </button>
                     ) : (
                         <>
-                            <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
+                            <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ plot }>
                                 <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                                 <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Plot</span>
                             </button>
@@ -267,6 +278,8 @@ export const Plot = () => {
                     setWs={setWs}
                     ws={ws}
                     setResponse={setResponse}
+                    job={job}
+                    setJob={setJob}
                 /> 
             }
         </div>

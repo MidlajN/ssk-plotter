@@ -1,52 +1,47 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 /* eslint-disable react/prop-types */
 import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { Webhook } from "lucide-react";
-import useCanvas from "../context";
-import tinycolor from "tinycolor2";
-import { Converter } from "svg-to-gcode";
+import { useCom } from "../context";
 ReactModal.setAppElement('#root');
 
 
-export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) => {
-    const [ socket, setSocket ] = useState({ connecting: false, connected: false })
-    const [ jobStarted, setJobStarted ] = useState(false);
-    const { canvas } = useCanvas();
+export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse, job, setJob}) => {
+    // const { machineUrl, port } = useCanvas();
+    const { machineUrl } = useCom();
     
     const openSocket = useCallback(() => {
         if (ws !== null) return;
         try {
-            setSocket({ connecting: true, connected: false })
+            setJob({ connecting: true, connected: false, started: false })
             // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
             setTimeout(() => {
-                // setWs(new WebSocket('ws://192.168.0.1:81'));
-                setWs(new WebSocket('ws://localhost:5000'));
+                // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
+                setWs(new WebSocket(`ws://${machineUrl}`));
             }, 3000)
 
         } catch (err) {
             setWs(null);
-            console.log("Error while connecting", err)
         }
-    }, [setWs, ws])
+    }, [])
 
     useEffect(() => {
         if (!ws) return;
-        console.log('Socket IS REady : ', socket)
         ws.onopen = () => {
-            console.log('Socket opened ->')
             
             // For Test
             const sendPing = () => {
                 if (ws.readyState === WebSocket.OPEN) {
-                    // console.log('Socket Still Running ->', socket)
                     ws.send('Ping');
                     setTimeout(sendPing, 5000);
                 }
             };
             sendPing();
 
-            setSocket({ connecting: false, connected: true })
+            setJob({ connecting: false, connected: true, started: false })
 
             setTimeout(() => {
                 setModalOpen(false);
@@ -60,12 +55,10 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
                 reader.onload = function() {
                     const text = reader.result;
                     console.log('Blob as Text: ', text);
-                    // You can also update your response state here
                     setResponse(prev => ({ ...prev, message: prev.message + text + "\n" }));
                 };
                 reader.readAsText(event.data);
-            }
-            if (event.data instanceof ArrayBuffer) {
+            } else if (event.data instanceof ArrayBuffer) {
                 const arrayBuffer = event.data;
                 const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
                 setResponse(prev => ({ ...prev, message: prev.message + text }));
@@ -78,35 +71,37 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
 
         ws.onclose = () => {
             setWs(null);
-            if (jobStarted) setJobStarted(false);
+            if (job.started) setJob({ connected: false, connecting: false, started: false });
             setResponse(prev => ({ ...prev, message: prev.message +`Socket Connection Closed ... \nSocket URL : ws://localhost:5000 \n` }));
-            if (socket.connected) setModalOpen(false);
+            if (job.connected) setModalOpen(false);
         }
 
         ws.onerror = (err) => {
             console.log('Socket error -> ', err);
-            setSocket({ connected: false, connecting: false })
+            setJob({ connected: false, connecting: false, started: false })
         }
 
         return () => {
-            console.log('Socket Check : ', socket)
+            // console.log('Socket Check : ', job)
         }
-    }, [setResponse, setWs, socket, ws])
+    }, [job, ws])
 
 
     useEffect(() => {
-        if (ws) {
-            setSocket({ connected: true, connecting: false })
+        if (ws || job.connected) {
             setTimeout(() => {
                 setModalOpen(false);
             }, 3000)
+            return
+        } else {
+            console.log('Function execution from useEffect ->')
+            openSocket();
         }
-        openSocket();
-
-        return () =>{
-            console.log('Socket : ', socket)
-        }
-    }, []);
+        
+        // return () =>{
+        //     console.log('Socket : ', job)
+        // }
+    }, [setModalOpen]);
 
     
 
@@ -138,11 +133,11 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
             <div className="setupModal" >
                 
                 <div className="bg-white py-3 px-6">
-                { !socket.connected ?
+                { !job.connected ?
                     <div className="flex items-center gap-6 p-5">
-                        <Triangle visible={true} width={40} height={40} color={ socket.connecting ? '#1c7f969c' : '#831414'} ariaLabel="infinity-spin-loading" />
+                        <Triangle visible={true} width={40} height={40} color={ job.connecting ? '#1c7f969c' : '#831414'} ariaLabel="infinity-spin-loading" />
                         <div className="config">
-                            { socket.connecting ? 
+                            { job.connecting ? 
                                 <p className="sm:text-[25px] text-[20px]">
                                     Connecting <span className="dots"></span>
                                 </p> : 
@@ -164,7 +159,7 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
                             </div>
                         </div> 
                         <div className="flex justify-between sm:items-start items-baseline sm:pt-12 pt-5">
-                            { jobStarted ? 
+                            { job.started ? 
                                 <div>
                                     <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">
                                         <span className="text-[#15af7c]">Job Started</span>
@@ -188,45 +183,13 @@ export const SetupModal = ({modalOpen, setModalOpen, ws, setWs, setResponse}) =>
                     </div>
                 }
                 </div>
-                { !socket.connecting && !socket.connected && 
+                { !job.connecting && !job.connected && 
                 <div className="content" >
                     <div className="flex justify-end gap-4 mt-10">
-                        
-                            <button 
-                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={openSocket}
-                            >Retry</button>
-                        
-
-                        {/* { !socket.connecting && !socket.connected && 
-                            <button 
-                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={openSocket}
-                            >Retry</button>
-                        }
-                        { !socket.connected && !jobStarted && 
-                            <button 
-                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={plot}
-                            >Plot</button>
-                        }
-                        { socket.connected && jobStarted && 
-                            <button 
-                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={ () => {
-                                    setJobStarted(false);
-                                }}
-                            >Refresh</button>
-                        }
                         <button 
-                            className="transition-all duration-300 bg-[#23325cbb] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                            onClick={ () => { 
-                                ws.close();
-                                setWs(null);
-                                setModalOpen(false) ;
-                            }}
-                        > Cancel
-                        </button> */}
+                            className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
+                            onClick={openSocket}
+                        >Retry</button>
                     </div>
                 </div>
                 }
