@@ -121,7 +121,7 @@ export const CommunicationProvider = ({ children }) => {
             // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
             setTimeout(() => {
                 // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
-                setWs(new WebSocket(`ws://${machineUrl}`));
+                setWs(new WebSocket(`ws://localhost:5000`));
             }, 3000)
 
         } catch (err) {

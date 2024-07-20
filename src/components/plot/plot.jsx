@@ -43,7 +43,7 @@ export const Plot = () => {
     }
 
     const plot =  async () => {
-        if (job.started) return
+        if (job.started) return;
         const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : "M03 S1", // Red
@@ -87,20 +87,36 @@ export const Plot = () => {
         formData.append('file', file);
         
         try {
-            const response = await fetch(`http://${ machineUrl }/upload`, {
-                method: 'POST',
-                body: formData,
-            });
-
-            const result = await response.json();
-            console.log('File Upload Finished -> ', result, response.status);
-
-            if (response.status === 200) {
-                const response = await fetch(`http://${ machineUrl }/command?commandText=[ESP220]/${file.name}`);
-                setJob({ connecting: false, connected: true, started:  true})
-                setSetupModal(true)
-                console.log(response);
+            // const response = await fetch(`http://${ machineUrl }/upload`, {
+            //     method: 'POST',
+            //     body: formData,
+            // });
+            const http = new XMLHttpRequest();
+            http.onreadystatechange = () => {
+                console.log(http)
+                if (http.readyState === 4) {
+                    console.log(http);
+                    if (http.status === 200) {
+                        console.log(http.responseText);
+                        sendToMachine(`[ESP220]/${file.name}`)
+                        console.log('HTTP : RAN : ', response)
+                        setJob({ connecting: false, connected: true, started:  true})
+                        setSetupModal(true)
+                    }
+                }
             }
+            http.open("POST", `http://${ machineUrl }/upload`, true);
+            http.send(formData);
+
+            // const result = await response.json();
+            // console.log('File Upload Finished -> ', result, response.status);
+
+            // if (response.status === 200) {
+            //     const response = await fetch(`http://${ machineUrl }/command?commandText=[ESP220]/${file.name}`);
+            //     setJob({ connecting: false, connected: true, started:  true})
+            //     setSetupModal(true)
+            //     console.log(response);
+            // }
         } catch (err) {
             console.log('Error While Uploading -> ', err);
         }
@@ -110,7 +126,9 @@ export const Plot = () => {
 
     const sendToMachine = async (gcode) => {
         try {
-
+            console.log(
+                'Function FOR SEND : ', gcode
+            )
             const http = new XMLHttpRequest();
             http.onreadystatechange = () => {
                 if (http.readyState === 4) {
