@@ -15,30 +15,31 @@ export const SetupModal = () => {
         job,
         openSocket,
         setupModal,
-        setSetupModal
+        machineUrl
     } = useCom();
 
-    useEffect(() => {
-        if (ws || job.connected) {
-            setTimeout(() => {
-                setSetupModal(false);
-            }, 3000)
-            return
-        } else {
-            openSocket();
-        }
-    }, [setupModal]);
+    // useEffect(() => {
+    //     if (ws || job.connected) {
+    //         setTimeout(() => {
+    //             // setSetupModal(false);
+    //         }, 3000)
+    //         return
+    //     } else {
+    //         // openSocket();
+    //     }
+    // }, [setupModal]);
 
     return (
         <ReactModal 
             isOpen={setupModal} 
             style={{ 
                 overlay: { 
-                    width: 'fit-content',
-                    height: 'fit-content', 
-                    top: '50%', 
-                    left: '50%', 
-                    transform: 'translate(-50%, -50%)',
+                    // width: 'fit-content',
+                    // height: 'fit-content', 
+                    // top: '50%', 
+                    // left: '50%', 
+                    // transform: 'translate(-50%, -50%)',
+                    background: 'transparent'
                 }, 
                 content: { 
                     width: 'fit-content', 
@@ -50,8 +51,10 @@ export const SetupModal = () => {
                     border: 'none',
                     // width: '50rem',
                     // minWidth: '30rem',
+                    maxWidth: '30rem',
                     borderRadius: 'none',
                     background: 'transparent'
+
                 } 
             }}>
             <div className="setupModal" >
@@ -69,7 +72,7 @@ export const SetupModal = () => {
                                     Couldn&apos;t Connect
                                 </p>
                             }
-                            <p className="text-[15px]">URL : <span className=" text-slate-400">ws://kochund.local:86</span></p>
+                            <p className="text-[15px]">URL : <span className=" text-slate-400">ws://{ machineUrl }</span></p>
                         </div>
                     </div> : 
                     <div className="p-5 overflow-hidden">

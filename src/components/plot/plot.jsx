@@ -27,12 +27,14 @@ export const Plot = () => {
         setJob,
         machineUrl,
         setupModal, 
-        setSetupModal
+        setSetupModal,
+        openSocket
     } = useCom();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
 
     const handleConnection = async () => {
+        openSocket();
         setSetupModal(true)
     }
 
@@ -42,7 +44,9 @@ export const Plot = () => {
     }
 
     const plot =  async () => {
-        if (job.started) return;
+        // if (job.started) return;
+        setJob({ connecting: false, connected: true, started:  false})
+        setSetupModal(true);
         const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : "M03 S1", // Red
@@ -95,8 +99,10 @@ export const Plot = () => {
                         console.log(http.responseText);
                         sendToMachine(`[ESP220]/${file.name}`)
                         console.log('HTTP : RAN : ', response)
-                        setJob({ connecting: false, connected: true, started:  true})
-                        setSetupModal(true)
+                        setJob({ connecting: false, connected: true, started:  true});
+                        setTimeout(() => {
+                            setSetupModal(false)
+                        }, 2000);
                     }
                 }
             }
