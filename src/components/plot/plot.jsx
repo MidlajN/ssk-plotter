@@ -8,7 +8,8 @@ import {
     Home,
     Power,
     FileCog,
-    Plug
+    Plug,
+    Pencil
 } from "lucide-react";
 import useCanvas, { useCom } from "../../context";
 import './cut.css';
@@ -242,8 +243,8 @@ export const Plot = () => {
                     ) : (
                         <>
                             <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ plot }>
-                                <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                                <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Plot</span>
+                                <Pencil size={18} strokeWidth={2} color="#FFFFFF" /> 
+                                <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]">Plot</span>
                             </button>
                             <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-3 px-8 rounded-md" onClick={ closeConnection }>
                                 <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
@@ -255,6 +256,7 @@ export const Plot = () => {
             </div>
 
             { setupModal && <SetupModal /> }
+            <SetupModal />
         </div>
     )
 }
