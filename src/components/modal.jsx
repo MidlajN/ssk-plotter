@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { Webhook } from "lucide-react";
 import { useCom } from "../context";
 ReactModal.setAppElement('#root');
@@ -11,7 +11,7 @@ ReactModal.setAppElement('#root');
 
 export const SetupModal = () => {
     const { 
-        ws,
+        // ws,
         job,
         openSocket,
         setupModal,
@@ -76,7 +76,7 @@ export const SetupModal = () => {
                         </div>
                     </div> : 
                     <div className="p-5 overflow-hidden">
-                        <div className="flex items-center gap-6">
+                        {/* <div className="flex items-center gap-6">
                             <Webhook width={40} height={40} color="#14831a" ariaLabel="infinity-spin-loading" strokeWidth={1} />
                             <div className="config">
                                     <p className="sm:text-[25px] text-[20px] text-[#14831a]">
@@ -84,7 +84,7 @@ export const SetupModal = () => {
                                     </p>
                                 <p className="sm:text-[15px] mt-1 text-[12px]">URL : <span className=" text-slate-400">ws://kochund.local:86</span></p>
                             </div>
-                        </div> 
+                        </div>  */}
                         <div className="flex justify-between sm:items-start items-baseline sm:pt-12 pt-5">
                             { job.started ? 
                                 <div>

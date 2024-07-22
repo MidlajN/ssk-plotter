@@ -104,6 +104,7 @@ export function useCom() {
 export const CommunicationProvider = ({ children }) => {
     const [ response, setResponse ] = useState({ visible: false, message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
+    const [ progress, setProgress ] = useState({ uploading: false, converting: false,})
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [ machineUrl, port ] = [ 'localhost:5000', '5000'];
@@ -219,7 +220,9 @@ export const CommunicationProvider = ({ children }) => {
                 port,
                 setupModal, 
                 setSetupModal,
-                openSocket
+                openSocket,
+                progress, 
+                setProgress
             }}
         >
             { children }

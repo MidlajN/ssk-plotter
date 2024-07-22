@@ -23,7 +23,7 @@ export const Plot = () => {
         response,
         ws, 
         setWs,
-        job,
+        // job,
         setJob,
         machineUrl,
         setupModal, 
@@ -91,14 +91,19 @@ export const Plot = () => {
         
         try {
             const http = new XMLHttpRequest();
+            http.upload.onprogress = (event) => {
+                console.log('EVET : ', event)
+                if (event.lengthComputable) {
+                    const precentCompleted = ( event.loaded / event.total ) * 100;
+                    console.log('Uploaded', precentCompleted);
+                }
+            }
             http.onreadystatechange = () => {
                 console.log(http)
                 if (http.readyState === 4) {
                     console.log(http);
                     if (http.status === 200) {
-                        console.log(http.responseText);
                         sendToMachine(`[ESP220]/${file.name}`)
-                        console.log('HTTP : RAN : ', response)
                         setJob({ connecting: false, connected: true, started:  true});
                         setTimeout(() => {
                             setSetupModal(false)
