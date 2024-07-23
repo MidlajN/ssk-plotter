@@ -83,7 +83,12 @@ export const Plot = () => {
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
-        const converter = new Converter();
+        let settings = {
+            zOffset : 3,
+            feedRate : 10000,
+            seekRate : 12000
+        }
+        const converter = new Converter(settings);
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             const [ code ] = await converter.convert(element.svg);
             const gCodeLines = code.split('\n');
@@ -93,6 +98,8 @@ export const Plot = () => {
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
+
+        console.log('Gcode Lines : ', gcodes.join('\n'));
 
         // Send to Machine
         const blob = new Blob([gcodes.join('\n')], { type: 'text/plain' });
@@ -107,13 +114,6 @@ export const Plot = () => {
             await delay(500);
 
             const http = new XMLHttpRequest();
-            // http.upload.onprogress = (event) => {
-            //     // console.log('EVET : ', event)
-            //     if (event.lengthComputable) {
-            //         const precentCompleted = ( event.loaded / event.total ) * 100;
-            //         // console.log('Uploaded', precentCompleted);
-            //     }
-            // }
             http.onreadystatechange = async () => {
                 if (http.readyState === 4) {
                     if (http.status === 200) {

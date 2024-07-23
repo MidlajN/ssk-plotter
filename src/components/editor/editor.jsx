@@ -9,6 +9,7 @@ import './editor.css';
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
     const { canvas } = useCanvas();
     const [ renderElements, setRenderElements ] = useState(false);
+    const [ renderColor, setRenderColor ] = useState(false);
 
     const handleColor = (e) => {
         const activeObject = canvas.getActiveObjects();
@@ -73,11 +74,19 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
 
                 <div 
                     className="overflow-hidden mt-4" 
-                    style={{ height: `${ tool === 'Elements' ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
+                    style={{ height: `${ renderElements ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
                     onTransitionEnd={handleTransitionEnd}
                 >
                     { renderElements && <Elements element={element} setElement={setElement}/>}
                 </div>
+
+                {/* <div 
+                    className="overflow-hidden mt-4" 
+                    style={{ height: `${ renderColor ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
+                    onTransitionEnd={handleTransitionEnd}
+                >
+                    { renderElements && <Elements element={element} setElement={setElement}/>}
+                </div> */}
 
             </div>
         </>
