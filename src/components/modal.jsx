@@ -18,10 +18,13 @@ export const SetupModal = () => {
         setupModal,
         setSetupModal,
         machineUrl,
-        // setJob
+        // setJob,
+        progress,
+        // setProgress
     } = useCom();
 
     useEffect(() => {
+        // setProgress({ uploading: false, converting: true, progress: 100 })
         // setJob({ connecting: false, connected: true, started: false })
     }, []);
 
@@ -42,7 +45,7 @@ export const SetupModal = () => {
                     transform: 'translate(-50%, -50%)',
                     padding: '0px',
                     border: 'none',
-                    maxWidth: '30rem',
+                    maxWidth: '33rem',
                     borderRadius: 'none',
                     background: 'transparent'
 
@@ -74,8 +77,8 @@ export const SetupModal = () => {
                         </div>
                     </div> : 
                     <div>
-                        <div className="flex justify-between sm:items-start items-baseline">
-                            { job.started ? 
+                        <div className="flex justify-between sm:items-start items-baseline gap-3">
+                            { job.started && !progress.converting && !progress.uploading &&
                                 <div>
                                     <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">
                                         <span className="text-[#15af7c]">Job Started</span>
@@ -83,7 +86,9 @@ export const SetupModal = () => {
                                     </p>
                                     {/* eslint-disable-next-line react/no-unescaped-entities */}
                                     <p className="sm:text-[13px] text-[11px] pr-3">The machine will start to plot in your canvas</p>
-                                </div> :
+                                </div>
+                            }
+                            { job.connected && !progress.converting && !progress.uploading && !job.started &&
                                 <div>
                                     <p className="text-nowrap sm:text-[27px] text-[20px] font-semibold text-gray-500 flex items-baseline gap-2">
                                         <span>Ready To</span> 
@@ -92,6 +97,40 @@ export const SetupModal = () => {
                                     </p>
                                     {/* eslint-disable-next-line react/no-unescaped-entities */}
                                     <p className="sm:text-[13px] text-[11px] pr-3">Click the <span className="font-semibold">'Plot'</span> Button to draw the pictures in from the canvas.</p>
+                                </div>
+                            }
+                            { job.connected && !progress.converting && progress.uploading &&
+                                <div className="h-full flex flex-col justify-center my-auto">
+                                    <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
+                                        {/* <span>Ready To</span>  */}
+                                        <span className="text-[#146a7e] sm:text-[20px] text-[15px]">Uploading</span> 
+                                        <span className="text-[20px] font-semibold text-[#146a7e]">!...</span>
+                                    </p>
+                                    <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
+                                        <div 
+                                            className="bg-[#1c8096] h-full transition-width duration-300" 
+                                            style={{ width: `${progress.progress}%` }}
+                                        />
+                                    </div>
+                                    {/* eslint-disable-next-line react/no-unescaped-entities */}
+                                    <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
+                                </div>
+                            }
+                            { job.connected && progress.converting && !progress.uploading &&
+                                <div className="h-full flex flex-col justify-center my-auto">
+                                    <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
+                                        {/* <span>Ready To</span>  */}
+                                        <span className="text-[#14427e] sm:text-[20px] text-[15px]">Converting</span> 
+                                        <span className="text-[20px] font-semibold text-[#14427e]">...</span>
+                                    </p>
+                                    <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
+                                        <div 
+                                            className="bg-[#14427e] h-full transition-width duration-300" 
+                                            style={{ width: `${progress.progress}%` }}
+                                        />
+                                    </div>
+                                    {/* eslint-disable-next-line react/no-unescaped-entities */}
+                                    <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
                                 </div>
                             }
                             <img className="object-contain w-[45%] mt-auto" src="/plot.svg" alt="" />

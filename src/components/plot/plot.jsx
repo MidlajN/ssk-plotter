@@ -29,7 +29,9 @@ export const Plot = () => {
         machineUrl,
         setupModal, 
         setSetupModal,
-        openSocket
+        openSocket,
+        // progress, 
+        setProgress
     } = useCom();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
@@ -44,10 +46,15 @@ export const Plot = () => {
         setWs(null);
     }
 
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     const plot =  async () => {
         // if (job.started) return;
-        setJob({ connecting: false, connected: true, started:  false})
+        setProgress({ uploading: false, converting: true, progress: 10 });
+        setJob({ connecting: false, connected: true, started:  false});
         setSetupModal(true);
+        await delay(500);
+
         const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : "M03 S1", // Red
@@ -73,6 +80,9 @@ export const Plot = () => {
             }
         });
 
+        setProgress({ uploading: false, converting: true, progress: 40 });
+        await delay(500);
+
         const converter = new Converter();
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             const [ code ] = await converter.convert(element.svg);
@@ -81,7 +91,8 @@ export const Plot = () => {
             return [ colorCommand[element.color] + cleanedGcodeLines.join('\n')];
         }));
 
-        console.log('Converted GCode -> \n', gcodes);
+        setProgress({ uploading: false, converting: true, progress: 80 });
+        await delay(500);
 
         // Send to Machine
         const blob = new Blob([gcodes.join('\n')], { type: 'text/plain' });
@@ -91,21 +102,27 @@ export const Plot = () => {
         formData.append('file', file);
         
         try {
+
+            setProgress({ uploading: true, converting: false, progress: 80  });
+            await delay(500);
+
             const http = new XMLHttpRequest();
-            http.upload.onprogress = (event) => {
-                console.log('EVET : ', event)
-                if (event.lengthComputable) {
-                    const precentCompleted = ( event.loaded / event.total ) * 100;
-                    console.log('Uploaded', precentCompleted);
-                }
-            }
-            http.onreadystatechange = () => {
-                console.log(http)
+            // http.upload.onprogress = (event) => {
+            //     // console.log('EVET : ', event)
+            //     if (event.lengthComputable) {
+            //         const precentCompleted = ( event.loaded / event.total ) * 100;
+            //         // console.log('Uploaded', precentCompleted);
+            //     }
+            // }
+            http.onreadystatechange = async () => {
                 if (http.readyState === 4) {
-                    console.log(http);
                     if (http.status === 200) {
                         sendToMachine(`[ESP220]/${file.name}`)
                         setJob({ connecting: false, connected: true, started:  true});
+                        setProgress({ uploading: true, converting: false, progress: 100  })
+                        await delay(500);
+                        setProgress({ uploading: false, converting: false, progress: 100  })
+                        
                         setTimeout(() => {
                             setSetupModal(false)
                         }, 2000);
