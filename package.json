@@ -17,7 +17,7 @@
     "react-loader-spinner": "^6.1.6",
     "react-modal": "^3.16.1",
     "react-zoom-pan-pinch": "^3.4.4",
-    "svg-to-gcode": "^1.2.0",
+    "svg-to-gcode": "^1.2.2",
     "tinycolor2": "^1.6.0"
   },
   "devDependencies": {

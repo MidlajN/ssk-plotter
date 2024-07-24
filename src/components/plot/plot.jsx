@@ -57,14 +57,38 @@ export const Plot = () => {
 
         const objects = canvas.getObjects();
         const colorCommand = {
-            "#ff0000" : "M03 S1", // Red
-            "#0000ff" : "M03 S2", // Blue
-            "#008000" : "M03 S3", // Green
-            "#ffff00" : "M03 S4", // Yellow
-            "#ffa500" : "M03 S5", // Orange
-            "#800080" : "M03 S6", // Purple
-            "#000000" : "M03 S7", // Black
-            "#ffc0cb" : "M03 S8", // Pink
+            "#ff0000" : {
+                command: "M03 S1",
+                zValue: 14
+            }, // Red
+            "#0000ff" : {
+                command: "M03 S2",
+                zValue: 17.6
+            }, // Blue
+            "#008000" : {
+                command: "M03 S3",
+                zValue: 18
+            }, // Green
+            "#ffff00" : {
+                command: "M03 S4",
+                zValue: 12
+            }, // Yellow
+            "#ffa500" : {
+                command: "M03 S5",
+                zValue: 14
+            }, // Orange
+            "#800080" : {
+                command: "M03 S6",
+                zValue: 19
+            }, // Purple
+            "#000000" : {
+                command: "M03 S7",
+                zValue: 11
+            }, // Black
+            "#ffc0cb" : {
+                command: "M03 S8",
+                zValue: 10
+            }, // Pink
         }
 
         const svgElements = objects.map(obj => {
@@ -83,22 +107,26 @@ export const Plot = () => {
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
-        let settings = {
-            zOffset : 3,
-            feedRate : 10000,
-            seekRate : 12000
-        }
-        const converter = new Converter(settings);
+        
         const gcodes = await Promise.all(svgElements.map( async (element) => {
+            let settings = {
+                zOffset : 3,
+                feedRate : 10000,
+                seekRate : 12000,
+                zValue: colorCommand[element.color].zValue
+            }
+            const converter = new Converter(settings);
             const [ code ] = await converter.convert(element.svg);
             const gCodeLines = code.split('\n');
-            const cleanedGcodeLines = gCodeLines.slice(0, -5);
-            return [ colorCommand[element.color] + cleanedGcodeLines.join('\n')];
+
+            // const cleanedGcodeLines = gCodeLines.slice(0, -5);
+            const cleanedGcodeLines = gCodeLines.slice(0, -1);
+            return [ colorCommand[element.color].command + cleanedGcodeLines.join('\n')];
         }));
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
-
+        gcodes.push('G0 X0Y0Z0')
         console.log('Gcode Lines : ', gcodes.join('\n'));
 
         // Send to Machine
@@ -119,13 +147,14 @@ export const Plot = () => {
                     if (http.status === 200) {
                         sendToMachine(`[ESP220]/${file.name}`)
                         setJob({ connecting: false, connected: true, started:  true});
+
                         setProgress({ uploading: true, converting: false, progress: 100  })
                         await delay(500);
                         setProgress({ uploading: false, converting: false, progress: 100  })
                         
                         setTimeout(() => {
                             setSetupModal(false)
-                        }, 2000);
+                        }, 3000);
                     }
                 }
             }
