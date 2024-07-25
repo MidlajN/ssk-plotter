@@ -10,7 +10,7 @@ import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import './App.css';
 import { SidebarItem } from "./components/sidebar";
-import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil,  } from "lucide-react";
+import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil } from "lucide-react";
 import { split, group, info } from "./components/editor/functions.jsx";
 // import { selectAllObject } from "./components/editor/functions.jsx";
 import { componentToUrl } from "./components/editor/functions.jsx";
@@ -179,17 +179,18 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       canvas.freeDrawingBrush.color = strokeColor;
       canvas.freeDrawingBrush.width = 3;
 
-      return () => { canvas.isDrawingMode = false; };
+      const customCursor = componentToUrl(PenTool, 0);
+      canvas.freeDrawingCursor = `url(${ customCursor }), auto`;
+
+      return () => { 
+        canvas.isDrawingMode = false; 
+      };
     }
 
     if (tool === 'Lines') {
       const customCursor = componentToUrl(Pencil, 90);
       canvas.defaultCursor = `url(${ customCursor }), auto`;
-
       commonSetup(`url(${ customCursor }), auto`);
-    
-      
-      console.log('Cursor : ', customCursor)
 
       let line;
       let mouseDown = false;

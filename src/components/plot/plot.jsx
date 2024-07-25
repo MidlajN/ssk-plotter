@@ -169,13 +169,9 @@ export const Plot = () => {
 
     const sendToMachine = async (gcode) => {
         try {
-            console.log(
-                'Function FOR SEND : ', gcode
-            )
             const http = new XMLHttpRequest();
             http.onreadystatechange = () => {
                 if (http.readyState === 4) {
-                    console.log(http);
                     if (http.status === 200) {
                         console.log(http.responseText);
                     }

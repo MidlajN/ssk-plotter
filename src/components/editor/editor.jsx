@@ -144,8 +144,8 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                 </div>
 
                 <div 
-                    className="overflow-hidden mt-4" 
-                    style={{ height: `${ renderElements ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
+                    className="overflow-hidden mt-6" 
+                    style={{ height: `${ tool === 'Elements' ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
                     onTransitionEnd={handleTransitionEnd}
                 >
                     { renderElements && <Elements element={element} setElement={setElement}/>}
@@ -211,7 +211,7 @@ export function Import() {
                 })
                 const svgObj = fabric.util.groupSVGElements(objects, options);
                 svgObj.set({ selectable: true, hasControls: true, });
-                console.log("RUN RUN RUN",objects, options, svgObj)
+                console.log("Svg objects from import -->>",objects, options, svgObj)
                 canvas.add(svgObj);
                 canvas.renderAll();
             })

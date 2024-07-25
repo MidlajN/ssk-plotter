@@ -17,7 +17,7 @@ export const handleFile = (file, canvas) => {
     
         fabric.loadSVGFromString(svg, (objects, options) => {
             const obj = fabric.util.groupSVGElements(objects, options);
-            console.log("RUN RUN RUN",objects, options, obj)
+            console.log("Svg from file -->> \n",objects, options, obj)
     
             // Set styles after object is loaded
             obj.set({ selectable: true, hasControls: true, strokeWidth: 1, stroke: '#fff', fill: '#fff' });
@@ -116,7 +116,7 @@ export const copyObject = (setCopiedObject, canvas) => {
         if (activeObject) {
             activeObject.clone((clonedObject) => {
                 setCopiedObject(clonedObject);
-                console.log('Object copied');
+                // console.log('Object copied');
             });
         } else {
             console.log('No object selected to copy');
@@ -220,7 +220,7 @@ export const componentToUrl = (Component, rotationAngle = 0) => {
         '<svg ',
         `<svg transform="rotate(${rotationAngle})" `
       );
-    console.log('svg :', svgString);
+    // console.log('svg :', svgString);
 
     const blob = new Blob([svgString], { type: 'image/svg+xml'});
     const url = URL.createObjectURL(blob);
