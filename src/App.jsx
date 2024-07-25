@@ -10,10 +10,10 @@ import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import './App.css';
 import { SidebarItem } from "./components/sidebar";
-import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool,  } from "lucide-react";
+import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil,  } from "lucide-react";
 import { split, group, info } from "./components/editor/functions.jsx";
 // import { selectAllObject } from "./components/editor/functions.jsx";
-
+import { componentToUrl } from "./components/editor/functions.jsx";
 
 export default function Home() {
   const { canvas } = useCanvas();
@@ -86,7 +86,6 @@ export default function Home() {
                   setExpanded={setExpanded}
                 />
               </div>
-
               <div className="bg-slate-200">
                 <SidebarItem 
                   icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
@@ -152,6 +151,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
     const resetCanvas = () => {
       canvas.selection = true;
       canvas.hoverCursor = 'all-scroll';
+      canvas.defaultCursor = 'auto';
 
       canvas.getObjects().forEach(obj => {
         obj.set({
@@ -164,9 +164,9 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       canvas.off('mouse:up');
     }
 
-    const commonSetup = () => {
+    const commonSetup = (cursor = 'auto') => {
       canvas.selection = false;
-      canvas.hoverCursor = 'auto';
+      canvas.hoverCursor = cursor;
       canvas.getObjects().forEach(obj => {
         obj.set({
           selectable: false
@@ -183,7 +183,13 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
     }
 
     if (tool === 'Lines') {
-      commonSetup();
+      const customCursor = componentToUrl(Pencil, 90);
+      canvas.defaultCursor = `url(${ customCursor }), auto`;
+
+      commonSetup(`url(${ customCursor }), auto`);
+    
+      
+      console.log('Cursor : ', customCursor)
 
       let line;
       let mouseDown = false;

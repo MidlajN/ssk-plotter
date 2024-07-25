@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
@@ -9,33 +10,43 @@ import './editor.css';
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
     const { canvas } = useCanvas();
     const [ renderElements, setRenderElements ] = useState(false);
-    const [ renderColor, setRenderColor ] = useState(false);
+    // const [ renderColor, setRenderColor ] = useState(false);
 
-    const handleColor = (e) => {
-        const activeObject = canvas.getActiveObjects();
-        if (activeObject) {
-            activeObject.forEach(obj => {
-                obj.set('stroke', e.target.value);
-            })
-            canvas.renderAll();
-        }
-        setStrokeColor(e.target.value);
-    }
+    // const handleColor = (e) => {
+    //     const activeObject = canvas.getActiveObjects();
+    //     if (activeObject) {
+    //         activeObject.forEach(obj => {
+    //             obj.set('stroke', e.target.value);
+    //         })
+    //         canvas.renderAll();
+    //     }
+    //     setStrokeColor(e.target.value);
+    // }
 
     useEffect(() => {
         if (canvas) {
+            const activeObject = canvas.getActiveObjects();
+            if (activeObject) {
+                activeObject.forEach(obj => {
+                    obj.set('stroke', strokeColor);
+                })
+                canvas.renderAll();
+            }
+
             canvas.on('mouse:down', () => {
                 const activeObject = canvas.getActiveObjects();
                 if (activeObject.length > 0) {
                     const color = activeObject[0].get('stroke');
                     setStrokeColor(color);
-                } else {
-                    if (canvas.isDrawingMode === true) return;
-                    setStrokeColor('black');
                 }
             })
+
+            return () => {
+                canvas.off('mouse:down');
+            }
         }
-    }, [canvas, setStrokeColor])
+
+    }, [canvas, strokeColor])
 
     useEffect(() => {
         if (tool === 'Elements') {
@@ -55,11 +66,12 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                     <h1>Settings</h1>
                 </div>
 
-                <div className="py-4 flex justify-between">
-                    <p>Pen</p>
-                    <div className="flex ">
-                        <div className="w-7 h-full rounded-s-md" style={{ backgroundColor: strokeColor }}></div>
-                        <select name="color" id="color" className="h-full px-2 rounded-e-md" onChange={handleColor} value={strokeColor}>
+                <div className="py-4 flex gap-4 items-center justify-between">
+                    <p className="text-lg font-medium text-gray-600">Pen Color</p>
+                    <div className="flex gap-3 items-center justify-center border pr-3 rounded-lg " style={{ borderColor: strokeColor }}>
+                        <div className="px-6 py-4 w-7 rounded-s-md" style={{ backgroundColor: strokeColor }}></div>
+                        <p className="h-fit capitalize text-sm font-medium w-14" style={{ color: strokeColor }}>{ strokeColor }</p>
+                        {/* <select name="color" id="color" className="h-full px-2 rounded-e-md" onChange={handleColor} value={strokeColor}>
                             <option value="black">Black</option>
                             <option value="red">Red</option>
                             <option value="blue">Blue</option>
@@ -68,7 +80,7 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                             <option value="orange">Orange</option>
                             <option value="purple">Purple</option>
                             <option value="pink">Pink</option>
-                        </select>
+                        </select> */}
                     </div>
                 </div>
 
@@ -85,10 +97,10 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                         style={{ borderColor: strokeColor === 'red' ? '#1f7f9481' : 'white'}}
                         onClick={ () => { setStrokeColor('red')}}
                     >
-                        <div className="p-5 bg-[red] border-2 border-white rounded-md"></div>
+                        <div className="p-5 bg-[#be1111] border-2 border-white rounded-md"></div>
                     </div>
                     <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
+                        className="rounded-md border-[white] border-4 cursor-pointer"
                         style={{ borderColor: strokeColor === 'blue' ? '#1f7f9481' : 'white'}}
                         onClick={ () => { setStrokeColor('blue')}}
                     >
@@ -106,7 +118,7 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                         style={{ borderColor: strokeColor === 'yellow' ? '#1f7f9481' : 'white'}}
                         onClick={ () => { setStrokeColor('yellow')}}
                     >
-                        <div className="p-5 bg-[yellow] border-2 border-white rounded-md"></div>
+                        <div className="p-5 bg-[#fdfd00] border-2 border-white rounded-md"></div>
                     </div>
                     <div 
                         className="rounded-md border-[white] border-4 cursor-pointer" 
@@ -138,14 +150,6 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                 >
                     { renderElements && <Elements element={element} setElement={setElement}/>}
                 </div>
-
-                {/* <div 
-                    className="overflow-hidden mt-4" 
-                    style={{ height: `${ renderColor ? '8rem' : '0' }`, transition: ' 0.5s ease'}} 
-                    onTransitionEnd={handleTransitionEnd}
-                >
-                    { renderElements && <Elements element={element} setElement={setElement}/>}
-                </div> */}
 
             </div>
         </>

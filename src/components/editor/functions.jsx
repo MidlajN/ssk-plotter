@@ -1,4 +1,6 @@
 /* eslint-disable no-undef */
+import ReactDOMServer from 'react-dom/server'
+
 
 /**
  * Handles the uploaded file, loads SVG content, and adds it to the canvas.
@@ -208,5 +210,20 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
 export const info = (canvas) => {
     // const activeObject = canvas.getActiveObject();
     console.log('SVG ::: ', canvas.toSVG())
+    console.log('OBJ ::: ', canvas.toJSON())
     canvas.renderAll();
+}
+
+export const componentToUrl = (Component, rotationAngle = 0) => {
+    let svgString = ReactDOMServer.renderToStaticMarkup(<Component size={20} strokeWidth={1.5} color={'#4b5563'}  />)
+    svgString = svgString.replace(
+        '<svg ',
+        `<svg transform="rotate(${rotationAngle})" `
+      );
+    console.log('svg :', svgString);
+
+    const blob = new Blob([svgString], { type: 'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+
+    return url
 }

@@ -13,7 +13,7 @@ export default function useCanvas() {
 
 export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
-    const [canvas, setCanvas ] = useState(null);
+    const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
 
