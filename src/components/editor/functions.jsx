@@ -191,7 +191,7 @@ export const selectAllObject = (canvas) => {
 }
 
 
-export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) => {
+export const handleKeyDown = ( copiedObject, setCopiedObject, canvas, savedState ) => (e) => {
     if (e.ctrlKey && e.key === 'c') {
         copyObject(setCopiedObject, canvas);
     } else if (e.ctrlKey && e.key === 'v') {
@@ -204,7 +204,14 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
     } else if (e.ctrlKey && e.key === 'g') {
         group(canvas);
         e.preventDefault();
-    } 
+    }
+    //  else if (e.ctrlKey && e.key === 'z') {
+    //     undo(canvas, savedState);
+    //     e.preventDefault();
+    // } else if (e.ctrlKey && e.key === 'y') {
+    //     redo(canvas, savedState);
+    //     e.preventDefault();
+    // }
 };
 
 export const info = (canvas) => {
@@ -228,10 +235,22 @@ export const componentToUrl = (Component, rotationAngle = 0) => {
     return url
 }
 
-export const undo = () => {
-    return null
+// let stateStack = []
+export const undo = (canvas, savedState) => {
+    if (canvas) {
+        // const state = savedState[savedState.length - 1]
+        canvas.clear().renderAll();
+        console.log('Call from undo : ', savedState.length)
+        canvas.loadFromJSON(savedState[savedState.length - 1]);
+    }
 }
 
-export const redo = () => {
-    return null
+export const redo = (canvas, savedState) => {
+    if (canvas) {
+        // const state = savedState[savedState.length - 2]
+
+        canvas.clear().renderAll();
+        console.log('Call from redo : ', savedState.length)
+        canvas.loadFromJSON(savedState[savedState.length - 2]);
+    }
 }

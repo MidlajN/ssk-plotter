@@ -58,15 +58,15 @@ export const Plot = () => {
         const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : {
-                command: "M6.7",
+                command: "G6.7",
                 zValue: 17.9
             }, // Red
             "#0000ff" : {
-                command: "M6.5",
+                command: "G6.5",
                 zValue: 17.6
             }, // Blue
             "#008000" : {
-                command: "M6.8",
+                command: "G6.8",
                 zValue: 19.4
             }, // Green
             "#ffff00" : {
@@ -74,19 +74,19 @@ export const Plot = () => {
                 zValue: 12
             }, // Yellow
             "#ffa500" : {
-                command: "M6.6",
+                command: "G6.6",
                 zValue: 18.6
             }, // Orange
             "#800080" : {
-                command: "M6.4",
+                command: "G6.4",
                 zValue: 19
             }, // Purple NEED TO CHANGE TO BROWN
             "#000000" : {
-                command: "M6.2",
+                command: "G6.2",
                 zValue: 18.6
             }, // Black
             "#ffc0cb" : {
-                command: "M6.3",
+                command: "G6.3",
                 zValue: 19.2
             }, // Pink
         }

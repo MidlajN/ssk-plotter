@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { fabric } from "fabric";
-import { handleKeyDown } from "./components/editor/functions";
+import { handleKeyDown, redo } from "./components/editor/functions";
 
 const CanvasContext = createContext(null);
 
@@ -14,8 +14,10 @@ export default function useCanvas() {
 export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
     const [ canvas, setCanvas ] = useState(null);
+    const [ savedState, setSavedState ] = useState([]);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
+    
 
     useEffect(() => {
         fabric.Object.prototype.cornerStyle = 'circle';
@@ -37,8 +39,59 @@ export const CanvasProvider = ({ children }) => {
         return () => fabricCanvas.dispose();
     }, []);
 
+    const saveState = () => {
+        const state = canvas.toJSON();
+        setSavedState(prev => [...prev, state]);
+    }
+
+    const undo = () => {
+        if (canvas) {
+            canvas.clear().renderAll();
+            console.log('Call from undo : ', savedState.length)
+            canvas.loadFromJSON(savedState[savedState.length - 1]);
+        }
+    }
+
+    const redo = () => {
+        if (canvas) {
+            canvas.clear().renderAll();
+            console.log('Call from redo : ', savedState.length)
+            canvas.loadFromJSON(savedState[savedState.length - 2]);
+        }
+    }
+
+    const handleState = (event) => {
+        if (event.ctrlKey && event.key === 'z') {
+            undo();
+        } else if (event.ctrlKey && event.key === 'y') {
+            redo();
+        }
+    }
+
     useEffect(() => {
-        if (!canvas) return;
+        if (canvas) {
+            const handleObjectAdded = () => saveState();
+            const handleObjectModified = () => saveState();
+
+            canvas.on('object:added', handleObjectAdded);
+            canvas.on('object:modified', handleObjectModified);
+
+            window.addEventListener('keydown', handleState);
+
+            return () => {
+                canvas.off('object:added', handleObjectAdded);
+                canvas.off('object:modified', handleObjectModified);
+                window.removeEventListener('keydown', handleState);
+            }
+        }
+    }, [canvas]);
+
+
+
+
+    useEffect(() => {
+        if (canvas === null) return;
+
         canvas.on('mouse:move', () => {
             const activeObject = canvas.getActiveObject();
 
@@ -51,8 +104,9 @@ export const CanvasProvider = ({ children }) => {
 
                 setObjectValues({ x: x, y: y, scaleX: scaleX, scaleY: scaleY, rotateAngle: angle });
             }
-        })
-    }, [canvas]);
+        });
+
+    }, [canvas,]);
 
     useEffect(() => {
         if (!canvas) return;
@@ -74,7 +128,7 @@ export const CanvasProvider = ({ children }) => {
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas ));
         return () => { 
-            window.removeEventListener('keydown', handleKeyDown) 
+            window.removeEventListener('keydown', handleKeyDown);
         };
     }, [canvas, copiedObject]);
 

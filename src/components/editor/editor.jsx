@@ -68,19 +68,12 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
 
                 <div className="py-4 flex gap-4 items-center justify-between">
                     <p className="text-lg font-medium text-gray-600">Pen Color</p>
-                    <div className="flex gap-3 items-center justify-center border pr-3 rounded-lg " style={{ borderColor: strokeColor }}>
-                        <div className="px-6 py-4 w-7 rounded-s-md" style={{ backgroundColor: strokeColor }}></div>
-                        <p className="h-fit capitalize text-sm font-medium w-14" style={{ color: strokeColor }}>{ strokeColor }</p>
-                        {/* <select name="color" id="color" className="h-full px-2 rounded-e-md" onChange={handleColor} value={strokeColor}>
-                            <option value="black">Black</option>
-                            <option value="red">Red</option>
-                            <option value="blue">Blue</option>
-                            <option value="green">Green</option>
-                            <option value="yellow">Yellow</option>
-                            <option value="orange">Orange</option>
-                            <option value="purple">Purple</option>
-                            <option value="pink">Pink</option>
-                        </select> */}
+                    <div 
+                        className="flex gap-3 items-center justify-center border pr-3 rounded-full shadow-[inset_0px_1px_2px_1px_#00000025] overflow-hidden bg-[#f0f0f0]" 
+                        // style={{ borderColor: strokeColor }}
+                    >
+                        <div className="px-6 py-3 rounded-full shadow-md" style={{ backgroundColor: strokeColor }}></div>
+                        <p className="h-fit capitalize text-sm font-medium w-14 text-center drop-shadow" style={{ color: strokeColor }}>{ strokeColor }</p>
                     </div>
                 </div>
 
