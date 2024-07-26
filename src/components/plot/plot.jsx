@@ -58,36 +58,36 @@ export const Plot = () => {
         const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : {
-                command: "M03 S1",
-                zValue: 14
+                command: "M6.7",
+                zValue: 17.9
             }, // Red
             "#0000ff" : {
-                command: "M03 S2",
+                command: "M6.5",
                 zValue: 17.6
             }, // Blue
             "#008000" : {
-                command: "M03 S3",
-                zValue: 18
+                command: "M6.8",
+                zValue: 19.4
             }, // Green
             "#ffff00" : {
                 command: "M03 S4",
                 zValue: 12
             }, // Yellow
             "#ffa500" : {
-                command: "M03 S5",
-                zValue: 14
+                command: "M6.6",
+                zValue: 18.6
             }, // Orange
             "#800080" : {
-                command: "M03 S6",
+                command: "M6.4",
                 zValue: 19
-            }, // Purple
+            }, // Purple NEED TO CHANGE TO BROWN
             "#000000" : {
-                command: "M03 S7",
-                zValue: 11
+                command: "M6.2",
+                zValue: 18.6
             }, // Black
             "#ffc0cb" : {
-                command: "M03 S8",
-                zValue: 10
+                command: "M6.3",
+                zValue: 19.2
             }, // Pink
         }
 
@@ -111,7 +111,7 @@ export const Plot = () => {
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             let settings = {
                 zOffset : 3,
-                feedRate : 10000,
+                feedRate : 12000,
                 seekRate : 12000,
                 zValue: colorCommand[element.color].zValue
             }
@@ -219,7 +219,7 @@ export const Plot = () => {
                 <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
                 </div>
                 <div className="text-sm responses h-[90%] relative">
-                    <textarea ref={textareaRef} value={ response.message } className="pointer-events-none" readOnly></textarea>
+                    <textarea ref={textareaRef} value={ response.message } className="cursor-default" readOnly></textarea>
                     <div className="absolute w-full bottom-0 left-0 p-3">
                         <input 
                             ref={ gcodeRef }

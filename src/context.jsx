@@ -107,7 +107,7 @@ export const CommunicationProvider = ({ children }) => {
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
-    const [ machineUrl, port ] = [ 'localhost:5000', '5000'];
+    const [ machineUrl, port ] = [ 'localhost:3000', '5000'];
     // const [ machineUrl, port ] = [ '192.168.0.1', '81']
     // const machineUrl = 'localhost'
     // const port = '5000'
@@ -122,8 +122,8 @@ export const CommunicationProvider = ({ children }) => {
             // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
             setTimeout(() => {
                 // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
-                // setWs(new WebSocket(`ws://192.168.0.1:81`));
-                setWs(new WebSocket(`ws://localhost:5000`));
+                setWs(new WebSocket(`ws://192.168.0.1:81`));
+                // setWs(new WebSocket(`ws://localhost:5000`));
             }, 3000)
 
         } catch (err) {

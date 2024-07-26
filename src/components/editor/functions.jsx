@@ -209,7 +209,7 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
 
 export const info = (canvas) => {
     // const activeObject = canvas.getActiveObject();
-    console.log('SVG ::: ', canvas.toSVG())
+    // console.log('SVG ::: ', canvas.toSVG())
     console.log('OBJ ::: ', canvas.toJSON())
     canvas.renderAll();
 }
@@ -226,4 +226,12 @@ export const componentToUrl = (Component, rotationAngle = 0) => {
     const url = URL.createObjectURL(blob);
 
     return url
+}
+
+export const undo = () => {
+    return null
+}
+
+export const redo = () => {
+    return null
 }
