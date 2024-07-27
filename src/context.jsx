@@ -15,7 +15,6 @@ export default function useCanvas() {
 export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
     const [ canvas, setCanvas ] = useState(null);
-    const [ savedState, setSavedState ] = useState([]);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
     
@@ -39,57 +38,6 @@ export const CanvasProvider = ({ children }) => {
         setCanvas(fabricCanvas);
         return () => fabricCanvas.dispose();
     }, []);
-
-    const saveState = () => {
-        const state = canvas.toJSON();
-        setSavedState(prev => [...prev, state]);
-    }
-
-    const undo = () => {
-        if (canvas) {
-            canvas.undo();
-            // canvas.clear().renderAll();
-            // console.log('Call from undo : ', savedState.length)
-            // canvas.loadFromJSON(savedState[savedState.length - 1]);
-        }
-    }
-
-    const redo = () => {
-        if (canvas) {
-            // canvas.clear().renderAll();
-            // console.log('Call from redo : ', savedState.length)
-            // canvas.loadFromJSON(savedState[savedState.length - 2]);
-            canvas.redo();
-        }
-    }
-
-    const handleState = (event) => {
-        if (event.ctrlKey && event.key === 'z') {
-            undo();
-        } else if (event.ctrlKey && event.key === 'y') {
-            redo();
-        }
-    }
-
-    useEffect(() => {
-        if (canvas) {
-            const handleObjectAdded = () => saveState();
-            const handleObjectModified = () => saveState();
-
-            canvas.on('object:added', handleObjectAdded);
-            canvas.on('object:modified', handleObjectModified);
-
-            window.addEventListener('keydown', handleState);
-
-            return () => {
-                canvas.off('object:added', handleObjectAdded);
-                canvas.off('object:modified', handleObjectModified);
-                window.removeEventListener('keydown', handleState);
-            }
-        }
-    }, [canvas, savedState]);
-
-
 
 
     useEffect(() => {
@@ -164,8 +112,8 @@ export const CommunicationProvider = ({ children }) => {
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
-    const [ machineUrl, port ] = [ 'localhost:3000', '5000'];
-    // const [ machineUrl, port ] = [ '192.168.0.1', '81']
+    // const [ machineUrl, port ] = [ 'localhost:5000', '5000'];
+    const [ machineUrl, port ] = [ '192.168.0.1', '81']
     // const machineUrl = 'localhost'
     // const port = '5000'
     // const machineUrl = '192.168.0.1'

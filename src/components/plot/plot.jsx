@@ -144,6 +144,7 @@ export const Plot = () => {
             const http = new XMLHttpRequest();
             http.onreadystatechange = async () => {
                 if (http.readyState === 4) {
+                    console.log('Http Request -> ', http)
                     if (http.status === 200) {
                         sendToMachine(`[ESP220]/${file.name}`)
                         setJob({ connecting: false, connected: true, started:  true});

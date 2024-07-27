@@ -191,7 +191,7 @@ export const selectAllObject = (canvas) => {
 }
 
 
-export const handleKeyDown = ( copiedObject, setCopiedObject, canvas, savedState ) => (e) => {
+export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) => {
     if (e.ctrlKey && e.key === 'c') {
         copyObject(setCopiedObject, canvas);
     } else if (e.ctrlKey && e.key === 'v') {
@@ -204,14 +204,13 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas, savedState
     } else if (e.ctrlKey && e.key === 'g') {
         group(canvas);
         e.preventDefault();
+    } else if (e.ctrlKey && e.key === 'z') {
+        canvas.undo();
+        e.preventDefault();
+    } else if (e.ctrlKey && e.key === 'y') {
+        canvas.redo();
+        e.preventDefault();
     }
-    //  else if (e.ctrlKey && e.key === 'z') {
-    //     undo(canvas, savedState);
-    //     e.preventDefault();
-    // } else if (e.ctrlKey && e.key === 'y') {
-    //     redo(canvas, savedState);
-    //     e.preventDefault();
-    // }
 };
 
 export const info = (canvas) => {
@@ -236,21 +235,23 @@ export const componentToUrl = (Component, rotationAngle = 0) => {
 }
 
 // let stateStack = []
-export const undo = (canvas, savedState) => {
-    if (canvas) {
-        // const state = savedState[savedState.length - 1]
-        canvas.clear().renderAll();
-        console.log('Call from undo : ', savedState.length)
-        canvas.loadFromJSON(savedState[savedState.length - 1]);
-    }
-}
+// export const undo = (canvas) => {
+//     if (canvas) {
+//         canvas.undo();
+//         // const state = savedState[savedState.length - 1]
+//         // canvas.clear().renderAll();
+//         // console.log('Call from undo : ', savedState.length)
+//         // canvas.loadFromJSON(savedState[savedState.length - 1]);
+//     }
+// }
 
-export const redo = (canvas, savedState) => {
-    if (canvas) {
-        // const state = savedState[savedState.length - 2]
+// export const redo = (canvas) => {
+//     if (canvas) {
+//         canvas.redo();
+//         // const state = savedState[savedState.length - 2]
 
-        canvas.clear().renderAll();
-        console.log('Call from redo : ', savedState.length)
-        canvas.loadFromJSON(savedState[savedState.length - 2]);
-    }
-}
+//         // canvas.clear().renderAll();
+//         // console.log('Call from redo : ', savedState.length)
+//         // canvas.loadFromJSON(savedState[savedState.length - 2]);
+//     }
+// }
