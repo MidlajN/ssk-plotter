@@ -2,7 +2,8 @@
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { fabric } from "fabric";
-import { handleKeyDown, redo } from "./components/editor/functions";
+import { handleKeyDown } from "./components/editor/functions";
+import 'fabric-history'
 
 const CanvasContext = createContext(null);
 
@@ -46,17 +47,19 @@ export const CanvasProvider = ({ children }) => {
 
     const undo = () => {
         if (canvas) {
-            canvas.clear().renderAll();
-            console.log('Call from undo : ', savedState.length)
-            canvas.loadFromJSON(savedState[savedState.length - 1]);
+            canvas.undo();
+            // canvas.clear().renderAll();
+            // console.log('Call from undo : ', savedState.length)
+            // canvas.loadFromJSON(savedState[savedState.length - 1]);
         }
     }
 
     const redo = () => {
         if (canvas) {
-            canvas.clear().renderAll();
-            console.log('Call from redo : ', savedState.length)
-            canvas.loadFromJSON(savedState[savedState.length - 2]);
+            // canvas.clear().renderAll();
+            // console.log('Call from redo : ', savedState.length)
+            // canvas.loadFromJSON(savedState[savedState.length - 2]);
+            canvas.redo();
         }
     }
 
@@ -84,7 +87,7 @@ export const CanvasProvider = ({ children }) => {
                 window.removeEventListener('keydown', handleState);
             }
         }
-    }, [canvas]);
+    }, [canvas, savedState]);
 
 
 
