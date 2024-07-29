@@ -43,7 +43,7 @@ export const CanvasProvider = ({ children }) => {
     useEffect(() => {
         if (canvas === null) return;
 
-        canvas.on('mouse:move', () => {
+        canvas.on('object:modified', () => {
             const activeObject = canvas.getActiveObject();
 
             if (activeObject) {
@@ -57,11 +57,13 @@ export const CanvasProvider = ({ children }) => {
             }
         });
 
-    }, [canvas,]);
+        return () => {
+            canvas.off('object:modified');
+        }
+    }, [canvas, objectValues]);
 
     useEffect(() => {
         if (!canvas) return;
-
         const activeObject = canvas.getActiveObject();
 
         if (activeObject) {

@@ -24,13 +24,11 @@ export const Plot = () => {
         response,
         ws, 
         setWs,
-        // job,
         setJob,
         machineUrl,
         setupModal, 
         setSetupModal,
         openSocket,
-        // progress, 
         setProgress
     } = useCom();
     const textareaRef = useRef(null)
@@ -188,6 +186,7 @@ export const Plot = () => {
 
     useEffect(() => {
         canvas.selection = false;
+        canvas.discardActiveObject();
         canvas.getObjects().forEach((obj) => {
             obj.set({
                 selectable: false
