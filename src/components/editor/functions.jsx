@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import ReactDOMServer from 'react-dom/server'
 
-
 /**
  * Handles the uploaded file, loads SVG content, and adds it to the canvas.
  *
@@ -115,8 +114,9 @@ export const copyObject = (setCopiedObject, canvas) => {
         const activeObject = canvas.getActiveObject();
         if (activeObject) {
             activeObject.clone((clonedObject) => {
+                canvas.discardActiveObject();
                 setCopiedObject(clonedObject);
-                // console.log('Object copied');
+                console.log('Object copied', );
             });
         } else {
             console.log('No object selected to copy');
@@ -136,24 +136,27 @@ export const pasteObject = (copiedObject, canvas) => {
     if (copiedObject) {
         copiedObject.clone((clonedObject) => {
 
-        clonedObject.set({
-            left: clonedObject.left + 10,
-            top: clonedObject.top + 10,
-            evented: true,
-        });
+            clonedObject.set({
+                left: clonedObject.left + 10,
+                top: clonedObject.top + 10,
+                evented: true,
+            });
 
-        if (clonedObject.get('type') === 'activeSelection') {
-            clonedObject.forEachObject((obj) => {
-                canvas.add(obj);
-            })
-        }
-
-        canvas.add(clonedObject);
-        canvas.setActiveObject(clonedObject);
-        canvas.requestRenderAll();
+            if (clonedObject.get('type') === 'activeSelection') {
+                clonedObject.canvas = canvas;
+                clonedObject.forEachObject((obj) => {
+                    canvas.add(obj);
+                });
+                clonedObject.setCoords();
+            } else {
+                canvas.add(clonedObject);
+            }
+            
+            copiedObject.top += 10;
+            copiedObject.left += 10;
+            canvas.setActiveObject(clonedObject);
+            canvas.requestRenderAll();
         });
-        copiedObject.top += 10;
-        copiedObject.left += 10;
     } else {
         return
     }
@@ -216,7 +219,7 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
 export const info = (canvas) => {
     // const activeObject = canvas.getActiveObject();
     // console.log('SVG ::: ', canvas.toSVG())
-    console.log('OBJ ::: ', canvas.toJSON())
+    // console.log('OBJ ::: ', canvas.toJSON())
     canvas.renderAll();
 }
 
@@ -226,32 +229,9 @@ export const componentToUrl = (Component, rotationAngle = 0) => {
         '<svg ',
         `<svg transform="rotate(${rotationAngle})" `
       );
-    // console.log('svg :', svgString);
 
     const blob = new Blob([svgString], { type: 'image/svg+xml'});
     const url = URL.createObjectURL(blob);
 
     return url
 }
-
-// let stateStack = []
-// export const undo = (canvas) => {
-//     if (canvas) {
-//         canvas.undo();
-//         // const state = savedState[savedState.length - 1]
-//         // canvas.clear().renderAll();
-//         // console.log('Call from undo : ', savedState.length)
-//         // canvas.loadFromJSON(savedState[savedState.length - 1]);
-//     }
-// }
-
-// export const redo = (canvas) => {
-//     if (canvas) {
-//         canvas.redo();
-//         // const state = savedState[savedState.length - 2]
-
-//         // canvas.clear().renderAll();
-//         // console.log('Call from redo : ', savedState.length)
-//         // canvas.loadFromJSON(savedState[savedState.length - 2]);
-//     }
-// }

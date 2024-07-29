@@ -92,8 +92,6 @@ export const CanvasProvider = ({ children }) => {
                 canvasRef, 
                 objectValues, 
                 setObjectValues, 
-                copiedObject, 
-                setCopiedObject, 
             }}
         >
             { children }
