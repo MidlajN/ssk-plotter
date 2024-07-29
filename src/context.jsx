@@ -107,13 +107,13 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
-    const [ response, setResponse ] = useState({ visible: false, message: '' });
+    const [ response, setResponse ] = useState({ pageId: 0, message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
-    // const [ machineUrl, port ] = [ 'localhost:5000', '5000'];
-    const [ machineUrl, port ] = [ '192.168.0.1', '81']
+    const [ machineUrl, port ] = [ 'localhost:3000', '5000'];
+    // const [ machineUrl, port ] = [ '192.168.0.1', '81']
     // const machineUrl = 'localhost'
     // const port = '5000'
     // const machineUrl = '192.168.0.1'
@@ -126,9 +126,14 @@ export const CommunicationProvider = ({ children }) => {
             setJob({ connecting: true, connected: false, started: false })
             // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
             setTimeout(() => {
+                const socket = new WebSocket(`ws://192.168.0.1:81`, ['arduino']);
+
+                socket.binaryType = 'arraybuffer';
                 // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
-                setWs(new WebSocket(`ws://192.168.0.1:81`));
+                // setWs(new WebSocket(`ws://192.168.0.1:81`, ["arduino"]));
                 // setWs(new WebSocket(`ws://localhost:5000`));
+
+                setWs(socket)
             }, 3000)
 
         } catch (err) {
@@ -139,16 +144,17 @@ export const CommunicationProvider = ({ children }) => {
 
     useEffect(() => {
         if (!ws) return;
+
         ws.onopen = () => {
             
             // For Test
-            const sendPing = () => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send('Ping');
-                    setTimeout(sendPing, 5000);
-                }
-            };
-            sendPing();
+            // const sendPing = () => {
+            //     if (ws.readyState === WebSocket.OPEN) {
+            //         ws.send('Ping');
+            //         setTimeout(sendPing, 5000);
+            //     }
+            // };
+            // sendPing();
 
             setJob({ connecting: false, connected: true, started: false })
 
@@ -159,34 +165,41 @@ export const CommunicationProvider = ({ children }) => {
         
         ws.onmessage = (event) => {
             if (event.data instanceof Blob) {
-                console.log('Blob ', event.data)
+                // console.log('Blob ', event.data)
                 const reader = new FileReader();
                 reader.onload = function() {
                     const text = reader.result;
-                    console.log('Blob as Text: ', text);
+                    // console.log('Blob as Text: ', text);
                     setResponse(prev => ({ 
                         ...prev, 
-                        line: prev.line + 1, 
-                        message: prev.message + text + "\n"
+                        // line: prev.line + 1, 
+                        message: prev.message + text
                     }));
                 };
                 reader.readAsText(event.data);
             } else if (event.data instanceof ArrayBuffer) {
                 const arrayBuffer = event.data;
-                const text = `Response  ->  ${ new TextDecoder().decode(arrayBuffer) }\n`;
+                console.log('Array  Buffer ', arrayBuffer)
+                const text = `${ new TextDecoder().decode(arrayBuffer) }`;
                 setResponse(prev => ({ 
                     ...prev, 
-                    line: prev.line + 1, 
-                    message: prev.message + text + "\n"
+                    // line: prev.line + 1, 
+                    message: prev.message + text
                 }));
 
             } else {
-                // console.log('Response :', event)
-                setResponse(prev => ({ 
-                    ...prev, 
-                    line: prev.line + 1, 
-                    message: prev.message + event.data + "\n"
-                }));
+                const [key, value] = event.data.split(':');
+
+                if (key !== 'PING') {
+                    console.log('String ;', key, ':  -> ', parseInt(value, 10));
+                    
+                    setResponse(prev => ({ 
+                        ...prev, 
+                        pageId: parseInt(value, 10), 
+                        message: prev.message + event.data
+                    }));
+
+                }
             }
         }
 

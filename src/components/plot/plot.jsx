@@ -124,6 +124,7 @@ export const Plot = () => {
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
+        gcodes.unshift('$HZ')
         gcodes.push('G0 X0Y0Z0')
         console.log('Gcode Lines : ', gcodes.join('\n'));
 
@@ -168,16 +169,28 @@ export const Plot = () => {
 
     const sendToMachine = async (gcode) => {
         try {
-            const http = new XMLHttpRequest();
-            http.onreadystatechange = () => {
-                if (http.readyState === 4) {
-                    if (http.status === 200) {
-                        console.log(http.responseText);
-                    }
+            const url = `http://${ machineUrl }/command?commandText=` + encodeURI(gcode) + `&PAGEID=${response.pageId}`
+
+            fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
                 }
-            }
-            http.open("GET", `http://${ machineUrl }/command?commandText=` + encodeURI(gcode), true);
-            http.send();
+            })
+            . catch (err => {
+                console.error('Err : ', err)
+            });
+            // const http = new XMLHttpRequest();
+            // http.onreadystatechange = () => {
+            //     if (http.readyState === 4) {
+            //         if (http.status === 200) {
+            //             console.log(http.responseText);
+            //         }
+            //     }
+            // }
+            // console.log('URL ', url)
+            // http.open("GET", url, true);
+            // http.send();
 
         } catch (err) {
             console.log(err);
@@ -241,7 +254,7 @@ export const Plot = () => {
                     <button 
                         className="p-3 bg-[#1C274C] rounded"
                         onClick={ () => {
-                            sendToMachine(`G91 G21  F4000 Y10`);
+                            sendToMachine(`$J=G91 G21 F2000 Y10`);
                         }}
                         >
                         <ChevronUp size={20} strokeWidth={4} color={'#F5762E'}/>
@@ -250,7 +263,7 @@ export const Plot = () => {
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
                             onClick={ () => {
-                                sendToMachine(`G91 G21  F4000 X-10`);
+                                sendToMachine(`$J=G91 G21 F2000 X-10`);
                             }}>
                             <ChevronLeft size={20} strokeWidth={4} color={'#F5762E'}/>
                         </button>
@@ -262,7 +275,7 @@ export const Plot = () => {
                         <button 
                             className="p-3 bg-[#1C274C] rounded"
                             onClick={ () => {
-                                sendToMachine(`G91 G21  F4000 X10`);
+                                sendToMachine(`$J=G91 G21 F2000 X10`);
                             }}>
                             <ChevronRight size={20} strokeWidth={4} color={'#F5762E'}/>
                         </button>
@@ -270,7 +283,7 @@ export const Plot = () => {
                     <button 
                         className="p-3 bg-[#1C274C] rounded"
                         onClick={ () => {
-                            sendToMachine(`G91 G21  F4000 Y-10`);
+                            sendToMachine(`$J=G91 G21 F2000 Y-10`);
                         }}>
                         <ChevronDown size={20} strokeWidth={4} color={'#F5762E'}/>
                     </button>
