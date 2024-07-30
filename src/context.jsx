@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
 import 'fabric-history'
+import { split } from "postcss/lib/list";
 
 const CanvasContext = createContext(null);
 
@@ -107,7 +108,7 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
-    const [ response, setResponse ] = useState({ pageId: 0, message: '' });
+    const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
@@ -167,6 +168,42 @@ export const CommunicationProvider = ({ children }) => {
             } else if (event.data instanceof ArrayBuffer) {
                 const arrayBuffer = event.data;
                 const text = `${ new TextDecoder().decode(arrayBuffer) }`;
+                let split_text = text.split(':', 2);
+
+                if (split_text.length >1) {
+                    split_text[1] = parseInt(split_text[1].trim())
+                    if (!isNaN(split_text[1])) {
+                        const url = `http://${ machineUrl }/command?commandText=`;
+
+                        if (split_text[0] === 'error' && split_text[1] === 8) {
+                            console.log('The Machine is in Alarm state, \nChanging...')
+                            fetch(url + encodeURI('$X') + `&PAGEID=${response.pageId}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Fetch Error ', err)
+                            })
+                        } else if (split_text[0] === 'ALARM' && split_text[1] === 1) {
+                            console.log('Hard Limit Triggered \nRestartng...');
+
+                            fetch(url + encodeURI('[ESP444]RESTART') + `&PAGEID=${response.pageId}`)
+                            .then(response => {
+                                if (response.ok){
+                                    ws.close()
+                                } else {
+                                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Restart Error ', err)
+                            })
+                        }
+                    }
+                }
+
                 setResponse(prev => ({ 
                     ...prev, 
                     message: prev.message + text
@@ -183,7 +220,6 @@ export const CommunicationProvider = ({ children }) => {
                         pageId: parseInt(value, 10), 
                         message: prev.message + event.data + "\n"
                     }));
-
                 }
             }
         }

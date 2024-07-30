@@ -46,7 +46,8 @@
     border-top: 1px solid #ffffff;
     border-left: 1px solid #ffffff;
     border-right: 1px solid #ffffff;
-    box-shadow: 0px 0px 3px #a3a3a3;
+    /* box-shadow: 0px 0px 3px #a3a3a3; */
+    box-shadow: 4px 4px 14px 4px #a3a3a3;
 }
 .canvas-section .canvas .machine-inner {
     background-color: #DFDFDF;
