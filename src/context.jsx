@@ -28,8 +28,8 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.noScaleCache = true;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-            width: fabric.util.parseUnit('85cm'),
-            height: fabric.util.parseUnit('60cm'),
+            width: fabric.util.parseUnit('73cm'),
+            height: fabric.util.parseUnit('53cm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
@@ -112,8 +112,8 @@ export const CommunicationProvider = ({ children }) => {
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
-    const [ machineUrl, port ] = [ 'localhost:3000', '5000'];
-    // const [ machineUrl, port ] = [ '192.168.0.1', '81']
+    // const [ machineUrl, port ] = [ 'localhost:3000', '5000'];
+    const [ machineUrl, port ] = [ '192.168.0.1', '81']
     // const machineUrl = 'localhost'
     // const port = '5000'
     // const machineUrl = '192.168.0.1'
@@ -124,10 +124,9 @@ export const CommunicationProvider = ({ children }) => {
         if (ws !== null) return;
         try {
             setJob({ connecting: true, connected: false, started: false })
-            // const socket = new WebSocket("ws://kochund.local:81", ['arduino']);
             setTimeout(() => {
+                
                 const socket = new WebSocket(`ws://192.168.0.1:81`, ['arduino']);
-
                 socket.binaryType = 'arraybuffer';
                 // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
                 // setWs(new WebSocket(`ws://192.168.0.1:81`, ["arduino"]));
@@ -146,15 +145,6 @@ export const CommunicationProvider = ({ children }) => {
         if (!ws) return;
 
         ws.onopen = () => {
-            
-            // For Test
-            // const sendPing = () => {
-            //     if (ws.readyState === WebSocket.OPEN) {
-            //         ws.send('Ping');
-            //         setTimeout(sendPing, 5000);
-            //     }
-            // };
-            // sendPing();
 
             setJob({ connecting: false, connected: true, started: false })
 
@@ -165,25 +155,20 @@ export const CommunicationProvider = ({ children }) => {
         
         ws.onmessage = (event) => {
             if (event.data instanceof Blob) {
-                // console.log('Blob ', event.data)
                 const reader = new FileReader();
                 reader.onload = function() {
                     const text = reader.result;
-                    // console.log('Blob as Text: ', text);
                     setResponse(prev => ({ 
                         ...prev, 
-                        // line: prev.line + 1, 
                         message: prev.message + text
                     }));
                 };
                 reader.readAsText(event.data);
             } else if (event.data instanceof ArrayBuffer) {
                 const arrayBuffer = event.data;
-                console.log('Array  Buffer ', arrayBuffer)
                 const text = `${ new TextDecoder().decode(arrayBuffer) }`;
                 setResponse(prev => ({ 
                     ...prev, 
-                    // line: prev.line + 1, 
                     message: prev.message + text
                 }));
 
@@ -196,7 +181,7 @@ export const CommunicationProvider = ({ children }) => {
                     setResponse(prev => ({ 
                         ...prev, 
                         pageId: parseInt(value, 10), 
-                        message: prev.message + event.data
+                        message: prev.message + event.data + "\n"
                     }));
 
                 }

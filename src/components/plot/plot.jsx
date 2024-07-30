@@ -124,8 +124,8 @@ export const Plot = () => {
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
-        gcodes.unshift('$HZ')
-        gcodes.push('G0 X0Y0Z0')
+        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
+        gcodes.push('G0 X0Y0')
         console.log('Gcode Lines : ', gcodes.join('\n'));
 
         // Send to Machine
@@ -178,19 +178,8 @@ export const Plot = () => {
                 }
             })
             . catch (err => {
-                console.error('Err : ', err)
+                console.error('Fetch Error : ', err)
             });
-            // const http = new XMLHttpRequest();
-            // http.onreadystatechange = () => {
-            //     if (http.readyState === 4) {
-            //         if (http.status === 200) {
-            //             console.log(http.responseText);
-            //         }
-            //     }
-            // }
-            // console.log('URL ', url)
-            // http.open("GET", url, true);
-            // http.send();
 
         } catch (err) {
             console.log(err);
@@ -311,7 +300,6 @@ export const Plot = () => {
             </div>
 
             { setupModal && <SetupModal /> }
-            <SetupModal />
         </div>
     )
 }
