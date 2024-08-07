@@ -217,9 +217,9 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
 };
 
 export const info = (canvas) => {
-    // const activeObject = canvas.getActiveObject();
-    // console.log('SVG ::: ', canvas.toSVG())
-    // console.log('OBJ ::: ', canvas.toJSON())
+    const activeObject = canvas.getActiveObject();
+    console.log('SVG ::: ', activeObject.toSVG())
+    console.log('OBJ ::: ', canvas.toSVG())
     canvas.renderAll();
 }
 

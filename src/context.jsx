@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
 import 'fabric-history'
-import { split } from "postcss/lib/list";
 
 const CanvasContext = createContext(null);
 
