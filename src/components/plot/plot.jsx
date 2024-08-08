@@ -59,101 +59,122 @@ export const Plot = () => {
     }
 
     const handleConnection = async () => {
-        const objects = canvas.getObjects();
-        const newObjs = returnObjs(objects);
+        // const objects = canvas.getObjects();
+        // const newObjs = returnObjs(objects);
 
-        const groupByStroke = {};
+        // const groupByStroke = {};
 
-        newObjs.forEach(obj => {
-            const stroke = obj.stroke;
+        // newObjs.forEach(obj => {
+        //     const stroke = tinycolor(obj.stroke);
 
-            if (stroke) {
-                if (!groupByStroke[stroke]) {
-                    groupByStroke[stroke] = [];
-                }
-                groupByStroke[stroke].push(obj);
-            }
-        })
+        //     if (stroke) {
+        //         if (!groupByStroke[stroke.toHexString()]) {
+        //             groupByStroke[stroke.toHexString()] = [];
+        //         }
+        //         groupByStroke[stroke.toHexString()].push(obj);
+        //     }
+        // });
+
+        // const SvgElemGroup = []
+        // for (const stroke in groupByStroke) {
+        //     let grouSVG = '';
+        //     if (groupByStroke[stroke].length > 1) {
+        //         groupByStroke[stroke].forEach(obj => {
+        //             const svg = obj.toSVG();
+        //             grouSVG += svg;
+        //         })
+                
+        //         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        //         svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+        //         svg.innerHTML = grouSVG;
+
+        //         const data = {
+        //             color : stroke,
+        //             svg : svg.outerHTML
+        //         }
+        //         SvgElemGroup.push(data);
+        //     }
+        // }
         
 
-        const colorCommand = {
-            "#ff0000" : {
-                command: "G6.7",
-                zValue: 17.9
-            }, // Red
-            "#0000ff" : {
-                command: "G6.5",
-                zValue: 17.6
-            }, // Blue
-            "#008000" : {
-                command: "G6.8",
-                zValue: 19.4
-            }, // Green
-            "#ffff00" : {
-                command: "G6.1",
-                zValue: 17
-            }, // Yellow
-            "#ffa500" : {
-                command: "G6.6",
-                zValue: 18
-            }, // Orange
-            "#800080" : {
-                command: "G6.4",
-                zValue: 19
-            }, // Purple NEED TO CHANGE TO BROWN
-            "#000000" : {
-                command: "G6.2",
-                zValue: 18.6
-            }, // Black
-            "#ffc0cb" : {
-                command: "G6.3",
-                zValue: 19.2
-            }, // Pink
-        }
+        // const colorCommand = {
+        //     "#ff0000" : {
+        //         command: "G6.7",
+        //         zValue: 17.9
+        //     }, // Red
+        //     "#0000ff" : {
+        //         command: "G6.5",
+        //         zValue: 17.6
+        //     }, // Blue
+        //     "#008000" : {
+        //         command: "G6.8",
+        //         zValue: 19.4
+        //     }, // Green
+        //     "#ffff00" : {
+        //         command: "G6.1",
+        //         zValue: 17
+        //     }, // Yellow
+        //     "#ffa500" : {
+        //         command: "G6.6",
+        //         zValue: 18
+        //     }, // Orange
+        //     "#800080" : {
+        //         command: "G6.4",
+        //         zValue: 19
+        //     }, // Purple NEED TO CHANGE TO BROWN
+        //     "#000000" : {
+        //         command: "G6.2",
+        //         zValue: 18.6
+        //     }, // Black
+        //     "#ffc0cb" : {
+        //         command: "G6.3",
+        //         zValue: 19.2
+        //     }, // Pink
+        // }
 
-        const svgElements = newObjs.map(obj => {
-            const objSvg = obj.toSVG();
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-            svg.innerHTML = objSvg;
-            const color = tinycolor(obj.stroke);
+        // const svgElements = newObjs.map(obj => {
+        //     const objSvg = obj.toSVG();
+        //     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        //     svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+        //     svg.innerHTML = objSvg;
+        //     const color = tinycolor(obj.stroke);
 
-            return {
-                color: color.toHexString(),
-                svg: svg.outerHTML
-            }
-        });
+        //     return {
+        //         color: color.toHexString(),
+        //         svg: svg.outerHTML
+        //     }
+        // });
 
-        setProgress({ uploading: false, converting: true, progress: 40 });
-        await delay(500);
+        // setProgress({ uploading: false, converting: true, progress: 40 });
+        // await delay(500);
 
         
-        const gcodes = await Promise.all(svgElements.map( async (element) => {
-            let settings = {
-                zOffset : 5,
-                feedRate : 10000,
-                seekRate : 10000,
-                zValue: colorCommand[element.color].zValue
-            }
-            const converter = new Converter(settings);
-            const [ code ] = await converter.convert(element.svg);
-            const gCodeLines = code.split('\n');
+        // const gcodes = await Promise.all(SvgElemGroup.map( async (element) => {
+        //     let settings = {
+        //         zOffset : 5,
+        //         feedRate : 10000,
+        //         seekRate : 10000,
+        //         zValue: colorCommand[element.color].zValue
+        //     }
+        //     const converter = new Converter(settings);
+        //     const [ code ] = await converter.convert(element.svg);
+        //     const gCodeLines = code.split('\n');
 
-            // const cleanedGcodeLines = gCodeLines.slice(0, -5);
-            const cleanedGcodeLines = gCodeLines.slice(0, -1);
-            cleanedGcodeLines.splice(2, 1);
-            return [ colorCommand[element.color].command + cleanedGcodeLines.join('\n')];
-        }));
+        //     // const cleanedGcodeLines = gCodeLines.slice(0, -5);
+        //     const cleanedGcodeLines = gCodeLines.slice(0, -1);
+        //     cleanedGcodeLines.splice(2, 1);
+        //     return [ colorCommand[element.color].command + cleanedGcodeLines.join('\n')];
+        // }));
 
-        setProgress({ uploading: false, converting: true, progress: 80 });
-        await delay(500);
+        // setProgress({ uploading: false, converting: true, progress: 80 });
+        // await delay(500);
 
-        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
-        gcodes.push('G0 X0Y0')
-        console.log('Gcode Lines : ', gcodes.join('\n'));
+        // gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
+        // gcodes.push('G0 X0Y0')
+        // console.log('Gcode Lines : ', gcodes.join('\n'));
 
-        // openSocket();
-        // setSetupModal(true)
+        openSocket();
+        setSetupModal(true)
     }
 
     const closeConnection = () => {
@@ -170,7 +191,6 @@ export const Plot = () => {
         setSetupModal(true);
         await delay(500);
 
-        const objects = canvas.getObjects();
         const colorCommand = {
             "#ff0000" : {
                 command: "G6.7",
@@ -197,8 +217,8 @@ export const Plot = () => {
                 zValue: 19
             }, // Purple NEED TO CHANGE TO BROWN
             "#000000" : {
-                command: "G6.2",
-                zValue: 18.6
+                command: "G6.1",
+                zValue: 14
             }, // Black
             "#ffc0cb" : {
                 command: "G6.3",
@@ -206,18 +226,42 @@ export const Plot = () => {
             }, // Pink
         }
 
-        const svgElements = objects.map(obj => {
-            const objSvg = obj.toSVG();
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-            svg.innerHTML = objSvg;
-            const color = tinycolor(obj.stroke);
+        const canvasObjects = canvas.getObjects();
+        const objects = returnObjs(canvasObjects);
 
-            return {
-                color: color.toHexString(),
-                svg: svg.outerHTML
+        const groupByStroke = {};
+        objects.forEach(obj => {
+            const stroke = tinycolor(obj.stroke);
+
+            if (stroke) {
+                if (!groupByStroke[stroke.toHexString()]) {
+                    groupByStroke[stroke.toHexString()] = [];
+                }
+                groupByStroke[stroke.toHexString()].push(obj);
             }
         });
+
+        const svgElements = []
+        for (const stroke in groupByStroke) {
+            let groupSVG = '';
+            if (groupByStroke[stroke].length > 1) {
+
+                groupByStroke[stroke].forEach(obj => {
+                    const svg = obj.toSVG();
+                    groupSVG += svg;
+                });
+                
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+                svg.innerHTML = groupSVG;
+
+                const data = {
+                    color : stroke,
+                    svg : svg.outerHTML
+                }
+                svgElements.push(data);
+            }
+        }
 
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
