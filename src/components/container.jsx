@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 // import React from "react";
-import { ChevronLeft, ChevronRight, Coins, GripHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, Coins, GripHorizontal, X } from "lucide-react";
 import { handleFile } from "./editor/functions";
 import './style.css';
 import  useCanvas, { useCom }  from "../context";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 
 export default function Container({ children, expanded, setExpanded, hideSideBar }) {
     const { 
@@ -13,6 +13,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
         canvasRef, 
         objectValues, 
     } = useCanvas();
+    const { config } = useCom()
 
     return (
         <section className={`h-full w-full ${ hideSideBar ? '' : 'md:w-[97%]' } flex flex-col md:flex-row canvas-section overflow-hidden relative max-w-[100vw] max-h-[100vh]`}>
@@ -41,7 +42,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
 
                 <button className="toggle" onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>
 
-                <div className="absolute w-fit top-7 bg-white p-5 flex flex-col gap-5">
+                <div className="absolute w-fit h-full bg-white p-5 flex flex-col transition-all duration-500" style={{ right: config.open ? 0 : '-30rem'}}>
                     <ConfigComponent />
                 </div>
             </div>
@@ -73,73 +74,49 @@ function ConfigComponent() {
         setColors(cloneColors)
     }
 
-    const InputComponent = ({ inputKey }) => {
+    const InputComponent = useCallback(({ inputKey, config, setConfig, label, limit=null }) => {
+        
+        const handleChange = (e) => {
+            let value = e.target.value;
+            if (limit) {
+                value = parseInt(value < limit ? value : limit)
+            }
+            setConfig({ ...config, [inputKey]: isNaN(value) ? 0 : value })
+        }
         return (
-            <div className="flex items-center justify-between relative">
-                <div className="flex gap-3 items-center justify-between border rounded-[7px] border-[#1c7f969c] p-1 bg-white z-10 w-full">
-                    <p className="pl-2 text-[#7a7a7a] font-medium">Machine URL</p>
+            <div className="flex items-center justify-between relative py-1">
+                <div className="flex gap-3 items-center justify-between rounded-[7px] p-1 bg-white z-10 w-full">
+                    <p className="text-[#7a7a7a] font-medium">{label}</p>
                     <input 
                         type="text" 
-                        className="text-end pr-2 outline-none focus:border-b border-[#1c7f969c]" 
+                        className="text-end pr-2 transition-all duration-500 outline-none border-b focus:border-[#1c7f969c]" 
                         value={config[inputKey]} 
-                        onChange={(e) => {
-                            setConfig({...config, [inputKey]: e.target.value })
-                        }}
+                        onChange={ handleChange }
                     />
                 </div>
             </div>
         )
-    }
+    }, [])
 
     return (
         <>
-            <InputComponent key={`url`} />
-            <div className="flex items-center justify-between relative">
-                <div className="flex gap-3 items-center justify-between border rounded-[7px] border-[#1c7f969c] p-1 bg-white z-10 w-full">
-                    <p className="pl-2 text-[#7a7a7a] font-medium">Feed Rate</p>
-                    <input 
-                        type="text"
-                        className="text-end pr-2 outline-none focus:border-b border-[#1c7f969c]" 
-                        value={config.feedRate}
-                        onChange={(e) => {
-                            setConfig({...config, feedRate: e.target.value < 12000 ? e.target.value : 12000 })
-                        }} 
-                    />
-                </div>
+            <div className="flex justify-between border-b pb-2 border-[#1c8096]">
+                <p className="font-medium text-[#0c4350]">Machine Configuration</p>
+                <button onClick={ () => { setConfig({ ...config, open: false })}}><X size={20} strokeWidth={4} color={'red'} /></button>
             </div>
-            <div className="flex items-center justify-between relative">
-                <div className="flex gap-3 items-center justify-between border rounded-[7px] border-[#1c7f969c] p-1 bg-white z-10 w-full">
-                    <p className="pl-2 text-[#7a7a7a] font-medium">Seek Rate</p>
-                    <input 
-                        type="text" 
-                        className="text-end pr-2 outline-none focus:border-b border-[#1c7f969c]" 
-                        value={config.seekRate} 
-                        onChange={(e) => {
-                            setConfig({ ...config, seekRate: e.target.value < 10000 ? e.target.value : 10000 })
-                        }}
-                    />
-                </div>
-            </div>
-            <div className="flex items-center justify-between relative">
-                <div className="flex gap-3 items-center justify-between border rounded-[7px] border-[#1c7f969c] p-1 bg-white z-10 w-full">
-                    <p className="pl-2 text-[#7a7a7a] font-medium">Z - Offset</p>
-                    <input 
-                        type="text" 
-                        className="text-end pr-2 outline-none focus:border-b border-[#1c7f969c]" 
-                        value={config.zOffset} 
-                        onChange={(e) => {
-                            setConfig({ ...config, zOffset:  e.target.value < 10 ? e.target.value : 10 })
-                        }}
-                    />
-                </div>
+            <div className="py-5">
+                <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
+                <InputComponent inputKey={`feedRate`} config={config} setConfig={setConfig} label={'Feed Rate'} limit={12000}/>
+                <InputComponent inputKey={`seekRate`} config={config} setConfig={setConfig} label={'Seek Rate'} limit={10000}/>
+                <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Value'} limit={10}/>
             </div>
 
             <div className="flex flex-col gap-2 py-4">
-                <p className="font-medium text-lg text-[#0a3f4b] ">Pen Colors</p>
+                <p className="font-medium text-lg text-[#0a3f4b] mb-3">Pen Colors</p>
                 { colors.map((color, index) => (
                     <div 
                         key={index} 
-                        className="flex justify-between items-center py-2 border-b" 
+                        className="flex justify-between items-center py-1 border-b" 
                         draggable
                         onDragStart={ () =>  ( dragDiv.current = index )}
                         onDragEnter={ () => { dragOverDiv.current = index }}
@@ -151,9 +128,23 @@ function ConfigComponent() {
                             <div className="border w-10 h-6 ml-2 rounded bg-slate-500" style={{ backgroundColor: `${color.color}`}}></div>
                             <p className="font-medium text-[#035264] text-md">{color.name}</p>
                         </div>
-                        <div className="flex items-center gap-2 bg-[#DFDFDF] py-1 px-1 rounded-md">
+                        <div className="flex items-center gap-2 bg-[#f0f0f0] py-1 px-1 rounded-md">
                             <p className="px-2 text-[#0a3f4b] text-sm">Z-Value :</p>
-                            <input className="text-center text-sm  pr-1 max-w-14 rounded outline-none" type="text" value={color.zValue} />
+                            <input 
+                                className="text-center text-sm  pr-1 max-w-14 rounded outline-none" 
+                                type="text" 
+                                value={color.zValue} 
+                                onChange={(e) => {
+                                    let value = parseFloat(e.target.value);
+                                    if (isNaN(value)) value = 0;
+                                    value = value > 20 ? 20 : value;
+                                    setColors(prevColor => 
+                                        prevColor.map((clr, idx) =>
+                                            idx === index ? {...clr, zValue: value } : clr
+                                        )
+                                    )
+                                }}
+                            />
                         </div>
                     </div>
                 ))}

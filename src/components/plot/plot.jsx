@@ -26,6 +26,7 @@ export const Plot = () => {
         setWs,
         setJob,
         config,
+        setConfig,
         setupModal, 
         setSetupModal,
         openSocket,
@@ -60,111 +61,74 @@ export const Plot = () => {
     }
 
     const handleConnection = async () => {
-        // const objects = canvas.getObjects();
-        // const newObjs = returnObjs(objects);
+        const objects = canvas.getObjects();
+        const newObjs = returnObjs(objects);
 
-        // const groupByStroke = {};
+        const groupByStroke = {};
 
-        // newObjs.forEach(obj => {
-        //     const stroke = tinycolor(obj.stroke);
+        newObjs.forEach(obj => {
+            const stroke = tinycolor(obj.stroke);
 
-        //     if (stroke) {
-        //         if (!groupByStroke[stroke.toHexString()]) {
-        //             groupByStroke[stroke.toHexString()] = [];
-        //         }
-        //         groupByStroke[stroke.toHexString()].push(obj);
-        //     }
-        // });
+            if (stroke) {
+                if (!groupByStroke[stroke.toHexString()]) {
+                    groupByStroke[stroke.toHexString()] = [];
+                }
+                groupByStroke[stroke.toHexString()].push(obj);
+            }
+        });
 
-        // const svgElements = []
-        // for (const stroke in groupByStroke) {
-        //     let groupSVG = '';
-        //     if (groupByStroke[stroke].length > 1) {
+        const svgElements = []
+        for (const stroke in groupByStroke) {
+            let groupSVG = '';
+            if (groupByStroke[stroke].length > 1) {
 
-        //         groupByStroke[stroke].forEach(obj => {
-        //             const svg = obj.toSVG();
-        //             groupSVG += svg;
-        //         });
-        //     } else {
-        //         const svg = groupByStroke[stroke][0].toSVG()
-        //         groupSVG += svg
-        //     }
+                groupByStroke[stroke].forEach(obj => {
+                    const svg = obj.toSVG();
+                    groupSVG += svg;
+                });
+            } else {
+                const svg = groupByStroke[stroke][0].toSVG()
+                groupSVG += svg
+            }
 
-        //     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        //     svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-        //     svg.innerHTML = groupSVG;
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+            svg.innerHTML = groupSVG;
 
-        //     const data = {
-        //         color : stroke,
-        //         svg : svg.outerHTML
-        //     }
-        //     console.log('Data', data)
-        //     svgElements.push(data);
-        // }
+            const data = {
+                color : stroke,
+                svg : svg.outerHTML
+            }
+            console.log('Data', data)
+            svgElements.push(data);
+        }
         
+        const gcodes = await Promise.all(svgElements.map( async (element) => {
+            const color = colors.find(obj => obj.color === element.color)
+            let settings = {
+                zOffset : 5,
+                feedRate : 10000,
+                seekRate : 10000,
+                zValue: color.command,
+                tolerance: 1
+            }
+            const converter = new Converter(settings);
+            const [ code ] = await converter.convert(element.svg);
+            console.log('Converted Code From the NPM -> ', code);
+            const gCodeLines = code.split('\n');
 
-        // const colorCommand = {
-        //     "#ff0000" : {
-        //         command: "G6.7",
-        //         zValue: 17.9
-        //     }, // Red
-        //     "#0000ff" : {
-        //         command: "G6.5",
-        //         zValue: 17.6
-        //     }, // Blue
-        //     "#008000" : {
-        //         command: "G6.8",
-        //         zValue: 19.4
-        //     }, // Green
-        //     "#ffff00" : {
-        //         command: "G6.1",
-        //         zValue: 17
-        //     }, // Yellow
-        //     "#ffa500" : {
-        //         command: "G6.6",
-        //         zValue: 18
-        //     }, // Orange
-        //     "#800080" : {
-        //         command: "G6.4",
-        //         zValue: 19
-        //     }, // Purple NEED TO CHANGE TO BROWN
-        //     "#000000" : {
-        //         command: "G6.2",
-        //         zValue: 18.6
-        //     }, // Black
-        //     "#ffc0cb" : {
-        //         command: "G6.3",
-        //         zValue: 19.2
-        //     }, // Pink
-        // }
+            // const cleanedGcodeLines = gCodeLines.slice(0, -5);
+            const cleanedGcodeLines = gCodeLines.slice(0, -1);
+            cleanedGcodeLines.splice(2, 1);
+            return [ 'G0 Z0\n' + color.command + cleanedGcodeLines.join('\n')];
+        }));
 
-        
-        // const gcodes = await Promise.all(svgElements.map( async (element) => {
-        //     const color = colors.find(obj => obj.color === element.color)
-        //     let settings = {
-        //         zOffset : 5,
-        //         feedRate : 10000,
-        //         seekRate : 10000,
-        //         zValue: color.command,
-        //         tolerance: 1
-        //     }
-        //     const converter = new Converter(settings);
-        //     const [ code ] = await converter.convert(element.svg);
-        //     console.log('Converted Code From the NPM -> ', code);
-        //     const gCodeLines = code.split('\n');
+        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
+        gcodes.push('G0 X0Y0')
+        console.log('Gcode Lines : ', gcodes.join('\n'));
 
-        //     // const cleanedGcodeLines = gCodeLines.slice(0, -5);
-        //     const cleanedGcodeLines = gCodeLines.slice(0, -1);
-        //     cleanedGcodeLines.splice(2, 1);
-        //     return [ 'G0 Z0\n' + color.command + cleanedGcodeLines.join('\n')];
-        // }));
-
-        // gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
-        // gcodes.push('G0 X0Y0')
-        // console.log('Gcode Lines : ', gcodes.join('\n'));
-
-        openSocket();
-        setSetupModal(true)
+        // openSocket();
+        // setSetupModal(true)
     }
 
     const closeConnection = () => {
@@ -341,8 +305,8 @@ export const Plot = () => {
     return (
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
             <div className="mt-4 h-full bg-[#EBEBEB] cut hidden md:block">
-                <div className="w-full h-[10%] bg-[#1e263f] flex items-end justify-end gap-3 p-3">
-                <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
+                <div className="w-full h-[10%] bg-[#1e263f] flex items-end justify-end gap-3 p-3" onClick={ () => { setConfig({ ...config, open: true })} }>
+                    <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
                 </div>
                 <div className="text-sm responses h-[90%] relative">
                     <textarea ref={textareaRef} value={ response.message } className="cursor-default" readOnly></textarea>

@@ -113,12 +113,12 @@ export const CommunicationProvider = ({ children }) => {
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
-    // const [ machineUrl, port ] = [ '192.168.0.1', '81'];
     const [ config, setConfig ] = useState({
         url: '192.168.0.1',
         feedRate: 12000,
         seekRate: 10000,
-        zOffset: 5
+        zOffset: 5,
+        open: false
     })
     const [colors, setColors] = useState([
         { color: '#ff0000', name: 'Red', zValue: 17.9, command: "G6.7" },
@@ -146,7 +146,7 @@ export const CommunicationProvider = ({ children }) => {
         } catch (err) {
             setWs(null);
         }
-    }, [])
+    }, [ws])
 
 
     useEffect(() => {
