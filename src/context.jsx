@@ -107,18 +107,13 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
+    
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
-    // const [ machineUrl, port ] = [ 'localhost:3000', '5000'];
     const [ machineUrl, port ] = [ '192.168.0.1', '81']
-    // const machineUrl = 'localhost'
-    // const port = '5000'
-    // const machineUrl = '192.168.0.1'
-    // const port = '192.168.0.1'
-
 
     const openSocket = useCallback(() => {
         if (ws !== null) return;
@@ -128,11 +123,8 @@ export const CommunicationProvider = ({ children }) => {
                 
                 const socket = new WebSocket(`ws://192.168.0.1:81`, ['arduino']);
                 socket.binaryType = 'arraybuffer';
-                // setWs(new WebSocket(`ws://${machineUrl}:${port}`));
-                // setWs(new WebSocket(`ws://192.168.0.1:81`, ["arduino"]));
-                // setWs(new WebSocket(`ws://localhost:5000`));
-
                 setWs(socket)
+
             }, 3000)
 
         } catch (err) {
@@ -189,9 +181,25 @@ export const CommunicationProvider = ({ children }) => {
                             console.log('Hard Limit Triggered \nRestartng...');
 
                             fetch(url + encodeURI('[ESP444]RESTART') + `&PAGEID=${response.pageId}`)
+                            // fetch(url + encodeURI('$X\n$X\nG1 X10Y10Z10 F3000\n$H') + `&PAGEID=${response.pageId}`)
                             .then(response => {
                                 if (response.ok){
                                     ws.close()
+                                } else {
+                                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Restart Error ', err)
+                            })
+                        }else if (split_text[0] === 'ALARM' && split_text[1] === 8) {
+                            console.log('Homing Failed \nRe-homing...');
+
+                            fetch(url + encodeURI('$X\nG1 X10Y10Z10 F3000\n$H') + `&PAGEID=${response.pageId}`)
+                            .then(response => {
+                                if (response.ok){
+                                    // ws.close()
+                                    console.log('Connection Established')
                                 } else {
                                     throw new Error('HTTP ERROR! STATUS : ' + response.status);
                                 }

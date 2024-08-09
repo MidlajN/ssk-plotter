@@ -10,28 +10,9 @@ import './editor.css';
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
     const { canvas } = useCanvas();
     const [ renderElements, setRenderElements ] = useState(false);
-    // const [ renderColor, setRenderColor ] = useState(false);
-
-    // const handleColor = (e) => {
-    //     const activeObject = canvas.getActiveObjects();
-    //     if (activeObject) {
-    //         activeObject.forEach(obj => {
-    //             obj.set('stroke', e.target.value);
-    //         })
-    //         canvas.renderAll();
-    //     }
-    //     setStrokeColor(e.target.value);
-    // }
 
     useEffect(() => {
         if (canvas) {
-            const activeObject = canvas.getActiveObjects();
-            if (activeObject) {
-                activeObject.forEach(obj => {
-                    obj.set('stroke', strokeColor);
-                })
-                canvas.renderAll();
-            }
 
             canvas.on('mouse:down', () => {
                 const activeObject = canvas.getActiveObjects();
@@ -46,7 +27,20 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
             }
         }
 
-    }, [canvas, strokeColor])
+    }, [canvas])
+
+    useEffect(() => {
+        if (canvas) {
+            const activeObject = canvas.getActiveObjects();
+            console.log('ActiveObject', activeObject)
+            if (activeObject) {
+                activeObject.forEach(obj => {
+                    obj.set('stroke', strokeColor);
+                })
+                canvas.renderAll();
+            }
+        }
+    }, [strokeColor])
 
     useEffect(() => {
         if (tool === 'Elements') {
