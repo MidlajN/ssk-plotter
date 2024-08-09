@@ -3,12 +3,13 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
 import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
-import useCanvas from "../../context";
+import useCanvas, { useCom } from "../../context";
 import './editor.css';
 
 
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
     const { canvas } = useCanvas();
+    const { colors } = useCom()
     const [ renderElements, setRenderElements ] = useState(false);
 
     useEffect(() => {
@@ -71,63 +72,17 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                     </div>
                 </div>
 
-                <div className="grid grid-cols-5  mt-8">
-                    <div 
-                        className="rounded-md border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'black' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('black')}}
-                    >
-                        <div className="p-5 bg-[black] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'red' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('red')}}
-                    >
-                        <div className="p-5 bg-[#be1111] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer"
-                        style={{ borderColor: strokeColor === 'blue' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('blue')}}
-                    >
-                        <div className="p-5 bg-[blue] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'green' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('green')}}
-                    >
-                        <div className="p-5 bg-[green] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'yellow' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('yellow')}}
-                    >
-                        <div className="p-5 bg-[#fdfd00] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'orange' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('orange')}}
-                    >
-                        <div className="p-5 bg-[orange] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'purple' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('purple')}}
-                    >
-                        <div className="p-5 bg-[purple] border-2 border-white rounded-md"></div>
-                    </div>
-                    <div 
-                        className="rounded-md border-[white] border-4 cursor-pointer" 
-                        style={{ borderColor: strokeColor === 'pink' ? '#1f7f9481' : 'white'}}
-                        onClick={ () => { setStrokeColor('pink')}}
-                    >
-                        <div className="p-5 bg-[pink] border-2 border-white rounded-md"></div>
-                    </div>
+                <div className="grid grid-cols-5 mt-8">
+                    { colors.map((color, index) => (
+                        <div 
+                            key={ index }
+                            className="rounded-md border-4 cursor-pointer" 
+                            style={{ borderColor: strokeColor === color.name ? '#1f7f9481' : 'white' }}
+                            onClick={ () => { setStrokeColor(color.name)}}
+                        >
+                            <div className="p-5 border-2 border-white rounded-md" style={{ backgroundColor: color.color }}></div>
+                        </div>
+                    ))}
                 </div>
 
                 <div 

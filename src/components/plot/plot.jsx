@@ -25,11 +25,12 @@ export const Plot = () => {
         ws, 
         setWs,
         setJob,
-        machineUrl,
+        config,
         setupModal, 
         setSetupModal,
         openSocket,
-        setProgress
+        setProgress,
+        colors
     } = useCom();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
@@ -139,11 +140,12 @@ export const Plot = () => {
 
         
         // const gcodes = await Promise.all(svgElements.map( async (element) => {
+        //     const color = colors.find(obj => obj.color === element.color)
         //     let settings = {
         //         zOffset : 5,
         //         feedRate : 10000,
         //         seekRate : 10000,
-        //         zValue: colorCommand[element.color].zValue,
+        //         zValue: color.command,
         //         tolerance: 1
         //     }
         //     const converter = new Converter(settings);
@@ -154,7 +156,7 @@ export const Plot = () => {
         //     // const cleanedGcodeLines = gCodeLines.slice(0, -5);
         //     const cleanedGcodeLines = gCodeLines.slice(0, -1);
         //     cleanedGcodeLines.splice(2, 1);
-        //     return [ 'G0 Z0\n' + colorCommand[element.color].command + cleanedGcodeLines.join('\n')];
+        //     return [ 'G0 Z0\n' + color.command + cleanedGcodeLines.join('\n')];
         // }));
 
         // gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
@@ -179,45 +181,8 @@ export const Plot = () => {
         setSetupModal(true);
         await delay(500);
 
-        const colorCommand = {
-            "#ff0000" : {
-                command: "G6.7",
-                zValue: 17.9
-            }, // Red
-            "#0000ff" : {
-                command: "G6.8",
-                zValue: 19.1
-            }, // Blue
-            "#008000" : {
-                command: "G6.4",
-                zValue: 19.4
-            }, // Green
-            "#ffff00" : {
-                command: "G6.1",
-                zValue: 18
-            }, // Yellow
-            "#ffa500" : {
-                command: "G6.2",
-                zValue: 19.4
-            }, // Orange
-            "#800080" : {
-                command: "G6.6",
-                zValue: 19.4
-            }, // Purple NEED TO CHANGE TO BROWN
-            "#000000" : {
-                command: "G6.1",
-                zValue: 14
-            }, // Black
-            "#ffc0cb" : {
-                command: "G6.3",
-                zValue: 19.2
-            }, // Pink
-        }
-
         const canvasObjects = canvas.getObjects();
         const objects = returnObjs(canvasObjects);
-
-        console.log('Object', objects)
 
         const groupByStroke = {};
         objects.forEach(obj => {
@@ -230,8 +195,6 @@ export const Plot = () => {
                 groupByStroke[stroke.toHexString()].push(obj);
             }
         });
-
-        console.log('GrouByStroke', groupByStroke)
 
         const svgElements = []
         for (const stroke in groupByStroke) {
@@ -259,18 +222,17 @@ export const Plot = () => {
             svgElements.push(data);
         }
 
-        console.log('SvgElements', svgElements)
-
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
         
         const gcodes = await Promise.all(svgElements.map( async (element) => {
+            const color = colors.find(obj => obj.color === element.color)
             let settings = {
                 zOffset : 5,
                 feedRate : 10000,
                 seekRate : 10000,
-                zValue: colorCommand[element.color].zValue,
+                zValue: color.zValue,
                 tolerance: 0.1
             }
             const converter = new Converter(settings);
@@ -280,7 +242,7 @@ export const Plot = () => {
             // const cleanedGcodeLines = gCodeLines.slice(0, -5);
             const cleanedGcodeLines = gCodeLines.slice(0, -1);
             cleanedGcodeLines.splice(2, 1);
-            return [ 'G90 G21\n G1 Z0 F1000\n' + colorCommand[element.color].command + cleanedGcodeLines.join('\n')];
+            return [ 'G90 G21\n G1 Z0 F1000\n' + color.command + cleanedGcodeLines.join('\n')];
         }));
 
         setProgress({ uploading: false, converting: true, progress: 80 });
@@ -320,7 +282,7 @@ export const Plot = () => {
                     }
                 }
             }
-            http.open("POST", `http://${ machineUrl }/upload`, true);
+            http.open("POST", `http://${ config.url }/upload`, true);
             http.send(formData);
         } catch (err) {
             console.log('Error While Uploading -> ', err);
@@ -331,7 +293,7 @@ export const Plot = () => {
 
     const sendToMachine = async (gcode) => {
         try {
-            const url = `http://${ machineUrl }/command?commandText=` + encodeURI(gcode) + `&PAGEID=${response.pageId}`
+            const url = `http://${ config.url }/command?commandText=` + encodeURI(gcode) + `&PAGEID=${response.pageId}`
 
             fetch(url)
             .then(response => {

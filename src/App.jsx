@@ -20,7 +20,7 @@ export default function Home() {
   const [tool, setTool] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
-  const [strokeColor, setStrokeColor] = useState('black');
+  const [strokeColor, setStrokeColor] = useState('Black');
   const [element, setElement] = useState('rectangle')
 
   useEditorSetup(canvas, tool, strokeColor, element);
