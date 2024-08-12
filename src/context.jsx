@@ -117,18 +117,18 @@ export const CommunicationProvider = ({ children }) => {
         url: '192.168.0.1',
         feedRate: 12000,
         seekRate: 10000,
-        zOffset: 5,
+        zOffset: 10,
         open: false
     })
     const [colors, setColors] = useState([
-        { color: '#ff0000', name: 'Red', zValue: 17.9, command: "G6.7" },
-        { color: '#0000ff', name: 'Blue', zValue: 19.2, command: "G6.8" },
-        { color: '#008000', name: 'Green', zValue: 19.4, command: "G6.4" },
-        { color: '#ffff00', name: 'Yellow', zValue: 18, command: "G6.1" },
-        { color: '#ffa500', name: 'Orange', zValue: 19.4, command: "G6.2" },
-        { color: '#800080', name: 'Purple', zValue: 19.4, command: "G6.6" },
-        { color: '#000000', name: 'Black', zValue: 14, command: "G6.5" },
-        { color: '#ffc0cb', name: 'Pink', zValue: 19.2, command: "G6.3" },
+        { color: '#ff0000', name: 'Red', zValue: 13, command: "G6.7" },
+        { color: '#0000ff', name: 'Blue', zValue: 13, command: "G6.8" },
+        { color: '#008000', name: 'Green', zValue: 13, command: "G6.4" },
+        { color: '#ffff00', name: 'Yellow', zValue: 13, command: "G6.1" },
+        { color: '#ffa500', name: 'Orange', zValue: 13, command: "G6.2" },
+        { color: '#800080', name: 'Purple', zValue: 13, command: "G6.6" },
+        { color: '#000000', name: 'Black', zValue: 13, command: "G6.5" },
+        { color: '#ffc0cb', name: 'Pink', zValue: 13, command: "G6.3" },
     ])
 
     const openSocket = useCallback(() => {

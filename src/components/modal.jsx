@@ -17,7 +17,7 @@ export const SetupModal = () => {
         openSocket,
         setupModal,
         setSetupModal,
-        machineUrl,
+        config,
         // setJob,
         progress,
         // setProgress
@@ -73,7 +73,7 @@ export const SetupModal = () => {
                                     Couldn&apos;t Connect
                                 </p>
                             }
-                            <p className="text-[15px]">URL : <span className=" text-slate-400">ws://{ machineUrl }</span></p>
+                            <p className="text-[15px]">URL : <span className=" text-slate-400">ws://{ config.url }</span></p>
                         </div>
                     </div> : 
                     <div>

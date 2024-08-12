@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 // import React from "react";
-import { ChevronLeft, ChevronRight, Coins, GripHorizontal, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, GripHorizontal, X } from "lucide-react";
 import { handleFile } from "./editor/functions";
 import './style.css';
 import  useCanvas, { useCom }  from "../context";
@@ -80,8 +80,9 @@ function ConfigComponent() {
             let value = e.target.value;
             if (limit) {
                 value = parseInt(value < limit ? value : limit)
+                value = isNaN(value) ? 0 : value
             }
-            setConfig({ ...config, [inputKey]: isNaN(value) ? 0 : value })
+            setConfig({ ...config, [inputKey]: value })
         }
         return (
             <div className="flex items-center justify-between relative py-1">
@@ -108,7 +109,7 @@ function ConfigComponent() {
                 <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
                 <InputComponent inputKey={`feedRate`} config={config} setConfig={setConfig} label={'Feed Rate'} limit={12000}/>
                 <InputComponent inputKey={`seekRate`} config={config} setConfig={setConfig} label={'Seek Rate'} limit={10000}/>
-                <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Value'} limit={10}/>
+                <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Offset'} limit={10}/>
             </div>
 
             <div className="flex flex-col gap-2 py-4">
@@ -132,17 +133,28 @@ function ConfigComponent() {
                             <p className="px-2 text-[#0a3f4b] text-sm">Z-Value :</p>
                             <input 
                                 className="text-center text-sm  pr-1 max-w-14 rounded outline-none" 
-                                type="text" 
+                                type="text"
                                 value={color.zValue} 
                                 onChange={(e) => {
-                                    let value = parseFloat(e.target.value);
-                                    if (isNaN(value)) value = 0;
-                                    value = value > 20 ? 20 : value;
+                                    let value = e.target.value
                                     setColors(prevColor => 
                                         prevColor.map((clr, idx) =>
                                             idx === index ? {...clr, zValue: value } : clr
                                         )
                                     )
+                                }}
+                                onBlur={() => {
+                                    // Convert to float when the input loses focus
+                                    let value = parseFloat(color.zValue);
+                                    if (isNaN(value)) value = 0;
+                                    value = value > 20 ? 20 : value;
+
+                                    // Update the state with the parsed float value
+                                    setColors(prevColors =>
+                                        prevColors.map((clr, idx) =>
+                                            idx === index ? { ...clr, zValue: value } : clr
+                                        )
+                                    );
                                 }}
                             />
                         </div>

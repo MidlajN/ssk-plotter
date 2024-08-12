@@ -29,9 +29,9 @@ export const Plot = () => {
         setConfig,
         setupModal, 
         setSetupModal,
-        openSocket,
         setProgress,
-        colors
+        colors,
+        openSocket
     } = useCom();
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
@@ -61,74 +61,86 @@ export const Plot = () => {
     }
 
     const handleConnection = async () => {
-        const objects = canvas.getObjects();
-        const newObjs = returnObjs(objects);
+        // const objects = canvas.getObjects();
+        // const newObjs = returnObjs(objects);
 
-        const groupByStroke = {};
+        // const groupByStroke = {};
 
-        newObjs.forEach(obj => {
-            const stroke = tinycolor(obj.stroke);
+        // newObjs.forEach(obj => {
+        //     const stroke = tinycolor(obj.stroke);
 
-            if (stroke) {
-                if (!groupByStroke[stroke.toHexString()]) {
-                    groupByStroke[stroke.toHexString()] = [];
-                }
-                groupByStroke[stroke.toHexString()].push(obj);
-            }
-        });
+        //     if (stroke) {
+        //         if (!groupByStroke[stroke.toHexString()]) {
+        //             groupByStroke[stroke.toHexString()] = [];
+        //         }
+        //         groupByStroke[stroke.toHexString()].push(obj);
+        //     }
+        // });
 
-        const svgElements = []
-        for (const stroke in groupByStroke) {
-            let groupSVG = '';
-            if (groupByStroke[stroke].length > 1) {
+        // const svgElements = []
+        // for (const stroke in groupByStroke) {
+        //     let groupSVG = '';
+        //     if (groupByStroke[stroke].length > 1) {
 
-                groupByStroke[stroke].forEach(obj => {
-                    const svg = obj.toSVG();
-                    groupSVG += svg;
-                });
-            } else {
-                const svg = groupByStroke[stroke][0].toSVG()
-                groupSVG += svg
-            }
+        //         groupByStroke[stroke].forEach(obj => {
+        //             const svg = obj.toSVG();
+        //             groupSVG += svg;
+        //         });
+        //     } else {
+        //         const svg = groupByStroke[stroke][0].toSVG()
+        //         groupSVG += svg
+        //     }
 
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
-            svg.innerHTML = groupSVG;
+        //     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        //     svg.setAttribute('viewBox', `0 0 ${ canvas.getWidth() } ${ canvas.getHeight() }`);
+        //     svg.innerHTML = groupSVG;
 
-            const data = {
-                color : stroke,
-                svg : svg.outerHTML
-            }
-            console.log('Data', data)
-            svgElements.push(data);
-        }
+        //     const data = {
+        //         color : stroke,
+        //         svg : svg.outerHTML
+        //     }
+        //     // console.log('Data', data)
+        //     svgElements.push(data);
+        // }
         
-        const gcodes = await Promise.all(svgElements.map( async (element) => {
-            const color = colors.find(obj => obj.color === element.color)
-            let settings = {
-                zOffset : 5,
-                feedRate : 10000,
-                seekRate : 10000,
-                zValue: color.command,
-                tolerance: 1
-            }
-            const converter = new Converter(settings);
-            const [ code ] = await converter.convert(element.svg);
-            console.log('Converted Code From the NPM -> ', code);
-            const gCodeLines = code.split('\n');
+        // const colorOrder = colors.reduce((acc, colorObject, index) => {
+        //     acc[colorObject.color] = index
+        //     return acc
+        // }, {})
+        // console.log('Color Object -> ', colorOrder)
+        // console.log('SvgElements Before ->', svgElements)
 
-            // const cleanedGcodeLines = gCodeLines.slice(0, -5);
-            const cleanedGcodeLines = gCodeLines.slice(0, -1);
-            cleanedGcodeLines.splice(2, 1);
-            return [ 'G0 Z0\n' + color.command + cleanedGcodeLines.join('\n')];
-        }));
+        // svgElements.sort((a, b) => {
+        //     return colorOrder[a.color] - colorOrder[b.color]
+        // })
+        // console.log('SvgElements After -> ', svgElements)
 
-        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
-        gcodes.push('G0 X0Y0')
-        console.log('Gcode Lines : ', gcodes.join('\n'));
+        // const gcodes = await Promise.all(svgElements.map( async (element) => {
+        //     const color = colors.find(obj => obj.color === element.color)
+        //     let settings = {
+        //         zOffset : 5,
+        //         feedRate : 10000,
+        //         seekRate : 10000,
+        //         zValue: color.command,
+        //         tolerance: 1
+        //     }
+        //     const converter = new Converter(settings);
+        //     const [ code ] = await converter.convert(element.svg);
+        //     // console.log('Converted Code From the NPM -> ', code);
+        //     const gCodeLines = code.split('\n');
 
-        // openSocket();
-        // setSetupModal(true)
+        //     // const cleanedGcodeLines = gCodeLines.slice(0, -5);
+        //     const cleanedGcodeLines = gCodeLines.slice(0, -1);
+        //     cleanedGcodeLines.splice(2, 1);
+        //     return [ 'G0 Z0\n' + color.command + cleanedGcodeLines.join('\n')];
+        // }));
+
+        // gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
+        // gcodes.push('G0 X0Y0')
+        // console.log('Gcode Lines : ', gcodes.join('\n'));
+
+        openSocket();
+        setSetupModal(true)
     }
 
     const closeConnection = () => {
@@ -189,13 +201,24 @@ export const Plot = () => {
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
+        const colorOrder = colors.reduce((acc, colorObject, index) => {
+            acc[colorObject.color] = index
+            return acc
+        }, {})
+        console.log('Color Object -> ', colorOrder)
+        console.log('SvgElements Before ->', svgElements)
+
+        svgElements.sort((a, b) => {
+            return colorOrder[a.color] - colorOrder[b.color]
+        })
+
         
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             const color = colors.find(obj => obj.color === element.color)
             let settings = {
-                zOffset : 5,
-                feedRate : 10000,
-                seekRate : 10000,
+                zOffset : config.zOffset,
+                feedRate : config.feedRate,
+                seekRate : config.seekRate,
                 zValue: color.zValue,
                 tolerance: 0.1
             }
