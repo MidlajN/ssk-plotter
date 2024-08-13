@@ -107,41 +107,45 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
-    
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
+    const [colors, setColors] = useState([
+        { color: '#ff0000', name: 'Red', zValue: -13, command: "G6.7" },
+        { color: '#0000ff', name: 'Blue', zValue: -13, command: "G6.8" },
+        { color: '#008000', name: 'Green', zValue: -13, command: "G6.4" },
+        { color: '#ffff00', name: 'Yellow', zValue: -13, command: "G6.1" },
+        { color: '#ffa500', name: 'Orange', zValue: -13, command: "G6.2" },
+        { color: '#800080', name: 'Purple', zValue: -13, command: "G6.6" },
+        { color: '#000000', name: 'Black', zValue: -13, command: "G6.5" },
+        { color: '#ffc0cb', name: 'Pink', zValue: -13, command: "G6.3" },
+    ]);
     const [ config, setConfig ] = useState({
         url: '192.168.0.1',
         feedRate: 12000,
-        seekRate: 10000,
+        jogSpeed: 2000,
         zOffset: 10,
         open: false
-    })
-    const [colors, setColors] = useState([
-        { color: '#ff0000', name: 'Red', zValue: 13, command: "G6.7" },
-        { color: '#0000ff', name: 'Blue', zValue: 13, command: "G6.8" },
-        { color: '#008000', name: 'Green', zValue: 13, command: "G6.4" },
-        { color: '#ffff00', name: 'Yellow', zValue: 13, command: "G6.1" },
-        { color: '#ffa500', name: 'Orange', zValue: 13, command: "G6.2" },
-        { color: '#800080', name: 'Purple', zValue: 13, command: "G6.6" },
-        { color: '#000000', name: 'Black', zValue: 13, command: "G6.5" },
-        { color: '#ffc0cb', name: 'Pink', zValue: 13, command: "G6.3" },
-    ])
+    });
+
+    const jogSpeedRef = useRef(config.jogSpeed);
+    useEffect(() => {
+        jogSpeedRef.current = config.jogSpeed;
+    }, [ config.jogSpeed ])
 
     const openSocket = useCallback(() => {
         if (ws !== null) return;
         try {
             setJob({ connecting: true, connected: false, started: false })
-            setTimeout(() => {
+            // setTimeout(() => {
                 
                 const socket = new WebSocket(`ws://${ config.url }:81`, ['arduino']);
                 socket.binaryType = 'arraybuffer';
                 setWs(socket)
 
-            }, 3000)
+            // }, 3000)
 
         } catch (err) {
             setWs(null);
@@ -161,27 +165,26 @@ export const CommunicationProvider = ({ children }) => {
         })
     }
 
-    const jogCommands = {
-        ArrowUp: {
-            normal: '$J=G91 G21 F2000 Y10',
-            shift: '$J=G91 G21 F2000 Z-1',
-            shiftCtrl: '$J=G91 G21 F2000 Z-.1'
-        },
-        ArrowDown: {
-            normal: '$J=G91 G21 F2000 Y-10',
-            shift: '$J=G91 G21 F2000 Z1',
-            shiftCtrl: '$J=G91 G21 F2000 Z.1'
-        },
-        ArrowLeft: {
-            normal: '$J=G91 G21 F2000 X-10',
-        },
-        ArrowRight: {
-            normal: '$J=G91 G21 F2000 X10',
-        }
-    }
-
     const handleJog = (e) => {
-        const { shiftKey, ctrlKey, key } = e
+        const { shiftKey, ctrlKey, key } = e;
+        const jogCommands = {
+            ArrowUp: {
+                normal: `$J=G91 G21 F${ jogSpeedRef.current } Y10`,
+                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z-1`,
+                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z-.1`
+            },
+            ArrowDown: {
+                normal: `$J=G91 G21 F${ jogSpeedRef.current } Y-10`,
+                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z1`,
+                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z.1`
+            },
+            ArrowLeft: {
+                normal: `$J=G91 G21 F${ jogSpeedRef.current } X-10`,
+            },
+            ArrowRight: {
+                normal: `$J=G91 G21 F${ jogSpeedRef.current } X10`,
+            }
+        }
 
         if (jogCommands[key]) {
             e.preventDefault();

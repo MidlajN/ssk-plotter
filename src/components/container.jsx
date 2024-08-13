@@ -108,7 +108,7 @@ function ConfigComponent() {
             <div className="py-5">
                 <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
                 <InputComponent inputKey={`feedRate`} config={config} setConfig={setConfig} label={'Feed Rate'} limit={12000}/>
-                <InputComponent inputKey={`seekRate`} config={config} setConfig={setConfig} label={'Seek Rate'} limit={10000}/>
+                <InputComponent inputKey={`jogSpeed`} config={config} setConfig={setConfig} label={'Jog Speed'} limit={15000}/>
                 <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Offset'} limit={10}/>
             </div>
 

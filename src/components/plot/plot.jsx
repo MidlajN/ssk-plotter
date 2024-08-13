@@ -218,7 +218,7 @@ export const Plot = () => {
             let settings = {
                 zOffset : config.zOffset,
                 feedRate : config.feedRate,
-                seekRate : config.seekRate,
+                seekRate : config.feedRate,
                 zValue: color.zValue,
                 tolerance: 0.1
             }
@@ -272,7 +272,7 @@ export const Plot = () => {
             http.open("POST", `http://${ config.url }/upload`, true);
             http.send(formData);
         } catch (err) {
-            console.log('Error While Uploading -> ', err);
+            console.error('Error While Uploading -> ', err);
         }
     }
 
@@ -324,6 +324,14 @@ export const Plot = () => {
         }
     }, [response.message]);
 
+    const JogButton = ({gcode, Icon}) => {
+        return (
+            <button className="p-3 bg-[#1C274C] rounded flex justify-center items-center" onClick={ () => sendToMachine(gcode) }>
+                <Icon size={20} strokeWidth={4} color={'#F5762E'} />
+            </button>
+        )
+    }
+
 
     return (
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
@@ -350,43 +358,25 @@ export const Plot = () => {
                 </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-5">
-                <div className="flex flex-col items-center justify-center gap-3 pb-10">
-                    <button 
-                        className="p-3 bg-[#1C274C] rounded"
-                        onClick={ () => {
-                            sendToMachine(`$J=G91 G21 F2000 Y10`);
-                        }}
-                        >
-                        <ChevronUp size={20} strokeWidth={4} color={'#F5762E'}/>
-                    </button>
-                    <div className="flex gap-3">
-                        <button 
-                            className="p-3 bg-[#1C274C] rounded"
-                            onClick={ () => {
-                                sendToMachine(`$J=G91 G21 F2000 X-10`);
-                            }}>
-                            <ChevronLeft size={20} strokeWidth={4} color={'#F5762E'}/>
-                        </button>
-                        <button 
-                            className="p-3 bg-[#1C274C] rounded"
-                            onClick={ () => sendToMachine('$H')} >
-                            <Home size={20} strokeWidth={2} color={'#ffffff'}/>
-                        </button>
-                        <button 
-                            className="p-3 bg-[#1C274C] rounded"
-                            onClick={ () => {
-                                sendToMachine(`$J=G91 G21 F2000 X10`);
-                            }}>
-                            <ChevronRight size={20} strokeWidth={4} color={'#F5762E'}/>
-                        </button>
+                <div className="flex  w-full justify-around items-center pb-10">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />
+                        <div className="flex gap-3">
+                            <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />   
+                            <button className="p-3 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
+                                <Home size={20} strokeWidth={2} color={'#ffffff'}/>
+                            </button>
+                            <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } X10`} Icon={ChevronRight} />  
+                        </div>
+                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
                     </div>
-                    <button 
-                        className="p-3 bg-[#1C274C] rounded"
-                        onClick={ () => {
-                            sendToMachine(`$J=G91 G21 F2000 Y-10`);
-                        }}>
-                        <ChevronDown size={20} strokeWidth={4} color={'#F5762E'}/>
-                    </button>
+                    <div className="flex flex-col h-full justify-between">
+                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Z1`} Icon={ChevronUp} />
+                        <button className="p-3 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
+                            <p className="text-white text-[10px]">Z-Axis</p>
+                        </button>
+                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
+                    </div>
                 </div>
 
                 <div className="flex w-full items-end justify-between">
@@ -411,7 +401,6 @@ export const Plot = () => {
             </div>
 
             { setupModal && <SetupModal /> }
-
 
         </div>
     )
