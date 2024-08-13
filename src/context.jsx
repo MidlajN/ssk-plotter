@@ -137,7 +137,7 @@ export const CommunicationProvider = ({ children }) => {
             setJob({ connecting: true, connected: false, started: false })
             setTimeout(() => {
                 
-                const socket = new WebSocket(`ws://192.168.0.1:81`, ['arduino']);
+                const socket = new WebSocket(`ws://${ config.url }:81`, ['arduino']);
                 socket.binaryType = 'arraybuffer';
                 setWs(socket)
 
@@ -146,19 +146,65 @@ export const CommunicationProvider = ({ children }) => {
         } catch (err) {
             setWs(null);
         }
-    }, [ws])
+    }, [config.url, ws])
+
+    const sendToMachine = (gcode) => {
+        const url = `http://${ config.url }/command?commandText=`;
+        fetch(url + encodeURI(gcode) + `&PAGEID=${response.pageId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Http Error Status : ', response.status);
+            }
+        })
+        .catch(err => {
+            console.log('Fetch Error ->\n', err)
+        })
+    }
+
+    const jogCommands = {
+        ArrowUp: {
+            normal: '$J=G91 G21 F2000 Y10',
+            shift: '$J=G91 G21 F2000 Z-1',
+            shiftCtrl: '$J=G91 G21 F2000 Z-.1'
+        },
+        ArrowDown: {
+            normal: '$J=G91 G21 F2000 Y-10',
+            shift: '$J=G91 G21 F2000 Z1',
+            shiftCtrl: '$J=G91 G21 F2000 Z.1'
+        },
+        ArrowLeft: {
+            normal: '$J=G91 G21 F2000 X-10',
+        },
+        ArrowRight: {
+            normal: '$J=G91 G21 F2000 X10',
+        }
+    }
+
+    const handleJog = (e) => {
+        const { shiftKey, ctrlKey, key } = e
+
+        if (jogCommands[key]) {
+            e.preventDefault();
+ 
+            if (shiftKey && ctrlKey && jogCommands[key].shiftCtrl) {
+                sendToMachine(jogCommands[key].shiftCtrl);
+            } else if (shiftKey && jogCommands[key].shift) {
+                sendToMachine(jogCommands[key].shift);
+            } else if (jogCommands[key].normal) {
+                sendToMachine(jogCommands[key].normal);
+            }
+        }
+    }
 
 
     useEffect(() => {
         if (!ws) return;
 
         ws.onopen = () => {
-
             setJob({ connecting: false, connected: true, started: false })
-
-            setTimeout(() => {
-                setSetupModal(false);
-            }, 3000);
+            setTimeout(() => { setSetupModal(false) }, 3000);
+            
+            window.addEventListener('keydown', handleJog)
         }
         
         ws.onmessage = (event) => {
@@ -180,49 +226,17 @@ export const CommunicationProvider = ({ children }) => {
                 if (split_text.length >1) {
                     split_text[1] = parseInt(split_text[1].trim())
                     if (!isNaN(split_text[1])) {
-                        const url = `http://${ config.url }/command?commandText=`;
-
                         if (split_text[0] === 'error' && split_text[1] === 8) {
-                            console.log('The Machine is in Alarm state, \nChanging...')
-                            fetch(url + encodeURI('$X') + `&PAGEID=${response.pageId}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Fetch Error ', err)
-                            })
+                            console.log('The Machine is in Alarm state \nChanging...')
+                            sendToMachine('$X')
+
                         } else if (split_text[0] === 'ALARM' && split_text[1] === 1) {
                             console.log('Hard Limit Triggered \nRestartng...');
+                            sendToMachine('[ESP444]RESTART')
 
-                            fetch(url + encodeURI('[ESP444]RESTART') + `&PAGEID=${response.pageId}`)
-                            // fetch(url + encodeURI('$X\n$X\nG1 X10Y10Z10 F3000\n$H') + `&PAGEID=${response.pageId}`)
-                            .then(response => {
-                                if (response.ok){
-                                    ws.close()
-                                } else {
-                                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Restart Error ', err)
-                            })
                         }else if (split_text[0] === 'ALARM' && split_text[1] === 8) {
-                            console.log('Homing Failed \nRe-homing...');
-
-                            fetch(url + encodeURI('$X\nG1 X10Y10Z10 F3000\n$H') + `&PAGEID=${response.pageId}`)
-                            .then(response => {
-                                if (response.ok){
-                                    // ws.close()
-                                    console.log('Connection Established')
-                                } else {
-                                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Restart Error ', err)
-                            })
+                            console.log('Soft Limit Triggered \nRe-Homing...')
+                            sendToMachine('$X\nG1 X10Y10Z10 F3000\n$H');
                         }
                     }
                 }
@@ -236,7 +250,7 @@ export const CommunicationProvider = ({ children }) => {
                 const [key, value] = event.data.split(':');
 
                 if (key !== 'PING') {
-                    console.log('String ;', key, ':  -> ', parseInt(value, 10));
+                    console.log('String :', key, ':  -> ', parseInt(value, 10));
                     
                     setResponse(prev => ({ 
                         ...prev, 
@@ -250,22 +264,16 @@ export const CommunicationProvider = ({ children }) => {
         ws.onclose = () => {
             setWs(null);
             setJob({ connected: false, connecting: false, started: false });
+            setResponse(prev => ({ ...prev, message: prev.message + 'Socket Connection Closed ... \n' }));
 
-            setResponse(prev => ({ 
-                ...prev, 
-                line: prev.line + 1, 
-                message: prev.message + 'Socket Connection Closed ... \n'
-            }));
+            window.removeEventListener('keydown', handleJog);
         }
 
         ws.onerror = (err) => {
-            console.log('Socket error -> ', err);
+            console.error('Socket error -> ', err);
             setJob({ connected: false, connecting: false, started: false })
         }
 
-        return () => {
-            // console.log('Socket Check : ', job)
-        }
     }, [job, ws])
 
 

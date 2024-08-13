@@ -6,32 +6,21 @@ import { Triangle } from "react-loader-spinner";
 // import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useCom } from "../context";
-import { useEffect } from "react";
 ReactModal.setAppElement('#root');
-
 
 export const SetupModal = () => {
     const { 
-        // ws,
         job,
         openSocket,
         setupModal,
         setSetupModal,
         config,
-        // setJob,
         progress,
-        // setProgress
     } = useCom();
-
-    useEffect(() => {
-        // setProgress({ uploading: false, converting: true, progress: 100 })
-        // setJob({ connecting: false, connected: true, started: false })
-    }, []);
 
 
     return (
         <ReactModal 
-            // isOpen={true} 
             isOpen={setupModal} 
             style={{ 
                 overlay: { 
@@ -138,16 +127,20 @@ export const SetupModal = () => {
                     </div>
                 }
                 </div>
-                { !job.connecting && !job.connected && 
+                { job.connecting && !job.connected && 
                     <div className="content" >
                         <div className="flex justify-end gap-4 mt-10">
+                        { !job.connecting && !job.connected && 
                             <button 
                                 className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
                                 onClick={openSocket}
                             >Retry</button>
+                        }
                             <button 
                                 className="transition-all duration-300 bg-[#404e7c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={ () => { setSetupModal(false) }}
+                                onClick={ () => {
+                                    setSetupModal(false);
+                                }}
                             >Cancel</button>
                         </div>
                     </div>
