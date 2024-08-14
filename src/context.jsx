@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
-import 'fabric-history'
+import 'fabric-history';
 
 const CanvasContext = createContext(null);
 
@@ -161,7 +161,7 @@ export const CommunicationProvider = ({ children }) => {
             }
         })
         .catch(err => {
-            console.log('Fetch Error ->\n', err)
+            console.error('Fetch Error ->\n', err)
         })
     }
 
@@ -170,13 +170,13 @@ export const CommunicationProvider = ({ children }) => {
         const jogCommands = {
             ArrowUp: {
                 normal: `$J=G91 G21 F${ jogSpeedRef.current } Y10`,
-                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z-1`,
-                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z-.1`
+                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z1`,
+                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z.1`
             },
             ArrowDown: {
                 normal: `$J=G91 G21 F${ jogSpeedRef.current } Y-10`,
-                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z1`,
-                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z.1`
+                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z-1`,
+                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z-.1`
             },
             ArrowLeft: {
                 normal: `$J=G91 G21 F${ jogSpeedRef.current } X-10`,
@@ -239,7 +239,7 @@ export const CommunicationProvider = ({ children }) => {
 
                         }else if (split_text[0] === 'ALARM' && split_text[1] === 8) {
                             console.log('Soft Limit Triggered \nRe-Homing...')
-                            sendToMachine('$X\nG1 X10Y10Z10 F3000\n$H');
+                            sendToMachine('$X\nG1 X10Y10Z-10 F3000\n$H');
                         }
                     }
                 }

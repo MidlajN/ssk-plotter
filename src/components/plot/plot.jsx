@@ -279,6 +279,7 @@ export const Plot = () => {
 
 
     const sendToMachine = async (gcode) => {
+        if (!ws) return;
         try {
             const url = `http://${ config.url }/command?commandText=` + encodeURI(gcode) + `&PAGEID=${response.pageId}`
 
@@ -372,7 +373,7 @@ export const Plot = () => {
                     </div>
                     <div className="flex flex-col h-full justify-between">
                         <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Z1`} Icon={ChevronUp} />
-                        <button className="p-3 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
+                        <button className="p-2 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
                             <p className="text-white text-[10px]">Z-Axis</p>
                         </button>
                         <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
