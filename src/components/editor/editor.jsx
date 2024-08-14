@@ -17,7 +17,7 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
 
             canvas.on('mouse:down', () => {
                 const activeObject = canvas.getActiveObjects();
-                if (activeObject.length > 0) {
+                if (activeObject.length === 1) {
                     const color = activeObject[0].get('stroke');
                     setStrokeColor(color);
                 }
@@ -33,7 +33,6 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
     useEffect(() => {
         if (canvas) {
             const activeObject = canvas.getActiveObjects();
-            console.log('ActiveObject', activeObject)
             if (activeObject) {
                 activeObject.forEach(obj => {
                     obj.set('stroke', strokeColor);
@@ -128,12 +127,6 @@ export function Elements({element, setElement}) {
         </>
     )
 }
-
-// export function TextBox() {
-//     return (
-//         <div>TextBox</div>
-//     )
-// }
 
 export function Import() {
     const { canvas } = useCanvas();

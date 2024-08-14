@@ -28,8 +28,8 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.noScaleCache = true;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-            width: fabric.util.parseUnit('73cm'),
-            height: fabric.util.parseUnit('53cm'),
+            width: fabric.util.parseUnit('680mm'),
+            height: fabric.util.parseUnit('540mm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
