@@ -216,13 +216,14 @@ export const Plot = () => {
 
         
         const gcodes = await Promise.all(svgElements.map( async (element) => {
+            console.log('Color', element )
             const color = colors.find(obj => obj.color === element.color)
             let settings = {
                 zOffset : config.zOffset,
                 feedRate : config.feedRate,
                 seekRate : config.feedRate,
                 zValue: color.zValue,
-                tolerance: 0.1
+                tolerance: 0.5
             }
             const converter = new Converter(settings);
             const [ code ] = await converter.convert(element.svg);
@@ -339,7 +340,7 @@ export const Plot = () => {
     return (
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
             <div className="h-full cut hidden md:block">
-                <div className="w-full flex items-end justify-end gap-3 pb-4 pt-2" onClick={ () => { setConfig({ ...config, open: !config.open })} }>
+                <div className="w-full flex items-end justify-end gap-3 pb-4" onClick={ () => { setConfig({ ...config, open: !config.open })} }>
                     <div className="flex gap-2 items-center bg-[#1287a1] p-1 rounded-full cursor-pointer">
                         <div className="bg-[#adc1ff83] rounded-full p-1">
                             { config.open ? (

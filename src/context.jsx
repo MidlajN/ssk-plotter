@@ -113,18 +113,18 @@ export const CommunicationProvider = ({ children }) => {
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
-        { color: '#ff0000', name: 'Red', zValue: -13, command: "G6.7" },
-        { color: '#0000ff', name: 'Blue', zValue: -13, command: "G6.8" },
-        { color: '#008000', name: 'Green', zValue: -13, command: "G6.4" },
-        { color: '#ffff00', name: 'Yellow', zValue: -13, command: "G6.1" },
-        { color: '#ffa500', name: 'Orange', zValue: -13, command: "G6.2" },
-        { color: '#800080', name: 'Purple', zValue: -13, command: "G6.6" },
-        { color: '#000000', name: 'Black', zValue: -13, command: "G6.5" },
-        { color: '#ffc0cb', name: 'Pink', zValue: -13, command: "G6.3" },
+        { color: '#ff0000', name: 'Red', zValue: -12.4, command: "G6.3" },
+        { color: '#0000ff', name: 'Blue', zValue: -11.3, command: "G6.1" },
+        { color: '#a52a2a', name: 'Brown', zValue: -11.8, command: "G6.5" },
+        { color: '#ffff00', name: 'Yellow', zValue: -12.35, command: "G6.8" },
+        { color: '#ffa500', name: 'Orange', zValue: -12.35, command: "G6.7" },
+        { color: '#800080', name: 'Purple', zValue: -11.2, command: "G6.4" },
+        { color: '#000000', name: 'Black', zValue: -12.9, command: "G6.6" },
+        { color: '#ffc0cb', name: 'Pink', zValue: -12.3, command: "G6.2" },
     ]);
     const [ config, setConfig ] = useState({
         url: 'miniZund.local',
-        feedRate: 12000,
+        feedRate: 10000,
         jogSpeed: 2000,
         zOffset: 10,
         open: false
@@ -280,7 +280,7 @@ export const CommunicationProvider = ({ children }) => {
             setJob({ connected: false, connecting: false, started: false })
         }
 
-    }, [handleJog, job, sendToMachine, ws])
+    }, [job, ws])
 
 
     return (

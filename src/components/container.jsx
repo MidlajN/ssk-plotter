@@ -116,25 +116,25 @@ function ConfigComponent() {
                 <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Offset'} limit={10}/>
             </div>
 
-            <div className="flex flex-col gap-2 py-4">
+            <div className="flex flex-col gap-2 p-4 rounded bg-[#f7f7f7]">
                 <p className="font-medium text-lg text-[#0a3f4b] mb-3">Pen Colors</p>
                 { colors.map((color, index) => (
                     <div 
                         key={index} 
-                        className="flex justify-between items-center py-1 border-b" 
+                        className="flex gap-4 justify-between items-center py-1 border-b-2 bg-white px-1 rounded-md" 
                         draggable
                         onDragStart={ () =>  ( dragDiv.current = index )}
                         onDragEnter={ () => { dragOverDiv.current = index }}
                         onDragEnd={ handleSort }
                         onDragOver={ (e) => { e.preventDefault() }}
                     >
-                        <div className="flex gap-2 items-center">
-                            <GripHorizontal color="gray" />
-                            <div className="border w-10 h-6 ml-2 rounded bg-slate-500" style={{ backgroundColor: `${color.color}`}}></div>
-                            <p className="font-medium text-[#035264] text-md">{color.name}</p>
+                        <div className="flex gap-1 items-center pr-4 pl-[2px]">
+                            <GripHorizontal size={17} strokeWidth={2} color="gray" />
+                            <div className="border w-9 h-6 rounded bg-slate-500" style={{ backgroundColor: `${color.color}`}}></div>
+                            <p className=" font-normal text-[#035264] text-sm pl-2">{color.name}</p>
                         </div>
                         <div className="flex items-center gap-2 bg-[#f0f0f0] py-1 px-1 rounded-md">
-                            <p className="px-2 text-[#0a3f4b] text-sm">Z-Value :</p>
+                            <p className="pl-2 text-[#0a3f4b] text-[12px]">Z-Value :</p>
                             <input 
                                 className="text-center text-sm  pr-1 max-w-14 rounded outline-none" 
                                 type="text"
@@ -165,6 +165,7 @@ function ConfigComponent() {
                     </div>
                 ))}
             </div>
+            <p className="text-[12px] max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
         </>
     )
 }
