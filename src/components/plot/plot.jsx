@@ -7,9 +7,11 @@ import {
     ChevronDown,
     Home,
     Power,
-    FileCog,
+    // FileCog,
     Plug,
-    Pencil
+    Pencil,
+    // Settings,
+    // Settings2
 } from "lucide-react";
 import useCanvas, { useCom } from "../../context";
 import './cut.css';
@@ -336,9 +338,19 @@ export const Plot = () => {
 
     return (
         <div className="flex justify-between gap-8 flex-col h-full pb-6">
-            <div className="mt-4 h-full bg-[#EBEBEB] cut hidden md:block">
-                <div className="w-full h-[10%] bg-[#1e263f] flex items-end justify-end gap-3 p-3" onClick={ () => { setConfig({ ...config, open: true })} }>
-                    <FileCog size={20} strokeWidth={2} color={'#ffffff'}  /> 
+            <div className="h-full cut hidden md:block">
+                <div className="w-full flex items-end justify-end gap-3 pb-4 pt-2" onClick={ () => { setConfig({ ...config, open: !config.open })} }>
+                    <div className="flex gap-2 items-center bg-[#1287a1] p-1 rounded-full cursor-pointer">
+                        <div className="bg-[#adc1ff83] rounded-full p-1">
+                            { config.open ? (
+                                <ChevronRight size={11} strokeWidth={4} color={'#ffffff'} />
+                            ): (
+                                <ChevronLeft size={11} strokeWidth={4} color={'#ffffff'} />
+                            )}
+                        </div>
+                        {/* <Settings2 size={11} strokeWidth={2} color={'#ffffff'} /> */}
+                        <p className="text-[12px] pr-2 text-white font-medium">Settings</p>
+                    </div>
                 </div>
                 <div className="text-sm responses h-[90%] relative">
                     <textarea ref={textareaRef} value={ response.message } className="cursor-default" readOnly></textarea>
@@ -372,11 +384,11 @@ export const Plot = () => {
                         <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
                     </div>
                     <div className="flex flex-col h-full justify-between">
-                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Z1`} Icon={ChevronUp} />
+                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed / 10 } Z1`} Icon={ChevronUp} />
                         <button className="p-2 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
                             <p className="text-white text-[10px]">Z-Axis</p>
                         </button>
-                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
+                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed / 10 } Z-1`} Icon={ChevronDown} />  
                     </div>
                 </div>
 

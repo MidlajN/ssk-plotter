@@ -170,13 +170,13 @@ export const CommunicationProvider = ({ children }) => {
         const jogCommands = {
             ArrowUp: {
                 normal: `$J=G91 G21 F${ jogSpeedRef.current } Y10`,
-                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z1`,
-                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z.1`
+                shift: `$J=G91 G21 F${ jogSpeedRef.current / 10 } Z1`,
+                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current / 10 } Z.1`
             },
             ArrowDown: {
                 normal: `$J=G91 G21 F${ jogSpeedRef.current } Y-10`,
-                shift: `$J=G91 G21 F${ jogSpeedRef.current } Z-1`,
-                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current } Z-.1`
+                shift: `$J=G91 G21 F${ jogSpeedRef.current / 10 } Z-1`,
+                shiftCtrl: `$J=G91 G21 F${ jogSpeedRef.current / 10 } Z-.1`
             },
             ArrowLeft: {
                 normal: `$J=G91 G21 F${ jogSpeedRef.current } X-10`,
