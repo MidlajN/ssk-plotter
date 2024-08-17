@@ -123,7 +123,7 @@ export const CommunicationProvider = ({ children }) => {
         { color: '#ffc0cb', name: 'Pink', zValue: -13, command: "G6.3" },
     ]);
     const [ config, setConfig ] = useState({
-        url: '192.168.0.1',
+        url: 'miniZund.local',
         feedRate: 12000,
         jogSpeed: 2000,
         zOffset: 10,
@@ -206,8 +206,11 @@ export const CommunicationProvider = ({ children }) => {
         ws.onopen = () => {
             setJob({ connecting: false, connected: true, started: false })
             setTimeout(() => { setSetupModal(false) }, 3000);
-            
-            window.addEventListener('keydown', handleJog)
+
+            if (!window._keydownListenerAdded) {
+                window.addEventListener('keydown', handleJog)
+                window._keydownListenerAdded = true;
+            }
         }
         
         ws.onmessage = (event) => {
@@ -277,7 +280,7 @@ export const CommunicationProvider = ({ children }) => {
             setJob({ connected: false, connecting: false, started: false })
         }
 
-    }, [job, ws])
+    }, [handleJog, job, sendToMachine, ws])
 
 
     return (

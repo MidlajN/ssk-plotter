@@ -87,10 +87,10 @@ function ConfigComponent() {
         return (
             <div className="flex items-center justify-between relative py-1">
                 <div className="flex gap-3 items-center justify-between rounded-[7px] p-1 bg-white z-10 w-full">
-                    <p className="text-[#7a7a7a] font-medium">{label}</p>
+                    <p className="text-[#575757] text-sm font-normal">{label}</p>
                     <input 
                         type="text" 
-                        className="text-end pr-2 transition-all duration-500 outline-none border-b focus:border-[#1c7f969c]" 
+                        className="text-end pr-2 transition-all duration-500 outline-none border-b focus:border-[#1c7f969c] text-sm font-normal" 
                         value={config[inputKey]} 
                         onChange={ handleChange }
                     />
@@ -101,9 +101,13 @@ function ConfigComponent() {
 
     return (
         <>
-            <div className="flex justify-between border-b pb-2 border-[#1c8096]">
-                <p className="font-medium text-[#0c4350]">Machine Configuration</p>
-                <button onClick={ () => { setConfig({ ...config, open: false })}}><X size={20} strokeWidth={4} color={'red'} /></button>
+            <div className="flex justify-between p-[2px] border-b border-b-[#1c809680] border">
+                <p className="font-medium text-[#0c4350] pl-1">Machine Configuration</p>
+                <button 
+                    onClick={ () => { setConfig({ ...config, open: false })}}
+                    className="px-1 bg-red-500">
+                    <X size={17} strokeWidth={2} color={'white'} />
+                </button>
             </div>
             <div className="py-5">
                 <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
