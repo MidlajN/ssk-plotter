@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { 
     ChevronLeft,
     ChevronRight,
@@ -12,6 +12,8 @@ import {
     Pencil,
     // Settings,
     // Settings2
+    GripHorizontal,
+    X
 } from "lucide-react";
 import useCanvas, { useCom } from "../../context";
 import './cut.css';
@@ -254,9 +256,13 @@ export const Plot = () => {
 
 
     return (
-        <div className="flex justify-between gap-8 flex-col h-full pb-6">
-            <div className="h-full cut hidden md:block">
-                <div className="w-full flex items-end justify-end gap-3 pb-4" onClick={ () => { setConfig({ ...config, open: !config.open })} }>
+        <>
+        <div className="flex justify-between gap-8 max-[500px]:flex-col md:flex-col p-5 z-10 relative bg-white h-full pb-10">
+            <div className="h-full cut w-full">
+                <div 
+                    className="w-full flex items-end  lg:justify-end gap-3 pb-4" 
+                    onClick={ () => { setConfig({ ...config, open: !config.open })}}
+                >
                     <div className="flex gap-2 items-center bg-[#1287a1] p-1 rounded-full cursor-pointer">
                         <div className="bg-[#adc1ff83] rounded-full p-1">
                             { config.open ? (
@@ -265,12 +271,11 @@ export const Plot = () => {
                                 <ChevronLeft size={11} strokeWidth={4} color={'#ffffff'} />
                             )}
                         </div>
-                        {/* <Settings2 size={11} strokeWidth={2} color={'#ffffff'} /> */}
                         <p className="text-[12px] pr-2 text-white font-medium">Settings</p>
                     </div>
                 </div>
-                <div className="text-sm responses h-[90%] relative">
-                    <textarea ref={textareaRef} value={ response.message } className="cursor-default" readOnly></textarea>
+                <div className="text-sm responses lg:h-[90%] min-h-44 relative">
+                    <textarea ref={textareaRef} value={ response.message } className="cursor-default min-h-24 lg:pb-8" readOnly></textarea>
                     <div className="absolute w-full bottom-0 left-0 p-3">
                         <input 
                             ref={ gcodeRef }
@@ -288,7 +293,7 @@ export const Plot = () => {
                 </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-5">
-                <div className="flex  w-full justify-around items-center pb-10">
+                <div className="flex  w-full justify-around items-center gap-16 pb-10">
                     <div className="flex flex-col items-center justify-center gap-3">
                         <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />
                         <div className="flex gap-3">
@@ -309,7 +314,7 @@ export const Plot = () => {
                     </div>
                 </div>
 
-                <div className="flex w-full items-end justify-between">
+                <div className="flex w-full items-end justify-between gap-1">
                     { !ws ? (
                         <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
                             <Plug size={18} strokeWidth={2} color="#FFFFFF"/>
@@ -333,6 +338,125 @@ export const Plot = () => {
             { setupModal && <SetupModal /> }
 
         </div>
+        <div 
+            className={`
+                absolute lg:z-0 z-20 lg:w-fit h-full bg-white p-5 flex flex-col top-0 transition-all 
+                duration-500 ${ config.open ? 'lg:right-96 right-0' : 'lg:right-0 -right-96' } 
+            `}
+        >
+            <ConfigComponent />
+        </div>
+        </>
     )
 }
 
+
+
+function ConfigComponent() {
+    const { colors, setColors, config, setConfig } = useCom();
+    const dragDiv = useRef(0);
+    const dragOverDiv = useRef(0)
+
+    const handleSort = () => {
+        const cloneColors = [...colors];
+        const temp = cloneColors[dragDiv.current]
+        cloneColors[dragDiv.current] = cloneColors[dragOverDiv.current];
+        cloneColors[dragOverDiv.current] = temp
+        setColors(cloneColors)
+    }
+
+    const InputComponent = useCallback(({ inputKey, config, setConfig, label, limit=null }) => {
+        
+        const handleChange = (e) => {
+            let value = e.target.value;
+            if (limit) {
+                value = parseInt(value < limit ? value : limit)
+                value = isNaN(value) ? 0 : value
+            }
+            setConfig({ ...config, [inputKey]: value })
+        }
+        return (
+            <div className="flex items-center justify-between relative py-1">
+                <div className="flex gap-3 items-center justify-between rounded-[7px] p-1 bg-white z-10 w-full">
+                    <p className="text-[#575757] text-sm font-normal">{label}</p>
+                    <input 
+                        type="text" 
+                        className="text-end pr-2 transition-all duration-500 outline-none border-b focus:border-[#1c7f969c] text-sm font-normal" 
+                        value={config[inputKey]} 
+                        onChange={ handleChange }
+                    />
+                </div>
+            </div>
+        )
+    }, [])
+
+    return (
+        <>
+            <div className="flex justify-between p-[2px] border-b border-b-[#1c809680] border">
+                <p className="font-medium text-[#0c4350] pl-1">Machine Configuration</p>
+                <button 
+                    onClick={ () => { setConfig({ ...config, open: false })}}
+                    className="px-1 bg-red-500">
+                    <X size={17} strokeWidth={2} color={'white'} />
+                </button>
+            </div>
+            <div className="py-5">
+                <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
+                <InputComponent inputKey={`feedRate`} config={config} setConfig={setConfig} label={'Feed Rate'} limit={12000}/>
+                <InputComponent inputKey={`jogSpeed`} config={config} setConfig={setConfig} label={'Jog Speed'} limit={15000}/>
+                <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Offset'} limit={10}/>
+            </div>
+
+            <div className="flex flex-col gap-2 p-4 rounded bg-[#f7f7f7]">
+                <p className="font-medium text-lg text-[#0a3f4b] mb-3">Pen Colors</p>
+                { colors.map((color, index) => (
+                    <div 
+                        key={index} 
+                        className="flex gap-4 justify-between items-center py-1 border-b-2 bg-white px-1 rounded-md" 
+                        draggable
+                        onDragStart={ () =>  ( dragDiv.current = index )}
+                        onDragEnter={ () => { dragOverDiv.current = index }}
+                        onDragEnd={ handleSort }
+                        onDragOver={ (e) => { e.preventDefault() }}
+                    >
+                        <div className="flex gap-1 items-center pr-4 pl-[2px]">
+                            <GripHorizontal size={17} strokeWidth={2} color="gray" />
+                            <div className="border w-9 h-6 rounded bg-slate-500" style={{ backgroundColor: `${color.color}`}}></div>
+                            <p className=" font-normal text-[#035264] text-sm pl-2">{color.name}</p>
+                        </div>
+                        <div className="flex items-center gap-2 bg-[#f0f0f0] py-1 px-1 rounded-md">
+                            <p className="pl-2 text-[#0a3f4b] text-[12px]">Z-Value :</p>
+                            <input 
+                                className="text-center text-sm  pr-1 max-w-14 rounded outline-none" 
+                                type="text"
+                                value={color.zValue} 
+                                onChange={(e) => {
+                                    let value = e.target.value
+                                    setColors(prevColor => 
+                                        prevColor.map((clr, idx) =>
+                                            idx === index ? {...clr, zValue: value } : clr
+                                        )
+                                    )
+                                }}
+                                onBlur={() => {
+                                    // Convert to float when the input loses focus
+                                    let value = parseFloat(color.zValue);
+                                    if (isNaN(value)) value = 0;
+                                    value = value > 20 ? 20 : value;
+
+                                    // Update the state with the parsed float value
+                                    setColors(prevColors =>
+                                        prevColors.map((clr, idx) =>
+                                            idx === index ? { ...clr, zValue: value } : clr
+                                        )
+                                    );
+                                }}
+                            />
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <p className="text-[12px] max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
+        </>
+    )
+}

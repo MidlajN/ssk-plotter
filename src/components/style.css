@@ -23,7 +23,7 @@
     margin-block: .3rem;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1024px) {
     .canvas-section .canvas .toggle {
         bottom: 0;
         left: 50%;

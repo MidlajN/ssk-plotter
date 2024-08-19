@@ -55,7 +55,7 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
     };
     return (
         <>
-            <div className="pb-6">
+            <div className="p-5 pb-10">
                 <div className="border-b-2 border-[#1c274c1c] py-1 mb-4 hidden md:block">
                     <h1>Settings</h1>
                 </div>
@@ -71,7 +71,7 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                     </div>
                 </div>
 
-                <div className="grid grid-cols-5 mt-8">
+                <div className="grid lg:grid-cols-5 grid-cols-8 max-[500px]:grid-cols-4 mt-8">
                     { colors.map((color, index) => (
                         <div 
                             key={ index }
@@ -155,7 +155,7 @@ export function Import() {
     }
 
     return (
-        <div onDragOver={ e => { e.preventDefault(); }} onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]) } }>
+        <div className="p-5" onDragOver={ e => { e.preventDefault(); }} onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]) } }>
             <div className="border-b-2 border-[#1c274c1c] py-1">
                 <h3>Upload SVG</h3>
             </div>

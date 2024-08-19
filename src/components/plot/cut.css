@@ -15,7 +15,6 @@
     background-color: #1e263f;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;
-    padding-bottom: 3rem; 
 }
 .cut .responses textarea::-webkit-scrollbar {
     display: none;

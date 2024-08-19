@@ -36,13 +36,13 @@ export default function Home() {
         />
 
         <div className="flex h-[91%]"> 
-          <div className={`hidden md:block ${ hideSideBar ? 'md:hidden' : '' }`}>
+          <div className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' }`}>
             <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
           </div>
           {/* { !hideSideBar && <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } /> } */}
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
-            <div className={`p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center md:hidden ${ tool !== 'Plot' ? '' : 'hidden' }`}>
+            <div className={`p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center lg:hidden ${ tool !== 'Plot' ? '' : 'hidden' }`}>
               <div className="bg-slate-300 rounded-s-md">
                 <SidebarItem 
                   icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
@@ -103,7 +103,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className={ `h-full py-5 px-5 transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
+            <div className={ `h-full transition-all ${ expanded ? 'opacity-100 duration-[2s]' : 'opacity-0'}`}>
               { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement}/>}
               { tool === 'Import' && <Import /> }
               { tool === 'Plot' && <Plot /> }
