@@ -237,8 +237,8 @@ export const CommunicationProvider = ({ children }) => {
                             sendToMachine('$X')
 
                         } else if (split_text[0] === 'ALARM' && split_text[1] === 1) {
-                            console.log('Hard Limit Triggered \nRestartng...');
-                            sendToMachine('[ESP444]RESTART')
+                            console.log('Hard Limit Triggered \nRe-Homing...');
+                            sendToMachine('$H')
 
                         }else if (split_text[0] === 'ALARM' && split_text[1] === 8) {
                             console.log('Soft Limit Triggered \nRe-Homing...')

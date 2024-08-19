@@ -116,7 +116,7 @@ function ConfigComponent() {
                 <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Offset'} limit={10}/>
             </div>
 
-            <div className="flex flex-col gap-2 p-4 rounded bg-[#f7f7f7]">
+            <div className="flex flex-col gap-2 p-4 rounded bg-[#f7f7f7]" style={{ boxShadow: 'inset 0px 0px 4px 0px #00000036' }}>
                 <p className="font-medium text-lg text-[#0a3f4b] mb-3">Pen Colors</p>
                 { colors.map((color, index) => (
                     <div 
