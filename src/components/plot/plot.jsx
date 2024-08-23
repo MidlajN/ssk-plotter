@@ -7,11 +7,8 @@ import {
     ChevronDown,
     Home,
     Power,
-    // FileCog,
     Plug,
     Pencil,
-    // Settings,
-    // Settings2
     GripHorizontal,
     X
 } from "lucide-react";
@@ -66,10 +63,12 @@ export const Plot = () => {
 
     const handleConnection = async () => {
         openSocket();
-        setSetupModal(true)
+        setSetupModal(true);
     }
 
     const closeConnection = () => {
+        setProgress({ uploading: false, converting: false, progress: 0 });
+        setJob({ connecting: false, connected: false, started:  false});
         ws.close();
         setWs(null);
     }
@@ -143,22 +142,26 @@ export const Plot = () => {
                 feedRate : config.feedRate,
                 seekRate : config.feedRate,
                 zValue: color.zValue,
-                tolerance:1
+                tolerance: 0.1
             }
             const converter = new Converter(settings);
             const [ code ] = await converter.convert(element.svg);
             const gCodeLines = code.split('\n');
 
-            const cleanedGcodeLines = gCodeLines.slice(0, -1);
-            cleanedGcodeLines.splice(2, 2);
-            return [color.command + '\n' + cleanedGcodeLines.join('\n')];
+            const filteredGcodes = gCodeLines.filter(command => command !== `G1 F${config.feedRate}`);
+
+            const cleanedGcodeLines = filteredGcodes.slice(0, -1);
+            cleanedGcodeLines.splice(0, 4);
+            cleanedGcodeLines.splice(1, 1);
+            return [ color.command + '\n' + cleanedGcodeLines.join('\n')];
         }));
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
 
-        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
-        gcodes.push('G0 X0Y0')
+        // gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
+        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0', `G1 F${config.feedRate}`, 'G0 X50Y50')
+        gcodes.push('G0 X680Y540')
         console.log('Gcode Lines : \n', gcodes.join('\n'));
 
         // Send to Machine
@@ -257,7 +260,7 @@ export const Plot = () => {
 
     return (
         <>
-        <div className="flex justify-between gap-8 max-[500px]:flex-col md:flex-col p-5 z-10 relative bg-white h-full pb-10">
+        <div className="flex justify-between gap-8 max-[600px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
             <div className="h-full cut w-full">
                 <div 
                     className="w-full flex items-end  lg:justify-end gap-3 pb-4" 
@@ -292,7 +295,7 @@ export const Plot = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col items-center justify-center gap-5">
+            <div className="flex flex-col items-center justify-center gap-5 px-12 lg:px-1">
                 <div className="flex  w-full justify-around items-center gap-16 pb-10">
                     <div className="flex flex-col items-center justify-center gap-3">
                         <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />
@@ -340,8 +343,8 @@ export const Plot = () => {
         </div>
         <div 
             className={`
-                absolute lg:z-0 z-20 lg:w-fit h-full bg-white p-5 flex flex-col top-0 transition-all 
-                duration-500 ${ config.open ? 'lg:right-96 right-0' : 'lg:right-0 -right-96' } 
+                absolute lg:z-0 z-10 lg:w-fit h-full bg-white p-5 flex flex-col top-0 transition-all 
+                duration-500 ${ config.open ? 'lg:right-96 right-0' : ' -right-96' } 
             `}
         >
             <ConfigComponent />
