@@ -3,16 +3,14 @@
 import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
 import { Default, Import } from "./components/editor/editor";
-import { Plot } from "./components/plot/plot.jsx";
+import { Plot } from "./components/plot.jsx";
 import useCanvas from "./context.jsx";
 import { SideNav } from "./components/sidebar";
 import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
-import './App.css';
 import { SidebarItem } from "./components/sidebar";
 import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil, Split } from "lucide-react";
 import { split, group, info } from "./components/editor/functions.jsx";
-// import { selectAllObject } from "./components/editor/functions.jsx";
 import { componentToUrl } from "./components/editor/functions.jsx";
 
 export default function Home() {

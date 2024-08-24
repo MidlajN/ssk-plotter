@@ -12,9 +12,8 @@ import {
     GripHorizontal,
     X
 } from "lucide-react";
-import useCanvas, { useCom } from "../../context";
-import './cut.css';
-import { SetupModal } from "../modal";
+import useCanvas, { useCom } from "../context";
+import { SetupModal } from "./modal";
 import tinycolor from "tinycolor2";
 import { Converter } from "svg-to-gcode";
 
@@ -323,17 +322,17 @@ export const Plot = () => {
                     { !job.connected ? (
                         <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
                             <Plug size={18} strokeWidth={2} color="#FFFFFF"/>
-                            <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Ready</span>
+                            <span className="text-[#ffffff] font-medium text-[16px]"> Ready</span>
                         </button>
                     ) : (
                         <>
                             <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ plot }>
                                 <Pencil size={18} strokeWidth={2} color="#FFFFFF" /> 
-                                <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]">Plot</span>
+                                <span className="text-[#ffffff] font-medium text-[16px]">Plot</span>
                             </button>
                             <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-3 px-8 rounded-md" onClick={ closeConnection }>
                                 <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                                <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Disconnect</span>
+                                <span className="text-[#ffffff] font-medium text-[16px]"> Disconnect</span>
                             </button>
                         </>
                     )}

@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
 import App from './App.jsx'
-import './index.css'
+import './main.css'
 import { CanvasProvider, CommunicationProvider } from './context.jsx'
 import { PlotSvg } from './components/icons.jsx'
 
