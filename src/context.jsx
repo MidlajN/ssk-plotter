@@ -113,18 +113,18 @@ export const CommunicationProvider = ({ children }) => {
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
-        { color: '#ff0000', name: 'Red', zValue: -23.8, command: "G6.7" },
-        { color: '#0000ff', name: 'Blue', zValue: -24.3, command: "G6.1" },
-        { color: '#a52a2a', name: 'Brown', zValue: -25.1, command: "G6.5" },
-        { color: '#ffff00', name: 'Yellow', zValue: -23, command: "G6.8" },
-        { color: '#ffa500', name: 'Orange', zValue: -26.2, command: "G6.4" },
-        { color: '#800080', name: 'Purple', zValue: -23.7, command: "G6.3" },
-        { color: '#000000', name: 'Black', zValue: -26.6, command: "G6.6" },
-        { color: '#ffc0cb', name: 'Pink', zValue: -26.4, command: "G6.2" },
+        { color: '#ff0000', name: 'Red', zValue: -22.5, command: "G6.1" },
+        { color: '#ffa500', name: 'Orange', zValue: -22.5, command: "G6.2" },
+        { color: '#000000', name: 'Black', zValue: -23, command: "G6.3" },
+        { color: '#227fe3', name: 'Blue', zValue: -22.5, command: "G6.4" },
+        { color: '#ffff00', name: 'Yellow', zValue: -22.5, command: "G6.5" },
+        { color: '#008000', name: 'Green', zValue: -22.5, command: "G6.6" },
+        { color: '#ffc0cb', name: 'Pink', zValue: -22.5, command: "G6.7" },
+        { color: '#a52a2a', name: 'Brown', zValue: -22.5, command: "G6.8" },
     ]);
     const [ config, setConfig ] = useState({
         url: 'miniZund.local',
-        feedRate: 1000,
+        feedRate: 10000,
         jogSpeed: 2000,
         zOffset: 10,
         open: false
@@ -139,13 +139,10 @@ export const CommunicationProvider = ({ children }) => {
         if (ws !== null) return;
         try {
             setJob({ connecting: true, connected: false, started: false })
-            // setTimeout(() => {
                 
-                const socket = new WebSocket(`ws://${ config.url }:81`, ['arduino']);
-                socket.binaryType = 'arraybuffer';
-                setWs(socket)
-
-            // }, 3000)
+            const socket = new WebSocket(`ws://${ config.url }:81`, ['arduino']);
+            socket.binaryType = 'arraybuffer';
+            setWs(socket)
 
         } catch (err) {
             setWs(null);

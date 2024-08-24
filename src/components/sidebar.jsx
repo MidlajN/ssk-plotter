@@ -2,6 +2,7 @@
 import useCanvas from "../context";
 import { Boxes, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
 import { split, group, info } from "../components/editor/functions";
+import { SplitSvg } from "./icons";
 
 export const SideNav = ({ tool, setTool, setExpanded }) => {
     const { canvas } = useCanvas();
@@ -28,7 +29,7 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
           canvasFunction={ () => group(canvas) }
         />
         <SidebarItem 
-          icon={ <img src="/split.svg" alt="" /> } 
+          icon={ <SplitSvg /> } 
           text={'Split'} 
           setTool={setTool} 
           setExpanded={setExpanded}
@@ -52,12 +53,6 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
           setTool={setTool}
           setExpanded={setExpanded}
         />
-        {/* <SidebarItem 
-          icon={ <CaseSensitiveIcon size={25} strokeWidth={1.5} color={ tool === 'Textbox' ? '#1c8096' : '#4b5563'} /> } 
-          text={'Textbox'} 
-          setTool={setTool} 
-          setExpanded={setExpanded}
-        /> */}
         <SidebarItem 
           icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
           text={'Import'} 
@@ -126,3 +121,4 @@ export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction }
         </li>
     )
 }
+

@@ -6,6 +6,7 @@ import { Triangle } from "react-loader-spinner";
 // import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useCom } from "../context";
+import { PlotSvg } from "./icons";
 ReactModal.setAppElement('#root');
 
 export const SetupModal = () => {
@@ -122,7 +123,8 @@ export const SetupModal = () => {
                             </div>
                         }
                         <div className="lg:w-[50%] w-[60%] pt-1">
-                            <img className="object-contain w-full mt-auto" src="/plot.svg" alt="" />
+                            {/* <img className="object-contain w-full mt-auto" src="/plot.svg" alt="" /> */}
+                            <PlotSvg />
                         </div>
                     </div>
                 }

@@ -27,7 +27,7 @@ export default function Home() {
 
   return (
     <>
-      <section className="h-screen">
+      <section className="h-dvh">
         <NavBar 
           tool={ tool } 
           setTool={ setTool } 

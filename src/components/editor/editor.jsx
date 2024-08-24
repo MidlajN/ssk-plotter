@@ -76,8 +76,8 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                         <div 
                             key={ index }
                             className="rounded-md border-4 cursor-pointer" 
-                            style={{ borderColor: strokeColor === color.name ? '#1f7f9481' : 'white' }}
-                            onClick={ () => { setStrokeColor(color.name)}}
+                            style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
+                            onClick={ () => { setStrokeColor(color.color)}}
                         >
                             <div className="p-5 border-2 border-white rounded-md" style={{ backgroundColor: color.color }}></div>
                         </div>

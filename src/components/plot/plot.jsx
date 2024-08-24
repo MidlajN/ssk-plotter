@@ -25,6 +25,7 @@ export const Plot = () => {
         response,
         ws, 
         setWs,
+        job,
         setJob,
         config,
         setConfig,
@@ -137,6 +138,7 @@ export const Plot = () => {
         
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             const color = colors.find(obj => obj.color === element.color)
+            console.log('Coloe', color, element.color)
             let settings = {
                 zOffset : config.zOffset,
                 feedRate : config.feedRate,
@@ -260,7 +262,7 @@ export const Plot = () => {
 
     return (
         <>
-        <div className="flex justify-between gap-8 max-[600px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
+        <div className="flex justify-between gap-8 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
             <div className="h-full cut w-full">
                 <div 
                     className="w-full flex items-end  lg:justify-end gap-3 pb-4" 
@@ -318,7 +320,7 @@ export const Plot = () => {
                 </div>
 
                 <div className="flex w-full items-end justify-between gap-1">
-                    { !ws ? (
+                    { !job.connected ? (
                         <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
                             <Plug size={18} strokeWidth={2} color="#FFFFFF"/>
                             <span className="text-[#ffffff] font-['MarryWeatherSans'] text-[16px]"> Ready</span>
