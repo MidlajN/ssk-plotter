@@ -80,6 +80,7 @@ export const CanvasProvider = ({ children }) => {
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas ));
+
         return () => { 
             window.removeEventListener('keydown', handleKeyDown);
         };
@@ -113,19 +114,19 @@ export const CommunicationProvider = ({ children }) => {
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
-        { color: '#ff0000', name: 'Red', zValue: -22.5, command: "G6.1" },
-        { color: '#ffa500', name: 'Orange', zValue: -22.5, command: "G6.2" },
-        { color: '#000000', name: 'Black', zValue: -23, command: "G6.3" },
-        { color: '#227fe3', name: 'Blue', zValue: -22.5, command: "G6.4" },
-        { color: '#ffff00', name: 'Yellow', zValue: -22.5, command: "G6.5" },
-        { color: '#008000', name: 'Green', zValue: -22.5, command: "G6.6" },
-        { color: '#ffc0cb', name: 'Pink', zValue: -22.5, command: "G6.7" },
-        { color: '#a52a2a', name: 'Brown', zValue: -22.5, command: "G6.8" },
+        { color: '#ff0000', name: 'Red', zValue: -9, command: "G6.1" },
+        { color: '#ffa500', name: 'Orange', zValue: -9.5, command: "G6.2" },
+        { color: '#000000', name: 'Black', zValue: -9, command: "G6.3" },
+        { color: '#227fe3', name: 'Blue', zValue: -9.8, command: "G6.4" },
+        { color: '#ffff00', name: 'Yellow', zValue: -9.3, command: "G6.5" },
+        { color: '#008000', name: 'Green', zValue: -9.5, command: "G6.6" },
+        { color: '#ffc0cb', name: 'Pink', zValue: -9.5, command: "G6.7" },
+        { color: '#a52a2a', name: 'Brown', zValue: -9.5, command: "G6.8" },
     ]);
     const [ config, setConfig ] = useState({
         url: 'miniZund.local',
         feedRate: 10000,
-        jogSpeed: 2000,
+        jogSpeed: 12000,
         zOffset: 10,
         open: false
     });
@@ -159,7 +160,7 @@ export const CommunicationProvider = ({ children }) => {
         })
         .catch(err => {
             console.error('Fetch Error ->\n', err)
-        })
+        });
     }
 
     const handleJog = (e) => {
@@ -185,7 +186,6 @@ export const CommunicationProvider = ({ children }) => {
 
         if (jogCommands[key]) {
             e.preventDefault();
- 
             if (shiftKey && ctrlKey && jogCommands[key].shiftCtrl) {
                 sendToMachine(jogCommands[key].shiftCtrl);
             } else if (shiftKey && jogCommands[key].shift) {
@@ -200,8 +200,8 @@ export const CommunicationProvider = ({ children }) => {
     useEffect(() => {
         if (!ws) return;
 
-        ws.onopen = () => {
-            setJob({ connecting: false, connected: true, started: false })
+        const handleSocketOpen = () => {
+            setJob({ connecting: false, connected: true, started: false });
             setTimeout(() => { setSetupModal(false) }, 3000);
 
             if (!window._keydownListenerAdded) {
@@ -209,62 +209,67 @@ export const CommunicationProvider = ({ children }) => {
                 window._keydownListenerAdded = true;
             }
         }
-        
-        ws.onmessage = (event) => {
-            if (event.data instanceof Blob) {
-                const reader = new FileReader();
-                reader.onload = function() {
-                    const text = reader.result;
-                    setResponse(prev => ({ 
-                        ...prev, 
-                        message: prev.message + text
-                    }));
-                };
-                reader.readAsText(event.data);
-            } else if (event.data instanceof ArrayBuffer) {
-                const arrayBuffer = event.data;
-                const text = `${ new TextDecoder().decode(arrayBuffer) }`;
-                let split_text = text.split(':', 2);
 
-                if (split_text.length >1) {
-                    split_text[1] = parseInt(split_text[1].trim())
-                    if (!isNaN(split_text[1])) {
-                        if (split_text[0] === 'error' && split_text[1] === 8) {
-                            console.log('The Machine is in Alarm state \nChanging...')
-                            sendToMachine('$X')
+        const handleSocketMessage =  (message, gcode = null) => {
+            console.log('Message :-> ', message);
+            setResponse(prev => ({
+                ...prev,
+                message: prev.message + message
+            }));
+    
+            if (gcode) sendToMachine(gcode);
+        }
 
-                        } else if (split_text[0] === 'ALARM' && split_text[1] === 1) {
-                            console.log('Hard Limit Triggered \nRe-Homing...');
-                            sendToMachine('$H')
+        const handleBlob = (event) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const text = reader.result;
+                handleSocketMessage(text);
+            }
+            reader.readAsText(event.data)
+        }
 
-                        }else if (split_text[0] === 'ALARM' && split_text[1] === 8) {
-                            console.log('Soft Limit Triggered \nRe-Homing...')
-                            sendToMachine('$X\nG1 X10Y10Z-10 F3000\n$H');
-                        }
-                    }
+        const handleArrayBuffer = (event) => {
+            const arrayBuffer = event.data;
+            const text = new TextDecoder().decode(arrayBuffer);
+            const [key, valueStr] = text.split(':', 2);
+            if (!valueStr) return;
+            const value = parseInt(valueStr.trim());
+            console.log(key, value);
+
+            if(!isNaN(value)) {
+                switch (true) {
+                    case key === 'error' && value === 8:
+                        handleSocketMessage('The Machine is in Alarm state \nChanging...', '$X');
+                        break;
+                    case key === 'ALARM' && value === 1:
+                        handleSocketMessage('Hard Limit Triggered \nRe-Homing...', '$H');
+                        break;
+                    case key === 'ALARM' && value === 8:
+                        handleSocketMessage('Hard Limit Triggered \nRe-Homing...', '$X\nG1 X10Y10Z-10 F3000\n$H');
+                        break;
+                    default:
+                        break;
                 }
-
-                setResponse(prev => ({ 
-                    ...prev, 
-                    message: prev.message + text
-                }));
-
             } else {
-                const [key, value] = event.data.split(':');
-
-                if (key !== 'PING') {
-                    console.log('String :', key, ':  -> ', parseInt(value, 10));
-                    
-                    setResponse(prev => ({ 
-                        ...prev, 
-                        pageId: parseInt(value, 10), 
-                        message: prev.message + event.data + "\n"
-                    }));
-                }
+                handleSocketMessage(text);
             }
         }
 
-        ws.onclose = () => {
+        const handleText = (event) => {
+            const [key, value] = event.data.split(':');
+
+            if (key !== 'PING') {
+                console.log(key, value);
+                setResponse(prev => ({ 
+                    ...prev, 
+                    pageId: parseInt(value, 10), 
+                    message: prev.message + event.data + "\n"
+                }));
+            }
+        }
+
+        const handleSocketClose = () => {
             setWs(null);
             setJob({ connected: false, connecting: false, started: false });
             setResponse(prev => ({ ...prev, message: prev.message + 'Socket Connection Closed ... \n' }));
@@ -272,10 +277,25 @@ export const CommunicationProvider = ({ children }) => {
             window.removeEventListener('keydown', handleJog);
         }
 
-        ws.onerror = (err) => {
-            console.error('Socket error -> ', err);
+        const handleSocketError = (err) => {
+            console.error('Socket error :-> ', err);
             setJob({ connected: false, connecting: false, started: false })
         }
+
+        ws.onopen = handleSocketOpen;
+
+        ws.onmessage = (event) => {
+            if (event.data instanceof Blob) {
+                handleBlob(event);
+            } else if (event.data instanceof ArrayBuffer) {
+                handleArrayBuffer(event);
+            } else {
+                handleText(event)
+            }
+        }
+
+        ws.onclose = handleSocketClose;
+        ws.onerror = handleSocketError;
 
     }, [job, ws])
 
