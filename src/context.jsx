@@ -115,12 +115,12 @@ export const CommunicationProvider = ({ children }) => {
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
         { color: '#ff0000', name: 'Red', zValue: -9, command: "G6.1" },
-        { color: '#ffa500', name: 'Orange', zValue: -9.5, command: "G6.2" },
-        { color: '#000000', name: 'Black', zValue: -9, command: "G6.3" },
-        { color: '#227fe3', name: 'Blue', zValue: -9.8, command: "G6.4" },
-        { color: '#ffff00', name: 'Yellow', zValue: -9.3, command: "G6.5" },
-        { color: '#008000', name: 'Green', zValue: -9.5, command: "G6.6" },
-        { color: '#ffc0cb', name: 'Pink', zValue: -9.5, command: "G6.7" },
+        { color: '#ffa500', name: 'Orange', zValue: -9.8, command: "G6.6" },
+        { color: '#000000', name: 'Black', zValue: -10.2, command: "G6.7" },
+        { color: '#227fe3', name: 'Blue', zValue: -9.8, command: "G6.5" },
+        { color: '#ffff00', name: 'Yellow', zValue: -9.5, command: "G6.3" },
+        { color: '#008000', name: 'Green', zValue: -9.9, command: "G6.4" },
+        { color: '#ffc0cb', name: 'Pink', zValue: -9.5, command: "G6.2" },
         { color: '#a52a2a', name: 'Brown', zValue: -9.5, command: "G6.8" },
     ]);
     const [ config, setConfig ] = useState({
@@ -132,9 +132,12 @@ export const CommunicationProvider = ({ children }) => {
     });
 
     const jogSpeedRef = useRef(config.jogSpeed);
+    const pageIdRef = useRef(response.pageId);
     useEffect(() => {
         jogSpeedRef.current = config.jogSpeed;
-    }, [ config.jogSpeed ])
+        pageIdRef.current = response.pageId;
+
+    }, [ config.jogSpeed, response.pageId ]);
 
     const openSocket = useCallback(() => {
         if (ws !== null) return;
@@ -152,7 +155,7 @@ export const CommunicationProvider = ({ children }) => {
 
     const sendToMachine = (gcode) => {
         const url = `http://${ config.url }/command?commandText=`;
-        fetch(url + encodeURI(gcode) + `&PAGEID=${response.pageId}`)
+        fetch(url + encodeURI(gcode) + `&PAGEID=${pageIdRef.current}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Http Error Status : ', response.status);
@@ -240,13 +243,13 @@ export const CommunicationProvider = ({ children }) => {
             if(!isNaN(value)) {
                 switch (true) {
                     case key === 'error' && value === 8:
-                        handleSocketMessage('The Machine is in Alarm state \nChanging...', '$X');
+                        handleSocketMessage('The Machine is in Alarm state \nChanging...\n', '$X');
                         break;
                     case key === 'ALARM' && value === 1:
-                        handleSocketMessage('Hard Limit Triggered \nRe-Homing...', '$H');
+                        handleSocketMessage('Hard Limit Triggered \nRe-Homing...\n', '$H');
                         break;
                     case key === 'ALARM' && value === 8:
-                        handleSocketMessage('Hard Limit Triggered \nRe-Homing...', '$X\nG1 X10Y10Z-10 F3000\n$H');
+                        handleSocketMessage('Hard Limit Triggered \nRe-Homing...\n', '$X\nG1 X10Y10Z-10 F3000\n$H');
                         break;
                     default:
                         break;

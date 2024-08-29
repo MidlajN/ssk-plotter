@@ -48,17 +48,22 @@ export const split = (canvas) => {
             const mainArray = [];
             const paths = activeObject.path;
             let array = [];
+            console.log('Paths :-> ', paths)
 
             for (let i = 0; i < paths.length; i++) {
                 const line = paths[i] ? paths[i].join(' ') : null;
                 const command = paths[i] ? paths[i][0] : null;
 
-                if (command === 'M' || i === paths.length - 1) {
+                console.log(command, line, i, paths.length -1)
+                if (command === 'M' || i === (paths.length - 1)) {
                     if (array.length) mainArray.push(array.join(' '));
+                    console.log('Paths -> ', paths[i])
                     array = []
                 }
                 array.push(line);
             }
+
+            console.log('Array -< ', mainArray)
 
             let fabricPaths = [];
             for (let i = 0; i < mainArray.length; i++) {

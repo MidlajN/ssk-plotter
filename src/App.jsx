@@ -15,11 +15,11 @@ import { componentToUrl } from "./components/editor/functions.jsx";
 
 export default function Home() {
   const { canvas } = useCanvas();
-  const [tool, setTool] = useState('Select');
+  const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
-  const [strokeColor, setStrokeColor] = useState('Black');
-  const [element, setElement] = useState('rectangle')
+  const [ strokeColor, setStrokeColor ] = useState('Black');
+  const [ element, setElement ] = useState('rectangle')
 
   useEditorSetup(canvas, tool, strokeColor, element);
 
@@ -37,7 +37,6 @@ export default function Home() {
           <div className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' }`}>
             <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
           </div>
-          {/* { !hideSideBar && <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } /> } */}
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
             <div className={`p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center lg:hidden ${ tool !== 'Plot' ? '' : 'hidden' }`}>

@@ -42,15 +42,28 @@ export const Plot = () => {
 
         objects.forEach(obj => {
             if (obj.get('type') === 'group') {
-                console.log('New OBJ -> ',obj)
                 const groupObjects = obj.getObjects();
 
                 groupObjects.forEach(innerObj => {
+
                     if (innerObj.get('type') === 'group') {
                         const groupObjects = returnObjs(innerObj.getObjects())
                         newObjects.push(...groupObjects);
                     } else {
-                        newObjects.push(innerObj);
+                        innerObj.clone(clonedObj => {
+                            const transformMatrix = obj.calcTransformMatrix();
+                            const originalLeft = innerObj.left;
+                            const originalTop = innerObj.top;
+        
+                            clonedObj.set({
+                                left: originalLeft * transformMatrix[0] + originalTop * transformMatrix[2] + transformMatrix[4],
+                                top: originalLeft * transformMatrix[1] + originalTop * transformMatrix[3] + transformMatrix[5],
+                                angle: innerObj.angle + obj.angle,
+                                scaleX: innerObj.scaleX * obj.scaleX,
+                                scaleY: innerObj.scaleY * obj.scaleY
+                            })
+                            newObjects.push(clonedObj);
+                        });
                     }
                 })
             } else {
@@ -177,25 +190,25 @@ export const Plot = () => {
             setProgress({ uploading: true, converting: false, progress: 80  });
             await delay(500);
 
-            const http = new XMLHttpRequest();
-            http.onreadystatechange = async () => {
-                if (http.readyState === 4) {
-                    if (http.status === 200) {
-                        sendToMachine(`[ESP220]/${file.name}`)
-                        setJob({ connecting: false, connected: true, started:  true});
+            // const http = new XMLHttpRequest();
+            // http.onreadystatechange = async () => {
+            //     if (http.readyState === 4) {
+            //         if (http.status === 200) {
+            //             sendToMachine(`[ESP220]/${file.name}`)
+            //             setJob({ connecting: false, connected: true, started:  true});
 
-                        setProgress({ uploading: true, converting: false, progress: 100  })
-                        await delay(500);
-                        setProgress({ uploading: false, converting: false, progress: 100  })
+            //             setProgress({ uploading: true, converting: false, progress: 100  })
+            //             await delay(500);
+            //             setProgress({ uploading: false, converting: false, progress: 100  })
                         
-                        setTimeout(() => {
-                            setSetupModal(false)
-                        }, 3000);
-                    }
-                }
-            }
-            http.open("POST", `http://${ config.url }/upload`, true);
-            http.send(formData);
+            //             setTimeout(() => {
+            //                 setSetupModal(false)
+            //             }, 3000);
+            //         }
+            //     }
+            // }
+            // http.open("POST", `http://${ config.url }/upload`, true);
+            // http.send(formData);
         } catch (err) {
             console.error('Error While Uploading -> ', err);
         }
