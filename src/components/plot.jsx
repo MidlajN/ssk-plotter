@@ -190,25 +190,25 @@ export const Plot = () => {
             setProgress({ uploading: true, converting: false, progress: 80  });
             await delay(500);
 
-            // const http = new XMLHttpRequest();
-            // http.onreadystatechange = async () => {
-            //     if (http.readyState === 4) {
-            //         if (http.status === 200) {
-            //             sendToMachine(`[ESP220]/${file.name}`)
-            //             setJob({ connecting: false, connected: true, started:  true});
+            const http = new XMLHttpRequest();
+            http.onreadystatechange = async () => {
+                if (http.readyState === 4) {
+                    if (http.status === 200) {
+                        sendToMachine(`[ESP220]/${file.name}`)
+                        setJob({ connecting: false, connected: true, started:  true});
 
-            //             setProgress({ uploading: true, converting: false, progress: 100  })
-            //             await delay(500);
-            //             setProgress({ uploading: false, converting: false, progress: 100  })
+                        setProgress({ uploading: true, converting: false, progress: 100  });
+                        await delay(500);
+                        setProgress({ uploading: false, converting: false, progress: 100  });
                         
-            //             setTimeout(() => {
-            //                 setSetupModal(false)
-            //             }, 3000);
-            //         }
-            //     }
-            // }
-            // http.open("POST", `http://${ config.url }/upload`, true);
-            // http.send(formData);
+                        setTimeout(() => {
+                            setSetupModal(false)
+                        }, 3000);
+                    }
+                }
+            }
+            http.open("POST", `http://${ config.url }/upload`, true);
+            http.send(formData);
         } catch (err) {
             console.error('Error While Uploading -> ', err);
         }

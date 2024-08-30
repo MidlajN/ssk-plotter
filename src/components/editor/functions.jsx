@@ -17,10 +17,10 @@ export const handleFile = (file, canvas) => {
         fabric.loadSVGFromString(svg, (objects, options) => {
             const obj = fabric.util.groupSVGElements(objects, options);
             console.log("Svg from file -->> \n",objects, options, obj)
-    
+
             // Set styles after object is loaded
             obj.set({ selectable: true, hasControls: true, strokeWidth: 1, stroke: '#fff', fill: '#fff' });
-    
+
             canvas.add(obj);
             canvas.renderAll();
         });
@@ -50,20 +50,26 @@ export const split = (canvas) => {
             let array = [];
             console.log('Paths :-> ', paths)
 
-            for (let i = 0; i < paths.length; i++) {
+            for (let i = 0; i <= paths.length; i++) {
                 const line = paths[i] ? paths[i].join(' ') : null;
                 const command = paths[i] ? paths[i][0] : null;
 
-                console.log(command, line, i, paths.length -1)
-                if (command === 'M' || i === (paths.length - 1)) {
-                    if (array.length) mainArray.push(array.join(' '));
-                    console.log('Paths -> ', paths[i])
+                console.log(
+                    '\nCommand :', command, 
+                    '\nLine :', line,
+                    '\ni Value :', i, 
+                    '\nTotal Length :',paths.length
+                );
+                
+                if (command === 'M' || i === paths.length) {
+                    if (array.length) {
+                        console.log('\nArray TO BE Pushed -> ', array);
+                        mainArray.push(array.join(' '));
+                    }
                     array = []
                 }
                 array.push(line);
             }
-
-            console.log('Array -< ', mainArray)
 
             let fabricPaths = [];
             for (let i = 0; i < mainArray.length; i++) {
