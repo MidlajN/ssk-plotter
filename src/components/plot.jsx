@@ -21,70 +21,45 @@ import { Converter } from "svg-to-gcode";
 export const Plot = () => {
     const { canvas } = useCanvas();
     const {
-        response,
-        ws, 
-        setWs,
-        job,
-        setJob,
-        config,
-        setConfig,
-        setupModal, 
-        setSetupModal,
-        setProgress,
-        colors,
-        openSocket
+        response, config, setConfig, setupModal, job, setJob, colors,
+        setSetupModal, setProgress,  openSocket, closeSocket, sendToMachine
     } = useCom();
+
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
 
     const returnObjs = (objects) => {
         const newObjects = []
 
-        objects.forEach(obj => {
-            if (obj.get('type') === 'group') {
-                const groupObjects = obj.getObjects();
-
-                groupObjects.forEach(innerObj => {
-
-                    if (innerObj.get('type') === 'group') {
-                        const groupObjects = returnObjs(innerObj.getObjects())
-                        newObjects.push(...groupObjects);
-                    } else {
-                        innerObj.clone(clonedObj => {
-                            const transformMatrix = obj.calcTransformMatrix();
-                            const originalLeft = innerObj.left;
-                            const originalTop = innerObj.top;
-        
-                            clonedObj.set({
-                                left: originalLeft * transformMatrix[0] + originalTop * transformMatrix[2] + transformMatrix[4],
-                                top: originalLeft * transformMatrix[1] + originalTop * transformMatrix[3] + transformMatrix[5],
-                                angle: innerObj.angle + obj.angle,
-                                scaleX: innerObj.scaleX * obj.scaleX,
-                                scaleY: innerObj.scaleY * obj.scaleY
-                            })
-                            newObjects.push(clonedObj);
-                        });
-                    }
+        const processObject = (object, transformMatrix = null) => {
+            if (object.get('type') ===  'group') {
+                object.getObjects().forEach(innerObject => {
+                    processObject(innerObject, object.calcTransformMatrix())
                 })
             } else {
-                newObjects.push(obj)
+                object.clone(clonedObject => {
+                    if (transformMatrix) {
+                        const originalLeft = clonedObject.left;
+                        const originalTop = clonedObject.top;
+    
+                        clonedObject.set({
+                            left: originalLeft * transformMatrix[0] + originalTop * transformMatrix[2] + transformMatrix[4],
+                            top: originalLeft * transformMatrix[1] + originalTop * transformMatrix[3] + transformMatrix[5],
+                            angle: clonedObject.angle + object.angle,
+                            scaleX: clonedObject.scaleX * object.scaleX,
+                            scaleY: clonedObject.scaleY * object.scaleY
+                        })
+                    }
+                    newObjects.push(clonedObject);
+                })  
             }
-        })
+        }
+
+        objects.forEach(obj => processObject(obj))
 
         return newObjects
     }
 
-    const handleConnection = async () => {
-        openSocket();
-        setSetupModal(true);
-    }
-
-    const closeConnection = () => {
-        setProgress({ uploading: false, converting: false, progress: 0 });
-        setJob({ connecting: false, connected: false, started:  false});
-        ws.close();
-        setWs(null);
-    }
 
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -150,7 +125,7 @@ export const Plot = () => {
         
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             const color = colors.find(obj => obj.color === element.color)
-            console.log('Coloe', color, element.color)
+            // console.log('Color :', color, element.color)
             let settings = {
                 zOffset : config.zOffset,
                 feedRate : config.feedRate,
@@ -214,27 +189,6 @@ export const Plot = () => {
         }
     }
 
-
-
-    const sendToMachine = async (gcode) => {
-        if (!ws) return;
-        try {
-            const url = `http://${ config.url }/command?commandText=` + encodeURI(gcode) + `&PAGEID=${response.pageId}`
-
-            fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP ERROR! STATUS : ' + response.status);
-                }
-            })
-            . catch (err => {
-                console.error('Fetch Error : ', err)
-            });
-
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
     useEffect(() => {
         canvas.selection = false;
@@ -333,7 +287,7 @@ export const Plot = () => {
 
                 <div className="flex w-full items-end justify-between gap-1">
                     { !job.connected ? (
-                        <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ handleConnection }>
+                        <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ openSocket }>
                             <Plug size={18} strokeWidth={2} color="#FFFFFF"/>
                             <span className="text-[#ffffff] font-medium text-[16px]"> Ready</span>
                         </button>
@@ -343,7 +297,7 @@ export const Plot = () => {
                                 <Pencil size={18} strokeWidth={2} color="#FFFFFF" /> 
                                 <span className="text-[#ffffff] font-medium text-[16px]">Plot</span>
                             </button>
-                            <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-3 px-8 rounded-md" onClick={ closeConnection }>
+                            <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-3 px-8 rounded-md" onClick={ closeSocket }>
                                 <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
                                 <span className="text-[#ffffff] font-medium text-[16px]"> Disconnect</span>
                             </button>

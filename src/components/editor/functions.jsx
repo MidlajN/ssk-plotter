@@ -48,24 +48,13 @@ export const split = (canvas) => {
             const mainArray = [];
             const paths = activeObject.path;
             let array = [];
-            console.log('Paths :-> ', paths)
 
             for (let i = 0; i <= paths.length; i++) {
                 const line = paths[i] ? paths[i].join(' ') : null;
                 const command = paths[i] ? paths[i][0] : null;
 
-                console.log(
-                    '\nCommand :', command, 
-                    '\nLine :', line,
-                    '\ni Value :', i, 
-                    '\nTotal Length :',paths.length
-                );
-                
                 if (command === 'M' || i === paths.length) {
-                    if (array.length) {
-                        console.log('\nArray TO BE Pushed -> ', array);
-                        mainArray.push(array.join(' '));
-                    }
+                    if (array.length) mainArray.push(array.join(' '));
                     array = []
                 }
                 array.push(line);
@@ -231,7 +220,6 @@ export const info = (canvas) => {
     if (!canvas.getActiveObject()) return;
     const activeObject = canvas.getActiveObject();
     console.log('SVG ::: ', activeObject.toSVG())
-    console.log('OBJ ::: ', canvas.toSVG())
     canvas.renderAll();
 }
 

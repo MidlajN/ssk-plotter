@@ -9,9 +9,10 @@ import { SideNav } from "./components/sidebar";
 import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import { SidebarItem } from "./components/sidebar";
-import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil, Split } from "lucide-react";
+import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil } from "lucide-react";
 import { split, group, info } from "./components/editor/functions.jsx";
 import { componentToUrl } from "./components/editor/functions.jsx";
+import { SplitSvg } from "./components/icons.jsx";
 
 export default function Home() {
   const { canvas } = useCanvas();
@@ -68,7 +69,7 @@ export default function Home() {
               </div>
               <div className="bg-slate-200">
                 <SidebarItem 
-                  icon={ <Split size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
+                  icon={ <SplitSvg /> } 
                   text={'Split'} 
                   setTool={setTool} 
                   setExpanded={setExpanded}

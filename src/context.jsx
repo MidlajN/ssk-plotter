@@ -133,13 +133,14 @@ export const CommunicationProvider = ({ children }) => {
 
     const jogSpeedRef = useRef(config.jogSpeed);
     const pageIdRef = useRef(response.pageId);
+
     useEffect(() => {
         jogSpeedRef.current = config.jogSpeed;
         pageIdRef.current = response.pageId;
-
     }, [ config.jogSpeed, response.pageId ]);
 
     const openSocket = useCallback(() => {
+        setSetupModal(true);
         if (ws !== null) return;
         try {
             setJob({ connecting: true, connected: false, started: false })
@@ -153,7 +154,14 @@ export const CommunicationProvider = ({ children }) => {
         }
     }, [config.url, ws])
 
-    const sendToMachine = (gcode) => {
+    const closeSocket = useCallback(() => {
+        setProgress({ uploading: false, converting: false, progress: 0 });
+        setJob({ connecting: false, connected: false, started:  false});
+        ws?.close();
+        setWs(null);
+    }, [ws])
+
+    const sendToMachine = useCallback((gcode) => {
         const url = `http://${ config.url }/command?commandText=`;
         fetch(url + encodeURI(gcode) + `&PAGEID=${pageIdRef.current}`)
         .then(response => {
@@ -164,7 +172,7 @@ export const CommunicationProvider = ({ children }) => {
         .catch(err => {
             console.error('Fetch Error ->\n', err)
         });
-    }
+    }, [config.url])
 
     const handleJog = (e) => {
         const { shiftKey, ctrlKey, key } = e;
@@ -198,7 +206,6 @@ export const CommunicationProvider = ({ children }) => {
             }
         }
     }
-
 
     useEffect(() => {
         if (!ws) return;
@@ -238,7 +245,7 @@ export const CommunicationProvider = ({ children }) => {
             const [key, valueStr] = text.split(':', 2);
             if (!valueStr) return;
             const value = parseInt(valueStr.trim());
-            console.log(key, value);
+            // console.log(key, value);
 
             if(!isNaN(value)) {
                 switch (true) {
@@ -314,13 +321,15 @@ export const CommunicationProvider = ({ children }) => {
                 setWs,
                 setupModal, 
                 setSetupModal,
-                openSocket,
                 progress, 
                 setProgress,
                 colors,
                 setColors,
                 config,
-                setConfig
+                setConfig,
+                openSocket,
+                closeSocket,
+                sendToMachine,
             }}
         >
             { children }
