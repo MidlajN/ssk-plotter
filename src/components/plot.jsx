@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { 
     ChevronLeft,
     ChevronRight,
@@ -16,6 +16,7 @@ import useCanvas, { useCom } from "../context";
 import { SetupModal } from "./modal";
 import tinycolor from "tinycolor2";
 import { Converter } from "svg-to-gcode";
+import { data } from "autoprefixer";
 
 
 export const Plot = () => {
@@ -28,7 +29,7 @@ export const Plot = () => {
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
 
-    const returnObjs = (objects) => {
+    const returnObjs = useCallback((objects) => {
         const newObjects = []
 
         const processObject = (object, transformMatrix = null) => {
@@ -58,44 +59,34 @@ export const Plot = () => {
         objects.forEach(obj => processObject(obj))
 
         return newObjects
-    }
+    },[])
 
+    const returnGroupedObjects = useCallback(() => {
+        const objects = returnObjs(canvas.getObjects());
 
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        return objects.reduce((acc, object) => {
+            const stroke = tinycolor(object.stroke).toHexString();
 
-    const plot =  async () => {
-        // if (job.started) return;
-        setProgress({ uploading: false, converting: true, progress: 10 });
-        setJob({ connecting: false, connected: true, started:  false});
-        setSetupModal(true);
-        await delay(500);
+            if (!acc[stroke]) acc[stroke] = [];
+            acc[stroke].push(object)
 
-        const canvasObjects = canvas.getObjects();
-        const objects = returnObjs(canvasObjects);
+            return acc
+        }, {});
+    }, [canvas, returnObjs]);
 
-        const groupByStroke = {};
-        objects.forEach(obj => {
-            const stroke = tinycolor(obj.stroke);
-
-            if (stroke) {
-                if (!groupByStroke[stroke.toHexString()]) {
-                    groupByStroke[stroke.toHexString()] = [];
-                }
-                groupByStroke[stroke.toHexString()].push(obj);
-            }
-        });
-
+    const returnSvgElements = (objects) => {
         const svgElements = []
-        for (const stroke in groupByStroke) {
-            let groupSVG = '';
-            if (groupByStroke[stroke].length > 1) {
 
-                groupByStroke[stroke].forEach(obj => {
+        for (const stroke in objects) {
+            let groupSVG = '';
+            if (objects[stroke].length > 1) {
+
+                objects[stroke].forEach(obj => {
                     const svg = obj.toSVG();
                     groupSVG += svg;
                 });
             } else {
-                const svg = groupByStroke[stroke][0].toSVG()
+                const svg = objects[stroke][0].toSVG()
                 groupSVG += svg
             }
 
@@ -110,18 +101,38 @@ export const Plot = () => {
             svgElements.push(data);
         }
 
-        setProgress({ uploading: false, converting: true, progress: 40 });
-        await delay(500);
+        return svgElements
+    }
 
+    const sortSvgElements = (svgElements) => {
         const colorOrder = colors.reduce((acc, colorObject, index) => {
             acc[colorObject.color] = index
             return acc
-        }, {})
+        }, {});
 
         svgElements.sort((a, b) => {
             return colorOrder[a.color] - colorOrder[b.color]
         })
+    }
 
+
+    const delay = useCallback((ms) => new Promise(resolve => setTimeout(resolve, ms)),[]);
+
+    const plot =  async () => {
+
+        setProgress({ uploading: false, converting: true, progress: 10 });
+        setJob({ connecting: false, connected: true, started:  false});
+        setSetupModal(true);
+        await delay(500);
+
+        const groupedObjects = returnGroupedObjects();
+
+        const svgElements = returnSvgElements(groupedObjects);
+
+        setProgress({ uploading: false, converting: true, progress: 40 });
+        await delay(500);
+
+        sortSvgElements(svgElements);
         
         const gcodes = await Promise.all(svgElements.map( async (element) => {
             const color = colors.find(obj => obj.color === element.color)
@@ -161,29 +172,29 @@ export const Plot = () => {
         formData.append('file', file);
         
         try {
-
             setProgress({ uploading: true, converting: false, progress: 80  });
             await delay(500);
 
-            const http = new XMLHttpRequest();
-            http.onreadystatechange = async () => {
-                if (http.readyState === 4) {
-                    if (http.status === 200) {
-                        sendToMachine(`[ESP220]/${file.name}`)
-                        setJob({ connecting: false, connected: true, started:  true});
+            fetch(`http://${ config.url }/upload`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(async (data) => {
+                console.log('Success : ', data);
 
-                        setProgress({ uploading: true, converting: false, progress: 100  });
-                        await delay(500);
-                        setProgress({ uploading: false, converting: false, progress: 100  });
-                        
-                        setTimeout(() => {
-                            setSetupModal(false)
-                        }, 3000);
-                    }
-                }
-            }
-            http.open("POST", `http://${ config.url }/upload`, true);
-            http.send(formData);
+                sendToMachine(`[ESP220]/${file.name}`);
+                setProgress({ uploading: true, converting: false, progress: 100  });
+                await delay(500);
+                setProgress({ uploading: false, converting: false, progress: 100  });
+
+                setTimeout(() => {
+                    setSetupModal(false);
+                }, 3000);
+ 
+            })
+            .catch(err => console.log('Error : ', err))
+
         } catch (err) {
             console.error('Error While Uploading -> ', err);
         }
