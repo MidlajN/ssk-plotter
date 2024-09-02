@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useCallback, useMemo } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { 
     ChevronLeft,
     ChevronRight,
@@ -16,7 +16,6 @@ import useCanvas, { useCom } from "../context";
 import { SetupModal } from "./modal";
 import tinycolor from "tinycolor2";
 import { Converter } from "svg-to-gcode";
-import { data } from "autoprefixer";
 
 
 export const Plot = () => {
@@ -115,6 +114,37 @@ export const Plot = () => {
         })
     }
 
+    const convertToGcode = async (svgElements) => {
+        const gcodes = await Promise.all(svgElements.map( async (element) => {
+            const color = colors.find(objects => objects.color === element.color);
+
+            let settings = {
+                zOffset: config.zOffset,
+                feedRate: config.feedRate,
+                seekRate: config.seekRate,
+                zValue: color.zValue,
+                tolerance: 0.1
+            }
+
+            const converter = new Converter(settings);
+            const [ code ] = await converter.convert(element.svg);
+            const gCodeLines = code.split('\n');
+
+            const filteredGcodes = gCodeLines.filter(command => command !== `G1 F${config.feedRate}`);
+
+            const cleanedGcodeLines = filteredGcodes.slice(0, -1);
+            cleanedGcodeLines.splice(0, 4);
+            cleanedGcodeLines.splice(1, 1);
+
+            return color.command + '\n' + cleanedGcodeLines.join('\n');
+        }));
+
+        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0', `G1 F${config.feedRate}`, 'G0 X50Y50\n')
+        gcodes.push('G0 X680Y540')
+
+        return gcodes;
+    }
+
 
     const delay = useCallback((ms) => new Promise(resolve => setTimeout(resolve, ms)),[]);
 
@@ -133,36 +163,12 @@ export const Plot = () => {
         await delay(500);
 
         sortSvgElements(svgElements);
-        
-        const gcodes = await Promise.all(svgElements.map( async (element) => {
-            const color = colors.find(obj => obj.color === element.color)
-            // console.log('Color :', color, element.color)
-            let settings = {
-                zOffset : config.zOffset,
-                feedRate : config.feedRate,
-                seekRate : config.feedRate,
-                zValue: color.zValue,
-                tolerance: 0.1
-            }
-            const converter = new Converter(settings);
-            const [ code ] = await converter.convert(element.svg);
-            const gCodeLines = code.split('\n');
 
-            const filteredGcodes = gCodeLines.filter(command => command !== `G1 F${config.feedRate}`);
-
-            const cleanedGcodeLines = filteredGcodes.slice(0, -1);
-            cleanedGcodeLines.splice(0, 4);
-            cleanedGcodeLines.splice(1, 1);
-            return [ color.command + '\n' + cleanedGcodeLines.join('\n')];
-        }));
+        const gcodes = await convertToGcode(svgElements);
+        console.log('G-Code :', gcodes);
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
-
-        // gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0')
-        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0', `G1 F${config.feedRate}`, 'G0 X50Y50')
-        gcodes.push('G0 X680Y540')
-        console.log('Gcode Lines : \n', gcodes.join('\n'));
 
         // Send to Machine
         const blob = new Blob([gcodes.join('\n')], { type: 'text/plain' });
@@ -170,7 +176,7 @@ export const Plot = () => {
 
         const formData = new FormData();
         formData.append('file', file);
-        
+
         try {
             setProgress({ uploading: true, converting: false, progress: 80  });
             await delay(500);
@@ -193,13 +199,19 @@ export const Plot = () => {
                 }, 3000);
  
             })
-            .catch(err => console.log('Error : ', err))
+            .catch(err => {
+                console.log('Error : ', err);
+                setProgress({ uploading: false, converting: false, progress: 0 });
+
+                setTimeout(() => {
+                    setSetupModal(false);
+                }, 3000);
+            })
 
         } catch (err) {
             console.error('Error While Uploading -> ', err);
         }
     }
-
 
     useEffect(() => {
         canvas.selection = false;
@@ -235,7 +247,6 @@ export const Plot = () => {
             </button>
         )
     }
-
 
     return (
         <>
