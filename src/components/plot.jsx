@@ -28,14 +28,14 @@ export const Plot = () => {
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
 
-    const returnObjs = useCallback((objects) => {
+    const returnObjs = (objects) => {
         const newObjects = []
 
         const processObject = (object, transformMatrix = null) => {
             if (object.get('type') ===  'group') {
                 object.getObjects().forEach(innerObject => {
                     processObject(innerObject, object.calcTransformMatrix())
-                })
+                });
             } else {
                 object.clone(clonedObject => {
                     if (transformMatrix) {
@@ -58,9 +58,9 @@ export const Plot = () => {
         objects.forEach(obj => processObject(obj))
 
         return newObjects
-    },[])
+    }
 
-    const returnGroupedObjects = useCallback(() => {
+    const returnGroupedObjects = () => {
         const objects = returnObjs(canvas.getObjects());
 
         return objects.reduce((acc, object) => {
@@ -71,7 +71,7 @@ export const Plot = () => {
 
             return acc
         }, {});
-    }, [canvas, returnObjs]);
+    }
 
     const returnSvgElements = (objects) => {
         const svgElements = []
@@ -145,8 +145,44 @@ export const Plot = () => {
         return gcodes;
     }
 
+    const uploadToMachine = async (gcode) => {
+        const blob = new Blob([gcode.join('\n')], { type: 'text/plain '});
+        const file = new File([blob], 'job.gcode', { type: 'text/plain' });
+        const formData = new FormData();
+        formData.append('file', file);
 
-    const delay = useCallback((ms) => new Promise(resolve => setTimeout(resolve, ms)),[]);
+        try {
+            setProgress({ uploading: true, converting: false, progress: 80  });
+
+            await delay(500);
+
+            const response =  await fetch(`http://${ config.url }/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            console.log('Request Send Successfully :', data);
+
+            sendToMachine(`[ESP220]/${file.name}`);
+            
+            setProgress({ uploading: true, converting: false, progress: 100  });
+            await delay(500);
+            setProgress({ uploading: false, converting: false, progress: 100  });
+            setJob({ connecting: false, connected: true, started:  true});
+
+            setTimeout(() => { setSetupModal(false) }, 3000);
+
+        } catch  (err) {
+            console.log('Error While Uploading : ', err);
+
+            setProgress({ uploading: false, converting: false, progress: 0 });
+            setTimeout(() => { setSetupModal(false) }, 3000);
+        }
+    }
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const plot =  async () => {
 
@@ -156,13 +192,11 @@ export const Plot = () => {
         await delay(500);
 
         const groupedObjects = returnGroupedObjects();
-
         const svgElements = returnSvgElements(groupedObjects);
+        sortSvgElements(svgElements);
 
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
-
-        sortSvgElements(svgElements);
 
         const gcodes = await convertToGcode(svgElements);
         console.log('G-Code :', gcodes);
@@ -170,47 +204,7 @@ export const Plot = () => {
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
 
-        // Send to Machine
-        const blob = new Blob([gcodes.join('\n')], { type: 'text/plain' });
-        const file = new File([blob], 'job.gcode', { type: 'text/plain' });
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            setProgress({ uploading: true, converting: false, progress: 80  });
-            await delay(500);
-
-            fetch(`http://${ config.url }/upload`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(async (data) => {
-                console.log('Success : ', data);
-
-                sendToMachine(`[ESP220]/${file.name}`);
-                setProgress({ uploading: true, converting: false, progress: 100  });
-                await delay(500);
-                setProgress({ uploading: false, converting: false, progress: 100  });
-
-                setTimeout(() => {
-                    setSetupModal(false);
-                }, 3000);
- 
-            })
-            .catch(err => {
-                console.log('Error : ', err);
-                setProgress({ uploading: false, converting: false, progress: 0 });
-
-                setTimeout(() => {
-                    setSetupModal(false);
-                }, 3000);
-            })
-
-        } catch (err) {
-            console.error('Error While Uploading -> ', err);
-        }
+        uploadToMachine(gcodes);
     }
 
     useEffect(() => {
