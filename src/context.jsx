@@ -109,7 +109,7 @@ export function useCom() {
 
 export const CommunicationProvider = ({ children }) => {
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
-    const [ job, setJob ] = useState({ connecting: false, connected: false, started: false });
+    const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
@@ -222,6 +222,12 @@ export const CommunicationProvider = ({ children }) => {
 
         const handleSocketMessage =  (message, gcode = null) => {
             console.log('Message :-> ', message);
+
+            if (message.includes('/job.gcode job sent')) {
+                console.log('The Indicator found');
+                setJob({ connecting: false, connected: true, started: false });
+            }
+
             setResponse(prev => ({
                 ...prev,
                 message: prev.message + message

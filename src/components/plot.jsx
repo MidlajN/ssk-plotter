@@ -10,7 +10,10 @@ import {
     Plug,
     Pencil,
     GripHorizontal,
-    X
+    X,
+    OctagonX,
+    Pause,
+    Play
 } from "lucide-react";
 import useCanvas, { useCom } from "../context";
 import { SetupModal } from "./modal";
@@ -170,7 +173,7 @@ export const Plot = () => {
             setProgress({ uploading: true, converting: false, progress: 100  });
             await delay(500);
             setProgress({ uploading: false, converting: false, progress: 100  });
-            setJob({ connecting: false, connected: true, started:  true});
+            setJob({ ...job, started:  true});
 
             setTimeout(() => { setSetupModal(false) }, 3000);
 
@@ -187,7 +190,7 @@ export const Plot = () => {
     const plot =  async () => {
 
         setProgress({ uploading: false, converting: true, progress: 10 });
-        setJob({ connecting: false, connected: true, started:  false});
+        setJob({ ...job, connected: true });
         setSetupModal(true);
         await delay(500);
 
@@ -234,10 +237,19 @@ export const Plot = () => {
         }
     }, [response.message]);
 
-    const JogButton = ({gcode, Icon}) => {
+    const JogButton = ({gcode, Icon, className}) => {
         return (
-            <button className="p-3 bg-[#1C274C] rounded flex justify-center items-center" onClick={ () => sendToMachine(gcode) }>
-                <Icon size={20} strokeWidth={4} color={'#F5762E'} />
+            <button className={`${className} p-3 bg-[#1C274C] rounded flex justify-center items-center`} onClick={ () => sendToMachine(gcode) }>
+                <Icon size={20} strokeWidth={gcode === '$H' ? 2 : 4} color={gcode === '$H' ? '#ffffff' : '#F5762E'} />
+            </button>
+        )
+    }
+
+    const ActionButton = ({ label, Icon, onclick, bgColor }) => {
+        return (
+            <button className={`flex items-center justify-center gap-1 bg-[${bgColor}] py-3 px-8 rounded-md`} onClick={ onclick }>
+                <Icon size={18} strokeWidth={2} color="#FFFFFF"/>
+                <span className="text-[#ffffff] font-medium text-[16px]"> { label } </span>
             </button>
         )
     }
@@ -280,43 +292,50 @@ export const Plot = () => {
                 </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-5 px-12 lg:px-1">
-                <div className="flex  w-full justify-around items-center gap-16 pb-10">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />
-                        <div className="flex gap-3">
-                            <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />   
-                            <button className="p-3 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
-                                <Home size={20} strokeWidth={2} color={'#ffffff'}/>
-                            </button>
-                            <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } X10`} Icon={ChevronRight} />  
-                        </div>
-                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
+                <div className="flex gap- w-full justify-around items-center">
+                    <div className="grid grid-cols-3 gap-3">
+                        <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronUp} />  
+                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />  
+                        <JogButton className='col-start-2' gcode={`$H`} Icon={Home} />  
+                        <JogButton className='col-start-3' gcode={`$J=G91 G21 F${ config.jogSpeed } X10`} Icon={ChevronRight} /> 
+                        <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
                     </div>
-                    <div className="flex flex-col h-full justify-between">
-                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed / 10 } Z1`} Icon={ChevronUp} />
-                        <button className="p-2 bg-[#1C274C] rounded" onClick={ () => sendToMachine('$H') }>
-                            <p className="text-white text-[10px]">Z-Axis</p>
-                        </button>
-                        <JogButton gcode={`$J=G91 G21 F${ config.jogSpeed / 10 } Z-1`} Icon={ChevronDown} />  
+                    <div className="grid grid-cols-1 gap-3 h-fit">
+                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronUp} />  
+                        <button className="p-2 bg-[#1C274C] rounded"><p className="text-white text-[10px]">Z-Axis</p></button>
+                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
                     </div>
                 </div>
 
                 <div className="flex w-full items-end justify-between gap-1">
                     { !job.connected ? (
-                        <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ openSocket }>
-                            <Plug size={18} strokeWidth={2} color="#FFFFFF"/>
-                            <span className="text-[#ffffff] font-medium text-[16px]"> Ready</span>
-                        </button>
+                        <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
                     ) : (
                         <>
-                            <button className="flex items-center justify-center gap-1 bg-[#0e505c] py-3 px-8 rounded-md" onClick={ plot }>
-                                <Pencil size={18} strokeWidth={2} color="#FFFFFF" /> 
-                                <span className="text-[#ffffff] font-medium text-[16px]">Plot</span>
-                            </button>
-                            <button className="flex items-center justify-center gap-1 bg-[#d41d1d] py-3 px-8 rounded-md" onClick={ closeSocket }>
-                                <Power size={18} strokeWidth={4} color="#FFFFFF" /> 
-                                <span className="text-[#ffffff] font-medium text-[16px]"> Disconnect</span>
-                            </button>
+                            { job.started ? (
+                                <>
+                                    <ActionButton 
+                                        label={ job.paused ? 'Resume' : 'Pause' } 
+                                        Icon={ job.paused ? Play : Pause }
+                                        bgColor='#113b7a'
+                                        onclick={() => {
+                                            sendToMachine(job.paused ? '~' : '!' );
+                                            setJob({ ...job, paused: !job.paused });
+                                        }}
+                                    />
+                                    <ActionButton 
+                                        label='Stop'
+                                        Icon={ OctagonX }
+                                        bgColor='#d41d1d'
+                                        onclick={ closeSocket }
+                                    />
+                                </>
+                            ): (
+                                <>
+                                    <ActionButton label='Plot' Icon={Pencil} bgColor='#0e505c' onclick={plot}/>
+                                    <ActionButton label='Disconnect' Icon={Power} bgColor='#d41d1d' onclick={closeSocket}/>
+                                </>
+                            )}
                         </>
                     )}
                 </div>
@@ -391,7 +410,6 @@ function ConfigComponent() {
                 <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
                 <InputComponent inputKey={`feedRate`} config={config} setConfig={setConfig} label={'Feed Rate'} limit={12000}/>
                 <InputComponent inputKey={`jogSpeed`} config={config} setConfig={setConfig} label={'Jog Speed'} limit={15000}/>
-                <InputComponent inputKey={`zOffset`} config={config} setConfig={setConfig} label={'Z - Offset'} limit={10}/>
             </div>
 
             <div className="flex flex-col gap-2 p-4 rounded bg-[#f7f7f7]">
@@ -420,10 +438,8 @@ function ConfigComponent() {
                                 onChange={(e) => {
                                     let value = e.target.value
                                     setColors(prevColor => 
-                                        prevColor.map((clr, idx) =>
-                                            idx === index ? {...clr, zValue: value } : clr
-                                        )
-                                    )
+                                        prevColor.map((clr, idx) => idx === index ? {...clr, zValue: value } : clr )
+                                    );
                                 }}
                                 onBlur={() => {
                                     // Convert to float when the input loses focus
@@ -433,9 +449,7 @@ function ConfigComponent() {
 
                                     // Update the state with the parsed float value
                                     setColors(prevColors =>
-                                        prevColors.map((clr, idx) =>
-                                            idx === index ? { ...clr, zValue: value } : clr
-                                        )
+                                        prevColors.map((clr, idx) => idx === index ? { ...clr, zValue: value } : clr )
                                     );
                                 }}
                             />

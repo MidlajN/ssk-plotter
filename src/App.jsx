@@ -210,8 +210,14 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       });
 
       canvas.on('mouse:move', (event) => {
+        const isCtrlPressed = event.e.ctrlKey;
+
         if (mouseDown) {
           const pointer = canvas.getPointer(event.e);
+          if (isCtrlPressed) {
+            if (pointer.x < line.x1 + 100 && pointer.x > line.x1 - 100 && line.height >  100 ) pointer.x = line.x1;
+            if (pointer.y < line.y1 + 100 && pointer.y > line.y1 - 100  && line.width >  100) pointer.y = line.y1
+          }
           line.set({ x2: pointer.x , y2: pointer.y });
           canvas.requestRenderAll();
         }
