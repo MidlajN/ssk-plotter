@@ -247,7 +247,7 @@ export const Plot = () => {
 
     const ActionButton = ({ label, Icon, onclick, bgColor }) => {
         return (
-            <button className={`flex items-center justify-center gap-1 bg-[${bgColor}] py-3 px-8 rounded-md`} onClick={ onclick }>
+            <button className={`flex items-center justify-center gap-1 py-3 px-8 rounded-md`} style={{ background: bgColor }} onClick={ onclick }>
                 <Icon size={18} strokeWidth={2} color="#FFFFFF"/>
                 <span className="text-[#ffffff] font-medium text-[16px]"> { label } </span>
             </button>
