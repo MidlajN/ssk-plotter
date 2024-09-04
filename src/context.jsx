@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
 import 'fabric-history';
+import { CornerRightDown } from "lucide-react";
 
 const CanvasContext = createContext(null);
 
@@ -108,6 +109,7 @@ export function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
+    const { canvas } = useCanvas()
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
@@ -124,11 +126,19 @@ export const CommunicationProvider = ({ children }) => {
         { color: '#a52a2a', name: 'Brown', zValue: -9.5, command: "G6.8" },
     ]);
     const [ config, setConfig ] = useState({
-        url: window.location.hostname,
+        // url: window.location.hostname,
+        url: '192.168.0.1',
         feedRate: 10000,
         jogSpeed: 12000,
         zOffset: 10,
         open: false
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const dot = new fabric.Circle({
+        radius: 30, // Set the radius as a number
+        fill: 'black', // Fill the circle with black color
+        top: 0,
+        left: 0,
     });
 
     const jogSpeedRef = useRef(config.jogSpeed);
@@ -162,7 +172,8 @@ export const CommunicationProvider = ({ children }) => {
     }, [ws])
 
     const sendToMachine = useCallback((gcode) => {
-        const url = `http://${ config.url }/command?commandText=`;
+        let url = `http://${ config.url }/command?commandText=`;
+
         fetch(url + encodeURI(gcode) + `&PAGEID=${pageIdRef.current}`)
         .then(response => {
             if (!response.ok) {
@@ -208,6 +219,19 @@ export const CommunicationProvider = ({ children }) => {
     },[sendToMachine])
 
     useEffect(() => {
+        if (!response.pageId) return;
+        console.log('Page ID ', response.pageId)
+        sendToMachine('$H\n$Report/interval=50');
+
+        canvas.add(dot);
+        canvas.renderAll();
+        return () => {
+            canvas.remove(dot)
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [response.pageId])
+
+    useEffect(() => {
         if (!ws) return;
 
         const handleSocketOpen = () => {
@@ -222,6 +246,20 @@ export const CommunicationProvider = ({ children }) => {
 
         const handleSocketMessage =  (message, gcode = null) => {
             console.log('Message :-> ', message);
+
+            if (message.startsWith('<')) {
+                const data = message.match(/<([^>]+)>/)[1];
+                const [status, position, feed] = data.split('|');
+                const coords = position.split(':')[1];
+                const [ x, y, z ] = coords.split(',').map(parseFloat);
+                console.log(x, y, z, status, position, feed);
+
+                dot.set({
+                    top: y,
+                    left: x,
+                })
+                canvas.renderAll()
+            }
 
             if (message.includes('/job.gcode job sent')) {
                 console.log('The Indicator found');
@@ -247,11 +285,12 @@ export const CommunicationProvider = ({ children }) => {
 
         const handleArrayBuffer = (event) => {
             const arrayBuffer = event.data;
-            const text = new TextDecoder().decode(arrayBuffer);
+            const uint8array = new Uint8Array(arrayBuffer)
+            const text = new TextDecoder().decode(uint8array);
+            // console.log('Uint8Array : ', uint8array, 'text : ', text)
             const [key, valueStr] = text.split(':', 2);
             if (!valueStr) return;
             const value = parseInt(valueStr.trim());
-            // console.log(key, value);
 
             if(!isNaN(value)) {
                 switch (true) {
@@ -267,9 +306,8 @@ export const CommunicationProvider = ({ children }) => {
                     default:
                         break;
                 }
-            } else {
-                handleSocketMessage(text);
-            }
+            } 
+            handleSocketMessage(text);
         }
 
         const handleText = (event) => {
@@ -299,6 +337,9 @@ export const CommunicationProvider = ({ children }) => {
         }
 
         ws.onopen = handleSocketOpen;
+        setResponse({ message: 'New One TEST', pageId: '3'})
+        handleSocketMessage('<Home|MPos:50.000,72.838,110.000|FS:0.000>');
+        // setResponse({ pageId: 0, message: 'DEEED'})
 
         ws.onmessage = (event) => {
             if (event.data instanceof Blob) {
