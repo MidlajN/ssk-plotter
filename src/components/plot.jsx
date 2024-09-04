@@ -13,7 +13,8 @@ import {
     X,
     OctagonX,
     Pause,
-    Play
+    Play,
+    Info
 } from "lucide-react";
 import useCanvas, { useCom } from "../context";
 import { SetupModal } from "./modal";
@@ -64,14 +65,13 @@ export const Plot = () => {
     }
 
     const returnGroupedObjects = () => {
-        const objects = returnObjs(canvas.getObjects());
+        // const objects = returnObjs(canvas.getObjects());
 
-        return objects.reduce((acc, object) => {
+        return returnObjs(canvas.getObjects()).reduce((acc, object) => {
             const stroke = tinycolor(object.stroke).toHexString();
-
-            if (!acc[stroke]) acc[stroke] = [];
+            acc[stroke] = acc[stroke] || [];
+            // if (!acc[stroke]) acc[stroke] = [];
             acc[stroke].push(object)
-
             return acc
         }, {});
     }
@@ -112,9 +112,7 @@ export const Plot = () => {
             return acc
         }, {});
 
-        svgElements.sort((a, b) => {
-            return colorOrder[a.color] - colorOrder[b.color]
-        })
+        svgElements.sort((a, b) => colorOrder[a.color] - colorOrder[b.color]);
     }
 
     const convertToGcode = async (svgElements) => {
@@ -142,10 +140,7 @@ export const Plot = () => {
             return color.command + '\n' + cleanedGcodeLines.join('\n');
         }));
 
-        gcodes.unshift('$H', 'G10 L20 P0 X0 Y0 Z0', `G1 F${config.feedRate}`, 'G0 X50Y50\n')
-        gcodes.push('G0 X680Y540')
-
-        return gcodes;
+        return ['$H', 'G10 L20 P0 X0 Y0 Z0', `G1 F${config.feedRate}`, 'G0 X50Y50\n', ...gcodes, 'G0 X680Y540']
     }
 
     const uploadToMachine = async (gcode) => {
@@ -156,7 +151,6 @@ export const Plot = () => {
 
         try {
             setProgress({ uploading: true, converting: false, progress: 80  });
-
             await delay(500);
 
             const response =  await fetch(`http://${ config.url }/upload`, {
@@ -165,21 +159,17 @@ export const Plot = () => {
             });
 
             const data = await response.json();
-
             console.log('Request Send Successfully :', data);
 
             sendToMachine(`[ESP220]/${file.name}`);
-            
             setProgress({ uploading: true, converting: false, progress: 100  });
             await delay(500);
             setProgress({ uploading: false, converting: false, progress: 100  });
             setJob({ ...job, started:  true});
 
             setTimeout(() => { setSetupModal(false) }, 3000);
-
         } catch  (err) {
             console.log('Error While Uploading : ', err);
-
             setProgress({ uploading: false, converting: false, progress: 0 });
             setTimeout(() => { setSetupModal(false) }, 3000);
         }
@@ -188,46 +178,36 @@ export const Plot = () => {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const plot =  async () => {
-
         setProgress({ uploading: false, converting: true, progress: 10 });
         setJob({ ...job, connected: true });
         setSetupModal(true);
         await delay(500);
 
-        const groupedObjects = returnGroupedObjects();
-        const svgElements = returnSvgElements(groupedObjects);
+        const svgElements = returnSvgElements(returnGroupedObjects());
         sortSvgElements(svgElements);
 
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
         const gcodes = await convertToGcode(svgElements);
-        console.log('G-Code :', gcodes);
+        console.log('G-Code :', gcodes.join('\n'));
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
 
         uploadToMachine(gcodes);
-    }
+    };
 
     useEffect(() => {
         canvas.selection = false;
         canvas.discardActiveObject();
-        canvas.getObjects().forEach((obj) => {
-            obj.set({
-                selectable: false
-            })
-        })
+        canvas.getObjects().forEach((obj) => obj.set({ selectable: false }));
         canvas.requestRenderAll();
 
         return () => {
             canvas.selection = true;
-            canvas.getObjects().forEach(obj => {
-                obj.set({
-                    selectable: true
-                })
-            })
-        }
+            canvas.getObjects().forEach(obj => obj.set({ selectable: true }));
+        };
     }, [canvas]);
 
     // Scroll the textarea to the bottom when it overflows
@@ -256,10 +236,10 @@ export const Plot = () => {
 
     return (
         <>
-        <div className="flex justify-between gap-8 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
-            <div className="h-full cut w-full">
+        <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
+            <div className="cut w-full">
                 <div 
-                    className="w-full flex items-end  lg:justify-end gap-3 pb-4" 
+                    className="w-full flex items-end lg:justify-end gap-3 pb-4" 
                     onClick={ () => { setConfig({ ...config, open: !config.open })}}
                 >
                     <div className="flex gap-2 items-center bg-[#1287a1] p-1 rounded-full cursor-pointer">
@@ -273,8 +253,20 @@ export const Plot = () => {
                         <p className="text-[12px] pr-2 text-white font-medium">Settings</p>
                     </div>
                 </div>
-                <div className="text-sm responses lg:h-[90%] min-h-44 relative">
-                    <textarea ref={textareaRef} value={ response.message } className="cursor-default min-h-24 lg:pb-8" readOnly></textarea>
+
+                <div className="px-3 py-4 border-b border-white bg-[#2a334e] flex items-center gap-2">
+                    <Info size={14} strokeWidth={2} color={'#ffff'} />
+                    <p className="text-sm text-white">Currently No Job Is Running...</p>
+                </div>
+
+                <div className="text-sm responses lg:h-[25rem] min-h-44 relative">
+                    <textarea 
+                        ref={textareaRef} 
+                        value={ response.message } 
+                        className="cursor-default min-h-22 lg:pb-8" 
+                        readOnly
+                    />
+                    
                     <div className="absolute w-full bottom-0 left-0 p-3">
                         <input 
                             ref={ gcodeRef }
@@ -291,8 +283,8 @@ export const Plot = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col items-center justify-center gap-5 px-12 lg:px-1">
-                <div className="flex gap- w-full justify-around items-center">
+            <div className="flex flex-col items-center justify-center gap-5 px-6 lg:px-1 min-w-fit">
+                <div className="flex gap-4 w-full justify-around items-center">
                     <div className="grid grid-cols-3 gap-3">
                         <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronUp} />  
                         <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />  
@@ -307,9 +299,9 @@ export const Plot = () => {
                     </div>
                 </div>
 
-                <div className="flex w-full items-end justify-between gap-1">
+                <div className="flex w-full min-w-80 items-end justify-between gap-1 pt-2 lg:pt-12">
                     { !job.connected ? (
-                        <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
+                        <ActionButton label={'Ready'} Icon={Plug} onclick={ plot } bgColor={'#0e505c'}/>
                     ) : (
                         <>
                             { job.started ? (
@@ -372,7 +364,6 @@ function ConfigComponent() {
     }
 
     const InputComponent = useCallback(({ inputKey, config, setConfig, label, limit=null }) => {
-        
         const handleChange = (e) => {
             let value = e.target.value;
             if (limit) {

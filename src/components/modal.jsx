@@ -73,6 +73,24 @@ export const SetupModal = () => {
         )
     }
 
+    const UploadModal = ({ label, color }) => {
+        return (
+            <div className="h-full flex flex-col justify-center my-auto sm:pb-2">
+                <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
+                    <span className="text-[#146a7e] sm:text-[20px] text-[15px]" style={{ color: color }}>{ label }</span> 
+                    <span className="text-[20px] font-semibold" style={{ color: color }}>!...</span>
+                </p>
+                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
+                    <div 
+                        className="h-full transition-width duration-300" 
+                        style={{ width: `${progress.progress}%`, background: color }}
+                    />
+                </div>
+                <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
+            </div>
+        )
+    }
+
 
     return (
         <ReactModal 
@@ -123,66 +141,19 @@ export const SetupModal = () => {
                                 text={<>Click the <span className="font-semibold">'Plot'</span> Button to draw the pictures in from the canvas.</>} 
                             />  
                         }
+                        
                         { job.connected && !progress.converting && progress.uploading &&
-                            <div className="h-full flex flex-col justify-center my-auto sm:pb-2">
-                                <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
-                                    {/* <span>Ready To</span>  */}
-                                    <span className="text-[#146a7e] sm:text-[20px] text-[15px]">Uploading</span> 
-                                    <span className="text-[20px] font-semibold text-[#146a7e]">!...</span>
-                                </p>
-                                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
-                                    <div 
-                                        className="bg-[#1c8096] h-full transition-width duration-300" 
-                                        style={{ width: `${progress.progress}%` }}
-                                    />
-                                </div>
-                                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                                <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
-                            </div>
+                            <UploadModal label={'Uploading'} color={'#146a7e'} />
                         }
                         { job.connected && progress.converting && !progress.uploading &&
-                            <div className="h-full flex flex-col justify-center my-auto sm:pb-2">
-                                <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
-                                    {/* <span>Ready To</span>  */}
-                                    <span className="text-[#14427e] sm:text-[20px] text-[15px]">Converting</span> 
-                                    <span className="text-[20px] font-semibold text-[#14427e]">...</span>
-                                </p>
-                                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
-                                    <div 
-                                        className="bg-[#14427e] h-full transition-width duration-300" 
-                                        style={{ width: `${progress.progress}%` }}
-                                    />
-                                </div>
-                                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                                <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
-                            </div>
+                            <UploadModal label={'Converting'} color={'#14427e'}/>
                         }
                         <div className="lg:w-[50%] w-[60%] pt-1">
-                            {/* <img className="object-contain w-full mt-auto" src="/plot.svg" alt="" /> */}
                             <PlotSvg />
                         </div>
                     </div>
                 </div>
                 }
-                
-                {/* { !job.connected &&
-                    <div className="content" >
-                        <div className="flex justify-end gap-4 mt-10">
-                        { !job.connecting &&
-                            <button 
-                                className="transition-all duration-300 bg-[#2a365c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={openSocket}
-                            >Retry</button>
-                        }
-                            <button 
-                                className="transition-all duration-300 bg-[#404e7c] hover:bg-[#1C274C] px-8 py-[2px] text-white"
-                                onClick={ () => {
-                                    setSetupModal(false);
-                                }}
-                            >Cancel</button>
-                        </div>
-                    </div>
-                } */}
             </div>
         </ReactModal>
     )

@@ -109,9 +109,9 @@ export function useCom() {
 
 export const CommunicationProvider = ({ children }) => {
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
-    const [ job, setJob ] = useState({ connecting: false, connected: true, started: true, paused: false });
+    const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
-    const [ setupModal, setSetupModal ] = useState(true);
+    const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
         { color: '#ff0000', name: 'Red', zValue: -9, command: "G6.1" },
@@ -174,7 +174,7 @@ export const CommunicationProvider = ({ children }) => {
         });
     }, [config.url])
 
-    const handleJog = (e) => {
+    const handleJog = useCallback((e) => {
         const { shiftKey, ctrlKey, key } = e;
         const jogCommands = {
             ArrowUp: {
@@ -205,7 +205,7 @@ export const CommunicationProvider = ({ children }) => {
                 sendToMachine(jogCommands[key].normal);
             }
         }
-    }
+    },[sendToMachine])
 
     useEffect(() => {
         if (!ws) return;
@@ -313,7 +313,7 @@ export const CommunicationProvider = ({ children }) => {
         ws.onclose = handleSocketClose;
         ws.onerror = handleSocketError;
 
-    }, [job, ws])
+    }, [handleJog, job, sendToMachine, ws])
 
 
     return (
