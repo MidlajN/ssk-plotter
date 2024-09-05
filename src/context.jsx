@@ -29,8 +29,8 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.noScaleCache = true;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-            width: fabric.util.parseUnit('680mm'),
-            height: fabric.util.parseUnit('540mm'),
+            width: fabric.util.parseUnit('690mm'),
+            height: fabric.util.parseUnit('550mm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
@@ -126,20 +126,15 @@ export const CommunicationProvider = ({ children }) => {
         { color: '#a52a2a', name: 'Brown', zValue: -9.5, command: "G6.8" },
     ]);
     const [ config, setConfig ] = useState({
-        // url: window.location.hostname,
-        url: '192.168.0.1',
+        url: window.location.hostname,
+        // url: '192.168.0.1',
         feedRate: 10000,
         jogSpeed: 12000,
         zOffset: 10,
         open: false
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const dot = new fabric.Circle({
-        radius: 30, // Set the radius as a number
-        fill: 'black', // Fill the circle with black color
-        top: 0,
-        left: 0,
-    });
+
+    const dotRef = useRef();    
 
     const jogSpeedRef = useRef(config.jogSpeed);
     const pageIdRef = useRef(response.pageId);
@@ -219,16 +214,31 @@ export const CommunicationProvider = ({ children }) => {
     },[sendToMachine])
 
     useEffect(() => {
-        if (!response.pageId) return;
+        console.log(response)
+        if (response.pageId === '') return;
         console.log('Page ID ', response.pageId)
         sendToMachine('$H\n$Report/interval=50');
 
-        canvas.add(dot);
+        dotRef.current = new fabric.Path('M -50,0 L 50,0 M 0,-50 L 0,50 M -25,-25 V-25,25 H25,25 V25,-25 Z', {
+            stroke: '#2a334e28', 
+            strokeWidth: 8,
+            fill: '#2a334e28',
+            originX: 'center',
+            originY: 'center',
+            lockMovementX: true,
+            lockMovementY: true,
+            lockScalingX: true,
+            lockScalingY: true,
+            lockRotation: true,
+            top: 550 * 96 / 25.4,
+            left: 0,
+        });
+
+        canvas.add(dotRef.current);
         canvas.renderAll();
         return () => {
-            canvas.remove(dot)
+            canvas.remove(dotRef.current)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [response.pageId])
 
     useEffect(() => {
@@ -252,13 +262,13 @@ export const CommunicationProvider = ({ children }) => {
                 const [status, position, feed] = data.split('|');
                 const coords = position.split(':')[1];
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
-                console.log(x, y, z, status, position, feed);
+                message = `Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`
 
-                dot.set({
-                    top: y,
-                    left: x,
-                })
-                canvas.renderAll()
+                dotRef.current.set({
+                    top: (550 - y) * 96 / 25.4,
+                    left: x * 96 / 25.4,
+                });
+                canvas.renderAll();
             }
 
             if (message.includes('/job.gcode job sent')) {
@@ -337,9 +347,6 @@ export const CommunicationProvider = ({ children }) => {
         }
 
         ws.onopen = handleSocketOpen;
-        setResponse({ message: 'New One TEST', pageId: '3'})
-        handleSocketMessage('<Home|MPos:50.000,72.838,110.000|FS:0.000>');
-        // setResponse({ pageId: 0, message: 'DEEED'})
 
         ws.onmessage = (event) => {
             if (event.data instanceof Blob) {
