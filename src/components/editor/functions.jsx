@@ -186,7 +186,6 @@ export const deleteObject = (canvas) => {
  * A function to select all objects on the canvas.
  */
 export const selectAllObject = (canvas) => {
-
     canvas.discardActiveObject();
     const selection = new fabric.ActiveSelection(canvas.getObjects(), { canvas: canvas });
     canvas.setActiveObject(selection);

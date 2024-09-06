@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import { fabric } from "fabric";
 import { handleKeyDown } from "./components/editor/functions";
 import 'fabric-history';
-import { CornerRightDown } from "lucide-react";
 
 const CanvasContext = createContext(null);
 
@@ -126,8 +125,8 @@ export const CommunicationProvider = ({ children }) => {
         { color: '#a52a2a', name: 'Brown', zValue: -9.5, command: "G6.8" },
     ]);
     const [ config, setConfig ] = useState({
-        url: window.location.hostname,
-        // url: '192.168.0.1',
+        // url: window.location.hostname,
+        url: '192.168.0.1',
         feedRate: 10000,
         jogSpeed: 12000,
         zOffset: 10,
@@ -232,7 +231,50 @@ export const CommunicationProvider = ({ children }) => {
             lockRotation: true,
             top: 550 * 96 / 25.4,
             left: 0,
+            name: 'ToolHead'
         });
+
+        canvas.on('object:moving', (e) => {
+            const movingObject = e.target;
+            const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = movingObject.getCoords();
+            // const [ dTopLeft, dTopRight, dBottomRight, dBottomLeft ] = dotRef.current.getCoords();
+            const dotCenter = dotRef.current.getCenterPoint();
+
+            console.log(
+                'Moving Object : ', mTopLeft, mTopRight, mBottomRight, mBottomLeft,
+                // '\nToolHead Object : ', dTopLeft, dTopRight, dBottomRight, dBottomLeft,
+                '\nToolHead Center : ', dotCenter
+            );
+
+            const calculateDist = (point, centerX, centerY) => {
+                const dx = point.x - centerX;
+                const dy = point.y - centerY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            const topLeftDistance = calculateDist(mTopLeft, dotCenter.x, dotCenter.y);
+            const topRightDistance = calculateDist(mTopRight, dotCenter.x, dotCenter.y);
+            const bottomLeftDistance = calculateDist(mBottomLeft, dotCenter.x, dotCenter.y);
+            const bottomRightDistance = calculateDist(mBottomRight, dotCenter.x, dotCenter.y);
+
+            const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
+
+            if (shortestDistance === topLeftDistance) {
+                console.log('Short : topLeft - ', topLeftDistance);
+                if (shortestDistance < 100) {
+                    movingObject.set({
+                        left: dotCenter.x,
+                        top: dotCenter.y
+                    })
+                }
+
+            }
+            if (shortestDistance === topRightDistance) console.log('Short : topRight');
+            if (shortestDistance === bottomLeftDistance) console.log('Short : bottomLeft');
+            if (shortestDistance === bottomRightDistance) console.log('Short : bottomRight');
+
+
+        })
 
         canvas.add(dotRef.current);
         canvas.renderAll();
@@ -262,7 +304,8 @@ export const CommunicationProvider = ({ children }) => {
                 const [status, position, feed] = data.split('|');
                 const coords = position.split(':')[1];
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
-                message = `Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`
+                // message = `Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`
+                message = '';
 
                 dotRef.current.set({
                     top: (550 - y) * 96 / 25.4,

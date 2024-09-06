@@ -59,7 +59,9 @@ export const Plot = () => {
             }
         }
 
-        objects.forEach(obj => processObject(obj))
+        objects.forEach(obj => {
+            if (obj.get('name') !== 'ToolHead') processObject(obj);
+        })
 
         return newObjects
     }
@@ -286,16 +288,16 @@ export const Plot = () => {
             <div className="flex flex-col items-center justify-center gap-5 px-6 lg:px-1 min-w-fit">
                 <div className="flex gap-4 w-full justify-around items-center">
                     <div className="grid grid-cols-3 gap-3">
-                        <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronUp} />  
+                        <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />  
                         <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />  
                         <JogButton className='col-start-2' gcode={`$H`} Icon={Home} />  
                         <JogButton className='col-start-3' gcode={`$J=G91 G21 F${ config.jogSpeed } X10`} Icon={ChevronRight} /> 
                         <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
                     </div>
                     <div className="grid grid-cols-1 gap-3 h-fit">
-                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronUp} />  
+                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z1`} Icon={ChevronUp} />  
                         <button className="p-2 bg-[#1C274C] rounded"><p className="text-white text-[10px]">Z-Axis</p></button>
-                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
+                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
                     </div>
                 </div>
 
