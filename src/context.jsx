@@ -161,6 +161,7 @@ export const CommunicationProvider = ({ children }) => {
     const closeSocket = useCallback(() => {
         setProgress({ uploading: false, converting: false, progress: 0 });
         setJob({ connecting: false, connected: false, started:  false});
+        setResponse({ ...response, pageId: ''})
         ws?.close();
         setWs(null);
     }, [ws])
@@ -213,7 +214,6 @@ export const CommunicationProvider = ({ children }) => {
     },[sendToMachine])
 
     useEffect(() => {
-        console.log(response)
         if (response.pageId === '') return;
         console.log('Page ID ', response.pageId)
         sendToMachine('$H\n$Report/interval=50');
@@ -234,7 +234,9 @@ export const CommunicationProvider = ({ children }) => {
             name: 'ToolHead'
         });
 
+        let snapped = false;
         canvas.on('object:moving', (e) => {
+
             const movingObject = e.target;
             const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = movingObject.getCoords();
             const dotCenter = dotRef.current.getCenterPoint();
@@ -250,9 +252,11 @@ export const CommunicationProvider = ({ children }) => {
             const bottomLeftDistance = calculateDist(mBottomLeft, dotCenter.x, dotCenter.y);
             const bottomRightDistance = calculateDist(mBottomRight, dotCenter.x, dotCenter.y);
 
-            const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
+            const shortestDistance = Math.truemin(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
 
-            if (shortestDistance < 100) {
+            if (!snapped && shortestDistance < 80) {
+                snapped = true
+
                 const horizontalD = mTopRight.x - mTopLeft.x;
                 const verticalD = mBottomLeft.y - mTopLeft.y;
                 console.log(
@@ -293,13 +297,19 @@ export const CommunicationProvider = ({ children }) => {
                         top: dotCenter.y - verticalD
                     })
                 }  
+            } else {
+                setTimeout(() => { snapped = false }, 200)
             }
-        })
+        });
+
+        canvas.on('mouse:up', () => {
+            snapped = false;
+        });
 
         canvas.add(dotRef.current);
         canvas.renderAll();
         return () => {
-            canvas.remove(dotRef.current)
+            canvas.remove(dotRef.current);    
         }
     }, [response.pageId])
 
@@ -317,14 +327,12 @@ export const CommunicationProvider = ({ children }) => {
         }
 
         const handleSocketMessage =  (message, gcode = null) => {
-            console.log('Message :-> ', message);
 
             if (message.startsWith('<')) {
                 const data = message.match(/<([^>]+)>/)[1];
                 const [status, position, feed] = data.split('|');
                 const coords = position.split(':')[1];
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
-                // message = `Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`
                 message = '';
 
                 dotRef.current.set({
@@ -332,6 +340,10 @@ export const CommunicationProvider = ({ children }) => {
                     left: x * 96 / 25.4,
                 });
                 canvas.renderAll();
+
+                console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
+            } else {
+                console.log('Message :-> ', message);
             }
 
             if (message.includes('/job.gcode job sent')) {
@@ -387,9 +399,8 @@ export const CommunicationProvider = ({ children }) => {
             const [key, value] = event.data.split(':');
 
             if (key !== 'PING') {
-                console.log(key, value);
+                console.log(key, parseInt(value, 10));
                 setResponse(prev => ({ 
-                    ...prev, 
                     pageId: parseInt(value, 10), 
                     message: prev.message + event.data + "\n"
                 }));
@@ -402,6 +413,7 @@ export const CommunicationProvider = ({ children }) => {
             setResponse(prev => ({ ...prev, message: prev.message + 'Socket Connection Closed ... \n' }));
 
             window.removeEventListener('keydown', handleJog);
+            window._keydownListenerAdded = false;
         }
 
         const handleSocketError = (err) => {

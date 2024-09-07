@@ -73,24 +73,6 @@ export const SetupModal = () => {
         )
     }
 
-    const UploadModal = ({ label, color }) => {
-        return (
-            <div className="h-full flex flex-col justify-center my-auto sm:pb-2">
-                <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
-                    <span className="text-[#146a7e] sm:text-[20px] text-[15px]" style={{ color: color }}>{ label }</span> 
-                    <span className="text-[20px] font-semibold" style={{ color: color }}>!...</span>
-                </p>
-                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
-                    <div 
-                        className="h-full transition-width duration-300" 
-                        style={{ width: `${progress.progress}%`, background: color }}
-                    />
-                </div>
-                <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
-            </div>
-        )
-    }
-
 
     return (
         <ReactModal 
@@ -141,12 +123,36 @@ export const SetupModal = () => {
                                 text={<>Click the <span className="font-semibold">'Plot'</span> Button to draw the pictures in from the canvas.</>} 
                             />  
                         }
-                        
+  
                         { job.connected && !progress.converting && progress.uploading &&
-                            <UploadModal label={'Uploading'} color={'#146a7e'} />
+                            <div className="h-full flex flex-col justify-center my-auto sm:pb-2">
+                                <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
+                                    <span className="sm:text-[20px] text-[15px]" style={{ color: '#146a7e' }}>Uploading</span> 
+                                    <span className="text-[20px] font-semibold" style={{ color: '#146a7e' }}>!...</span>
+                                </p>
+                                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
+                                    <div 
+                                        className="h-full transition-all duration-500" 
+                                        style={{ width: `${progress.progress}%`, background: '#146a7e' }}
+                                    />
+                                </div>
+                                <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
+                            </div>
                         }
                         { job.connected && progress.converting && !progress.uploading &&
-                            <UploadModal label={'Converting'} color={'#14427e'}/>
+                            <div className="h-full flex flex-col justify-center my-auto sm:pb-2">
+                                <p className="text-nowrap font-medium text-gray-500 flex items-baseline gap-1">
+                                    <span className="sm:text-[20px] text-[15px]" style={{ color: '#14427e' }}>Converting</span> 
+                                    <span className="text-[20px] font-semibold" style={{ color: '#14427e' }}>!...</span>
+                                </p>
+                                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden mb-4 mt-1">
+                                    <div 
+                                        className="h-full transition-all duration-500" 
+                                        style={{ width: `${progress.progress}%`, background: '#14427e' }}
+                                    />
+                                </div>
+                                <p className="sm:text-[13px] text-[11px] pr-3">We are uploading the pictures to machine <span className="font-semibold">Please Wait...</span></p>
+                            </div>
                         }
                         <div className="lg:w-[50%] w-[60%] pt-1">
                             <PlotSvg />
