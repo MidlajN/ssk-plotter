@@ -237,14 +237,7 @@ export const CommunicationProvider = ({ children }) => {
         canvas.on('object:moving', (e) => {
             const movingObject = e.target;
             const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = movingObject.getCoords();
-            // const [ dTopLeft, dTopRight, dBottomRight, dBottomLeft ] = dotRef.current.getCoords();
             const dotCenter = dotRef.current.getCenterPoint();
-
-            console.log(
-                'Moving Object : ', mTopLeft, mTopRight, mBottomRight, mBottomLeft,
-                // '\nToolHead Object : ', dTopLeft, dTopRight, dBottomRight, dBottomLeft,
-                '\nToolHead Center : ', dotCenter
-            );
 
             const calculateDist = (point, centerX, centerY) => {
                 const dx = point.x - centerX;
@@ -259,21 +252,48 @@ export const CommunicationProvider = ({ children }) => {
 
             const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
 
-            if (shortestDistance === topLeftDistance) {
-                console.log('Short : topLeft - ', topLeftDistance);
-                if (shortestDistance < 100) {
+            if (shortestDistance < 100) {
+                const horizontalD = mTopRight.x - mTopLeft.x;
+                const verticalD = mBottomLeft.y - mTopLeft.y;
+                console.log(
+                    'horizontal : ', horizontalD, 
+                    '\nvertical : ', verticalD, 
+                    '\nmTopRight : ', mTopRight, 
+                    '\nmTopLeft : ', mTopLeft,
+                    '\nmBottomLeft : ', mBottomLeft
+                );
+
+                if (shortestDistance === topLeftDistance) {
+                    console.log('Short : topLeft - ', topLeftDistance);
                     movingObject.set({
                         left: dotCenter.x,
                         top: dotCenter.y
                     })
                 }
-
+                else if (shortestDistance === topRightDistance) {
+                    console.log('Short : topRight');
+                    movingObject.set({
+                        left: dotCenter.x - horizontalD,
+                        top: dotCenter.y
+                    })
+                    console.log(movingObject)
+                }
+                else if (shortestDistance === bottomLeftDistance){
+                    console.log('Short : bottomLeft');
+                    movingObject.set({
+                        left: dotCenter.x,
+                        top: dotCenter.y - verticalD
+                    })
+                    console.log(movingObject)
+                }
+                else if (shortestDistance === bottomRightDistance) {
+                    console.log('Short : bottomRight');  
+                    movingObject.set({
+                        left: dotCenter.x - horizontalD,
+                        top: dotCenter.y - verticalD
+                    })
+                }  
             }
-            if (shortestDistance === topRightDistance) console.log('Short : topRight');
-            if (shortestDistance === bottomLeftDistance) console.log('Short : bottomLeft');
-            if (shortestDistance === bottomRightDistance) console.log('Short : bottomRight');
-
-
         })
 
         canvas.add(dotRef.current);
