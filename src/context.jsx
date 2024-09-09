@@ -110,7 +110,7 @@ export function useCom() {
 export const CommunicationProvider = ({ children }) => {
     const { canvas } = useCanvas()
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
-    const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false });
+    const [ job, setJob ] = useState({ connecting: false, connected: true, started: true, paused: false, percentage: null });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
@@ -169,6 +169,7 @@ export const CommunicationProvider = ({ children }) => {
     const sendToMachine = useCallback((gcode) => {
         let url = `http://${ config.url }/command?commandText=`;
 
+        console.log(' Clicked : ', gcode);
         fetch(url + encodeURI(gcode) + `&PAGEID=${pageIdRef.current}`)
         .then(response => {
             if (!response.ok) {
@@ -330,9 +331,20 @@ export const CommunicationProvider = ({ children }) => {
 
             if (message.startsWith('<')) {
                 const data = message.match(/<([^>]+)>/)[1];
-                const [status, position, feed] = data.split('|');
+                const [ status, position, feed ] = data.split('|');
+                const sdPercent = data.split('|').pop().includes('SD') ? data.split('|').pop() : null
+                const percentage = sdPercent ? parseInt(sdPercent.split(',')[0].split(':')[1]) : null
+                setJob({ ...job, percentage: percentage })
+
                 const coords = position.split(':')[1];
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
+ 
+                // SD:100.00,/sd/job.gcode
+                console.log(
+                    'Data : ', data,
+                    '\nSplits : ', data.split('|'),
+                    '\nSD Percent : ', sdPercent, ' <-> ', percentage
+                );
                 message = '';
 
                 dotRef.current.set({

@@ -14,7 +14,8 @@ import {
     OctagonX,
     Pause,
     Play,
-    Info
+    Info,
+    CheckCheck
 } from "lucide-react";
 import useCanvas, { useCom } from "../context";
 import { SetupModal } from "./modal";
@@ -258,7 +259,20 @@ export const Plot = () => {
 
                 <div className="px-3 py-4 border-b border-white bg-[#2a334e] flex items-center gap-2">
                     <Info size={14} strokeWidth={2} color={'#ffff'} />
-                    <p className="text-sm text-white">Currently No Job Is Running...</p>
+                    { !job.started && !job.percentage ? (
+                        <p className="text-sm text-white">Currently No Job Is Running...</p>
+                    ) : (
+                        <>
+                            <div className="w-1/2 bg-gray-200 rounded-full h-1 overflow-hidden">
+                                <div 
+                                    className="h-full transition-all duration-500" 
+                                    style={{ width: `${job.percentage}%`, background: `${job.percentage === 100 ? '#146a7e' : '#F5762E'}` }}
+                                />
+                            </div>
+                            <p className="text-sm font-medium text-[#c5c5c5]">{job.percentage}%</p>
+                            { job.percentage === 100 && <CheckCheck size={17} strokeWidth={2.5} color={'#ffffff'} /> }
+                        </>  
+                    )}
                 </div>
 
                 <div className="text-sm responses lg:h-[25rem] min-h-44 relative">
@@ -313,6 +327,7 @@ export const Plot = () => {
                                         Icon={ job.paused ? Play : Pause }
                                         bgColor='#113b7a'
                                         onclick={() => {
+                                            console.log('Clicked', job.paused)
                                             sendToMachine(job.paused ? '~' : '!' );
                                             setJob({ ...job, paused: !job.paused });
                                         }}
@@ -321,7 +336,7 @@ export const Plot = () => {
                                         label='Stop'
                                         Icon={ OctagonX }
                                         bgColor='#d41d1d'
-                                        onclick={ closeSocket }
+                                        onclick={() => { sendToMachine('$Report/interval=50') }}
                                     />
                                 </>
                             ): (
