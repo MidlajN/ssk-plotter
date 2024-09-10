@@ -334,17 +334,17 @@ export const CommunicationProvider = ({ children }) => {
                 const [ status, position, feed ] = data.split('|');
                 const sdPercent = data.split('|').pop().includes('SD') ? data.split('|').pop() : null
                 const percentage = sdPercent ? parseInt(sdPercent.split(',')[0].split(':')[1]) : null
-                setJob(prev => ({ ...prev, percentage: prev.percentage === 100 ? 100 : percentage }))
+                setJob(prev => ({ ...prev, percentage:  percentage === null && prev.started ? 100 : percentage }))
 
                 const coords = position.split(':')[1];
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
  
                 // SD:100.00,/sd/job.gcode
-                // console.log(
-                //     'Data : ', data,
-                //     '\nSplits : ', data.split('|'),
-                //     '\nSD Percent : ', sdPercent, ' <-> ', percentage
-                // );
+                console.log(
+                    'Data : ', data,
+                    '\nSplits : ', data.split('|'),
+                    '\nSD Percent : ', sdPercent, ' <-> ', percentage
+                );
 
                 dotRef.current.set({
                     top: (550 - y) * 96 / 25.4,
@@ -355,11 +355,10 @@ export const CommunicationProvider = ({ children }) => {
                 console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
             } else {
                 if (message.includes('/job.gcode job sent')) {
-                    console.log('The Indicator found');
-                    setJob({ ...job, connecting: false, connected: true});
-                    setTimeout(() => {
-                        setJob({ ...job, started: false, percentage: null })
-                    }, 5000)
+                    console.log('The Indicator found', job);
+
+                    // setTimeout(() => { setJob({ ...job, connecting: false, connected: true, percentage: 100 }) }, 5000)
+                    setTimeout(() => { setJob({ ...job, started: false, percentage: null }) }, 10000)
                 }
 
                 setResponse(prev => ({

@@ -326,22 +326,27 @@ export const Plot = () => {
                         <>
                             { job.started ? (
                                 <>
-                                    <ActionButton 
-                                        label={ job.paused ? 'Resume' : 'Pause' } 
-                                        Icon={ job.paused ? Play : Pause }
-                                        bgColor='#113b7a'
-                                        onclick={() => {
-                                            console.log('Clicked', job.paused)
-                                            sendToMachine(job.paused ? '~' : '!' );
+                                    <button 
+                                        className={`flex items-center justify-center gap-1 py-3 px-8 rounded-md`} 
+                                        style={{ background: '#113b7a' }} 
+                                        onClick={() => {
+                                            sendToMachine(job.paused ? '~' : '!');
                                             setJob({ ...job, paused: !job.paused });
-                                        }}
-                                    />
-                                    <ActionButton 
-                                        label='Stop'
-                                        Icon={ OctagonX }
-                                        bgColor='#d41d1d'
-                                        onclick={() => { sendToMachine('$Report/interval=50') }}
-                                    />
+                                        }}>
+                                        <Play size={18} strokeWidth={2} color="#FFFFFF"/>
+                                        <span className="text-[#ffffff] font-medium text-[16px]"> {  job.paused ? 'Resume' : 'Pause' } </span>
+                                    </button>
+                                    <button 
+                                        className={`flex items-center justify-center gap-1 py-3 px-8 rounded-md`} 
+                                        style={{ background: '#d41d1d' }} 
+                                        onClick={() => {
+                                            console.log('Clicked', job.paused)
+                                            sendToMachine('$Report/interval=50');
+                                            setJob({ ...job, paused: !job.paused });
+                                        }}>
+                                        <OctagonX size={18} strokeWidth={2} color="#FFFFFF"/>
+                                        <span className="text-[#ffffff] font-medium text-[16px]"> Stop </span>
+                                    </button>
                                 </>
                             ): (
                                 <>
