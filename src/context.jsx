@@ -110,7 +110,7 @@ export function useCom() {
 export const CommunicationProvider = ({ children }) => {
     const { canvas } = useCanvas()
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
-    const [ job, setJob ] = useState({ connecting: false, connected: true, started: true, paused: false, percentage: null });
+    const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false, percentage: null });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
@@ -147,7 +147,7 @@ export const CommunicationProvider = ({ children }) => {
         setSetupModal(true);
         if (ws !== null) return;
         try {
-            setJob({ connecting: true, connected: false, started: false })
+            setJob({ ...job, connecting: true, connected: false, started: false })
                 
             const socket = new WebSocket(`ws://${ config.url }:81`, ['arduino']);
             socket.binaryType = 'arraybuffer';
@@ -160,7 +160,7 @@ export const CommunicationProvider = ({ children }) => {
 
     const closeSocket = useCallback(() => {
         setProgress({ uploading: false, converting: false, progress: 0 });
-        setJob({ connecting: false, connected: false, started:  false});
+        setJob({ ...job, connecting: false, connected: false, started:  false });
         setResponse({ ...response, pageId: ''})
         ws?.close();
         setWs(null);
@@ -253,7 +253,7 @@ export const CommunicationProvider = ({ children }) => {
             const bottomLeftDistance = calculateDist(mBottomLeft, dotCenter.x, dotCenter.y);
             const bottomRightDistance = calculateDist(mBottomRight, dotCenter.x, dotCenter.y);
 
-            const shortestDistance = Math.truemin(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
+            const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
 
             if (!snapped && shortestDistance < 80) {
                 snapped = true
@@ -318,7 +318,7 @@ export const CommunicationProvider = ({ children }) => {
         if (!ws) return;
 
         const handleSocketOpen = () => {
-            setJob({ connecting: false, connected: true, started: false });
+            setJob({ ...job, connecting: false, connected: true, started: false });
             setTimeout(() => { setSetupModal(false) }, 3000);
 
             if (!window._keydownListenerAdded) {
@@ -334,18 +334,17 @@ export const CommunicationProvider = ({ children }) => {
                 const [ status, position, feed ] = data.split('|');
                 const sdPercent = data.split('|').pop().includes('SD') ? data.split('|').pop() : null
                 const percentage = sdPercent ? parseInt(sdPercent.split(',')[0].split(':')[1]) : null
-                setJob({ ...job, percentage: percentage })
+                setJob(prev => ({ ...prev, percentage: prev.percentage === 100 ? 100 : percentage }))
 
                 const coords = position.split(':')[1];
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
  
                 // SD:100.00,/sd/job.gcode
-                console.log(
-                    'Data : ', data,
-                    '\nSplits : ', data.split('|'),
-                    '\nSD Percent : ', sdPercent, ' <-> ', percentage
-                );
-                message = '';
+                // console.log(
+                //     'Data : ', data,
+                //     '\nSplits : ', data.split('|'),
+                //     '\nSD Percent : ', sdPercent, ' <-> ', percentage
+                // );
 
                 dotRef.current.set({
                     top: (550 - y) * 96 / 25.4,
@@ -355,18 +354,20 @@ export const CommunicationProvider = ({ children }) => {
 
                 console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
             } else {
-                console.log('Message :-> ', message);
-            }
+                if (message.includes('/job.gcode job sent')) {
+                    console.log('The Indicator found');
+                    setJob({ ...job, connecting: false, connected: true});
+                    setTimeout(() => {
+                        setJob({ ...job, started: false, percentage: null })
+                    }, 5000)
+                }
 
-            if (message.includes('/job.gcode job sent')) {
-                console.log('The Indicator found');
-                setJob({ connecting: false, connected: true, started: false });
-            }
+                setResponse(prev => ({
+                    ...prev,
+                    message: prev.message + message
+                }));
 
-            setResponse(prev => ({
-                ...prev,
-                message: prev.message + message
-            }));
+            }
     
             if (gcode) sendToMachine(gcode);
         }
@@ -421,7 +422,7 @@ export const CommunicationProvider = ({ children }) => {
 
         const handleSocketClose = () => {
             setWs(null);
-            setJob({ connected: false, connecting: false, started: false });
+            setJob({ ...job, connected: false, connecting: false, started: false });
             setResponse(prev => ({ ...prev, message: prev.message + 'Socket Connection Closed ... \n' }));
 
             window.removeEventListener('keydown', handleJog);
@@ -430,7 +431,7 @@ export const CommunicationProvider = ({ children }) => {
 
         const handleSocketError = (err) => {
             console.error('Socket error :-> ', err);
-            setJob({ connected: false, connecting: false, started: false })
+            setJob({ ...job, connected: false, connecting: false, started: false })
         }
 
         ws.onopen = handleSocketOpen;

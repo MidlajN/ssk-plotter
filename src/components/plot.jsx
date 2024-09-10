@@ -265,8 +265,12 @@ export const Plot = () => {
                         <>
                             <div className="w-1/2 bg-gray-200 rounded-full h-1 overflow-hidden">
                                 <div 
-                                    className="h-full transition-all duration-500" 
-                                    style={{ width: `${job.percentage}%`, background: `${job.percentage === 100 ? '#146a7e' : '#F5762E'}` }}
+                                    className="h-full transition-all duration-500 animate-gradientMove" 
+                                    style={{ 
+                                        width: `${job.percentage}%`, 
+                                        background: `${job.percentage === 100 ? '#146a7e' : 'linear-gradient(10deg, #F5762E 40%, #ff925dd1 50%, #F5762E 57%)'}`,
+                                        backgroundSize: '200% 100%'
+                                    }}
                                 />
                             </div>
                             <p className="text-sm font-medium text-[#c5c5c5]">{job.percentage}%</p>
