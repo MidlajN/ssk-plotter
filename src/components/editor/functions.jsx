@@ -186,8 +186,12 @@ export const deleteObject = (canvas) => {
  * A function to select all objects on the canvas.
  */
 export const selectAllObject = (canvas) => {
+    if (!canvas) return;
+    if (['tool', 'Elements', 'Pen', 'Plot'].includes(canvas.mode)) return;
+
     canvas.discardActiveObject();
-    const selection = new fabric.ActiveSelection(canvas.getObjects(), { canvas: canvas });
+    const objects = canvas.getObjects().filter(obj => obj.get('name') !== 'ToolHead');
+    const selection = new fabric.ActiveSelection(objects, { canvas: canvas });
     canvas.setActiveObject(selection);
     canvas.requestRenderAll();
 }
@@ -216,7 +220,7 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
 };
 
 export const info = (canvas) => {
-    if (!canvas.getActiveObject()) return;
+    if (!canvas && !canvas.getActiveObject()) return;
     const activeObject = canvas.getActiveObject();
     console.log('SVG ::: ', activeObject.toSVG())
     canvas.renderAll();

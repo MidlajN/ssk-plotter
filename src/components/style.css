@@ -310,6 +310,7 @@ select#color:focus {
     background-color: #1e263f;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;
+    min-height: 7rem;
 }
 .cut .responses textarea::-webkit-scrollbar {
     display: none;

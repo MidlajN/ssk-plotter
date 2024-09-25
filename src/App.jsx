@@ -55,7 +55,7 @@ export default function Home() {
                   text={'Elements'} 
                   setTool={setTool}
                   setExpanded={setExpanded}
-                  canvasFunction={ () => info(canvas) }
+                  // canvasFunction={ () => info(canvas) }
                 />
               </div>
               <div className="bg-slate-200">
@@ -145,6 +145,8 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
 const useEditorSetup = (canvas, tool, strokeColor, element) => {
   useEffect(() => {
     if (!canvas) return;
+
+    canvas.mode = tool;
 
     const resetCanvas = () => {
       canvas.selection = true;

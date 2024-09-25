@@ -12,7 +12,7 @@ import {
     GripHorizontal,
     X,
     OctagonX,
-    Pause,
+    // Pause,
     Play,
     Info,
     CheckCheck

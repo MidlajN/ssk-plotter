@@ -358,7 +358,7 @@ export const CommunicationProvider = ({ children }) => {
                     console.log('The Indicator found', job);
 
                     // setTimeout(() => { setJob({ ...job, connecting: false, connected: true, percentage: 100 }) }, 5000)
-                    setTimeout(() => { setJob({ ...job, started: false, percentage: null }) }, 10000)
+                    setTimeout(() => { setJob({ ...job, started: false, percentage: null }) }, 7000)
                 }
 
                 setResponse(prev => ({
