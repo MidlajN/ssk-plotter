@@ -26,7 +26,7 @@ import { Converter } from "svg-to-gcode";
 export const Plot = () => {
     const { canvas } = useCanvas();
     const {
-        response, config, setConfig, setupModal, job, setJob, colors,
+        response, config, setConfig, setupModal, job, setJob, colors, setResponse,
         setSetupModal, setProgress,  openSocket, closeSocket, sendToMachine
     } = useCom();
 

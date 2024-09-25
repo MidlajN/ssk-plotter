@@ -67,7 +67,12 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                         // style={{ borderColor: strokeColor }}
                     >
                         <div className="px-6 py-3 rounded-full shadow-md" style={{ backgroundColor: strokeColor }}></div>
-                        <p className="h-fit capitalize text-sm font-medium w-14 text-center drop-shadow" style={{ color: strokeColor }}>{ strokeColor }</p>
+                        <p 
+                            className="h-fit capitalize text-sm font-medium w-14 text-center drop-shadow" 
+                            style={{ color: strokeColor }}
+                        >
+                            { colors.filter(color => color.color === strokeColor).map(color => color.name)[0] }
+                        </p>
                     </div>
                 </div>
 

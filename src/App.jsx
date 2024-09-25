@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Container from "./components/container.jsx";
 import { Default, Import } from "./components/editor/editor";
 import { Plot } from "./components/plot.jsx";
-import useCanvas from "./context.jsx";
+import useCanvas, { useCom } from "./context.jsx";
 import { SideNav } from "./components/sidebar";
 import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
@@ -19,8 +19,14 @@ export default function Home() {
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
-  const [ strokeColor, setStrokeColor ] = useState('Black');
-  const [ element, setElement ] = useState('rectangle')
+  const [ strokeColor, setStrokeColor ] = useState('#000000');
+  const [ element, setElement ] = useState('rectangle');
+
+  // ---- For Debug Purposes ----
+  const { setResponse, response } = useCom();
+  useEffect(() => {
+    setResponse({ ...response, pageId: 0 })
+  }, [])
 
   useEditorSetup(canvas, tool, strokeColor, element);
 

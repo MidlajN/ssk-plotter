@@ -33,6 +33,7 @@ export const CanvasProvider = ({ children }) => {
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
+            centeredRotation: true
         })
 
         setCanvas(fabricCanvas);
@@ -216,6 +217,7 @@ export const CommunicationProvider = ({ children }) => {
 
     useEffect(() => {
         if (response.pageId === '') return;
+
         console.log('Page ID ', response.pageId)
         sendToMachine('$H\n$Report/interval=50');
 
@@ -230,12 +232,17 @@ export const CommunicationProvider = ({ children }) => {
             lockScalingX: true,
             lockScalingY: true,
             lockRotation: true,
-            top: 550 * 96 / 25.4,
-            left: 0,
-            name: 'ToolHead'
+            // top: 550 * 96 / 25.4,
+            // left: 0,
+            top: 600,
+            left: 600,
+            name: 'ToolHead',
+            selectable: false,
+            hoverCursor: 'auto'
         });
 
         let snapped = false;
+
         canvas.on('object:moving', (e) => {
 
             const movingObject = e.target;
@@ -256,27 +263,16 @@ export const CommunicationProvider = ({ children }) => {
             const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
 
             if (!snapped && shortestDistance < 80) {
-                snapped = true
-
                 const horizontalD = mTopRight.x - mTopLeft.x;
                 const verticalD = mBottomLeft.y - mTopLeft.y;
-                console.log(
-                    'horizontal : ', horizontalD, 
-                    '\nvertical : ', verticalD, 
-                    '\nmTopRight : ', mTopRight, 
-                    '\nmTopLeft : ', mTopLeft,
-                    '\nmBottomLeft : ', mBottomLeft
-                );
 
                 if (shortestDistance === topLeftDistance) {
-                    console.log('Short : topLeft - ', topLeftDistance);
                     movingObject.set({
                         left: dotCenter.x,
                         top: dotCenter.y
                     })
                 }
                 else if (shortestDistance === topRightDistance) {
-                    console.log('Short : topRight');
                     movingObject.set({
                         left: dotCenter.x - horizontalD,
                         top: dotCenter.y
@@ -284,28 +280,25 @@ export const CommunicationProvider = ({ children }) => {
                     console.log(movingObject)
                 }
                 else if (shortestDistance === bottomLeftDistance){
-                    console.log('Short : bottomLeft');
                     movingObject.set({
                         left: dotCenter.x,
                         top: dotCenter.y - verticalD
                     })
-                    console.log(movingObject)
                 }
                 else if (shortestDistance === bottomRightDistance) {
-                    console.log('Short : bottomRight');  
                     movingObject.set({
                         left: dotCenter.x - horizontalD,
                         top: dotCenter.y - verticalD
                     })
                 }  
+                movingObject.setCoords();
+                setTimeout(() => { snapped = true }, 500)
             } else {
-                setTimeout(() => { snapped = false }, 200)
+                setTimeout(() => { snapped = false }, 500)
             }
         });
 
-        canvas.on('mouse:up', () => {
-            snapped = false;
-        });
+        canvas.on('mouse:up', () => { snapped = false; });
 
         canvas.add(dotRef.current);
         canvas.renderAll();
