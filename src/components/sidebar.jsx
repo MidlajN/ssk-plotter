@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import useCanvas from "../context";
 import { Boxes, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
-import { split, group, info } from "../components/editor/functions";
+import { split, group } from "../components/editor/functions";
 import { SplitSvg } from "./icons";
 
 export const SideNav = ({ tool, setTool, setExpanded }) => {
@@ -19,7 +19,7 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
           text={'Elements'} 
           setTool={setTool}
           setExpanded={setExpanded}
-          canvasFunction={ () => info(canvas) }
+          // canvasFunction={ () => info(canvas) }
         />
         <SidebarItem 
           icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563' } /> } 

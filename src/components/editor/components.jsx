@@ -41,20 +41,5 @@ export const prebuiltComponents = {
         stroke: 'black',
         strokeWidth: 3,
     }),
-    hexagon: new fabric.Polygon(
-        [
-            { x: 200, y: 10 },
-            { x: 250, y: 50 },
-            { x: 250, y: 100 },
-            { x: 200, y: 150 },
-            { x: 150, y: 100 },
-            { x: 150, y: 50 }
-        ],
-        {
-           fill: "red",
-           left: 140,
-           top: 10,
-        }
-     )
 };
   

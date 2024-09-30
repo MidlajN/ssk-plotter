@@ -10,7 +10,7 @@ import { fabric } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import { SidebarItem } from "./components/sidebar";
 import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil } from "lucide-react";
-import { split, group, info } from "./components/editor/functions.jsx";
+import { split, group } from "./components/editor/functions.jsx";
 import { componentToUrl } from "./components/editor/functions.jsx";
 import { SplitSvg } from "./components/icons.jsx";
 
@@ -22,11 +22,13 @@ export default function Home() {
   const [ strokeColor, setStrokeColor ] = useState('#000000');
   const [ element, setElement ] = useState('rectangle');
 
+
   // ---- For Debug Purposes ----
   const { setResponse, response } = useCom();
-  useEffect(() => {
-    setResponse({ ...response, pageId: 0 })
-  }, [])
+  // useEffect(() => {
+  //   setResponse({ ...response, pageId: 0 })
+  // }, [])
+
 
   useEditorSetup(canvas, tool, strokeColor, element);
 
@@ -160,9 +162,11 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       canvas.defaultCursor = 'auto';
 
       canvas.getObjects().forEach(obj => {
-        obj.set({
-          selectable: true
-        })
+        if (obj.name !== 'ToolHead') {
+          obj.set({
+            selectable: true
+          })
+        }
       });
 
       canvas.off('mouse:down');
