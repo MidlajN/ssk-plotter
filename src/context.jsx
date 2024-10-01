@@ -232,10 +232,10 @@ export const CommunicationProvider = ({ children }) => {
             lockScalingX: true,
             lockScalingY: true,
             lockRotation: true,
-            // top: 550 * 96 / 25.4,
-            // left: 0,
-            top: 600,
-            left: 600,
+            top: 550 * 96 / 25.4,
+            left: 0,
+            // top: 600,
+            // left: 600,
             name: 'ToolHead',
             selectable: false,
             hoverCursor: 'auto'
@@ -277,7 +277,6 @@ export const CommunicationProvider = ({ children }) => {
                         left: dotCenter.x - horizontalD,
                         top: dotCenter.y
                     })
-                    console.log(movingObject)
                 }
                 else if (shortestDistance === bottomLeftDistance){
                     movingObject.set({
@@ -333,11 +332,11 @@ export const CommunicationProvider = ({ children }) => {
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
  
                 // SD:100.00,/sd/job.gcode
-                console.log(
-                    'Data : ', data,
-                    '\nSplits : ', data.split('|'),
-                    '\nSD Percent : ', sdPercent, ' <-> ', percentage
-                );
+                // console.log(
+                //     'Data : ', data,
+                //     '\nSplits : ', data.split('|'),
+                //     '\nSD Percent : ', sdPercent, ' <-> ', percentage
+                // );
 
                 dotRef.current.set({
                     top: (550 - y) * 96 / 25.4,
@@ -345,7 +344,7 @@ export const CommunicationProvider = ({ children }) => {
                 });
                 canvas.renderAll();
 
-                console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
+                // console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
             } else {
                 if (message.includes('/job.gcode job sent')) {
                     console.log('The Indicator found', job);

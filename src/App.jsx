@@ -24,7 +24,7 @@ export default function Home() {
 
 
   // ---- For Debug Purposes ----
-  const { setResponse, response } = useCom();
+  // const { setResponse, response } = useCom();
   // useEffect(() => {
   //   setResponse({ ...response, pageId: 0 })
   // }, [])

@@ -77,12 +77,10 @@ export const Plot = () => {
         const svgElements = returnSvgElements(groupedObjects, canvas.getWidth(), canvas.getHeight());
         sortSvgElements(svgElements, colors);
 
-        console.log('Svg TO Be Converter : ', canvas.toSVG())
         setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
         const gcodes = await convertToGcode(svgElements, colors, config);
-        console.log('G-Code :', gcodes.join('\n'));
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
@@ -253,7 +251,7 @@ export const Plot = () => {
         </div>
         <div 
             className={`
-                absolute lg:z-0 z-10 lg:w-fit h-full bg-white p-5 flex flex-col top-0 transition-all 
+                absolute lg:z-0 z-10 lg:w-fit max-w-[24rem] h-full bg-white p-5 flex flex-col top-0 transition-all 
                 duration-500 ${ config.open ? 'lg:right-96 right-0' : ' -right-96' } 
             `}
         >
