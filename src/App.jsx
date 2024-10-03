@@ -24,10 +24,10 @@ export default function Home() {
 
 
   // ---- For Debug Purposes ----
-  // const { setResponse, response } = useCom();
-  // useEffect(() => {
-  //   setResponse({ ...response, pageId: 0 })
-  // }, [])
+  const { setResponse, response } = useCom();
+  useEffect(() => {
+    setResponse({ ...response, pageId: 0 })
+  }, [])
 
 
   useEditorSetup(canvas, tool, strokeColor, element);

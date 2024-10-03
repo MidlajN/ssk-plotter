@@ -96,7 +96,11 @@ export const Plot = () => {
 
         return () => {
             canvas.selection = true;
-            canvas.getObjects().forEach(obj => obj.set({ selectable: true }));
+            canvas.getObjects().forEach(obj => {
+                if (obj.name !== 'ToolHead') {
+                    obj.set({ selectable: true })
+                }
+            });
         };
     }, [canvas]);
 
