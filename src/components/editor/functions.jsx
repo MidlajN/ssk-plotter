@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import { comma } from 'postcss/lib/list';
+import { act } from 'react';
 import ReactDOMServer from 'react-dom/server'
 
 /**
@@ -40,7 +41,30 @@ export const handleFile = (file, canvas) => {
 export const split = (canvas) => {
     const activeObject = canvas.getActiveObject();
     if (!activeObject || activeObject.get('type') === 'activeSelection') return;
+    let fabricPaths = [];
 
+    const createLine = (x,y, x1, y1) => {
+        const line = new fabric.Line([ x,y, x1, y1 ], {
+            selectable: true,
+            hasControls: true,
+            fill: 'transparent',
+            stroke: 'black',
+            strokeWidth: 1,
+        });
+        fabricPaths.push(line)
+    }
+
+    const createPath = (path) => {
+        const fabricPath = new fabric.Path(path);
+        fabricPath.set({
+            selectable: true,
+            hasControls: true,
+            fill: 'transparent',
+            stroke: 'black',
+            strokeWidth: 1,
+        });
+        fabricPaths.push(fabricPath);
+    }
     
     if (activeObject.get('type') === 'group') {
         activeObject.toActiveSelection();
@@ -49,8 +73,7 @@ export const split = (canvas) => {
         if (activeObject.path) {
             const mainArray = [];
             const paths = activeObject.path;
-            let array = [];
-            let fabricPaths = [];
+            fabricPaths = [];
 
             const multipleMFound = () => {
                 let firstMFound = false;
@@ -67,6 +90,7 @@ export const split = (canvas) => {
             }
 
             if (multipleMFound()) {
+                let array = [];
                 for (let i = 0; i <= paths.length; i++) {
                     const line = paths[i] ? paths[i].join(' ') : null;
                     const command = paths[i] ? paths[i][0] : null;
@@ -79,15 +103,7 @@ export const split = (canvas) => {
                 }
                 for (let i = 0; i < mainArray.length; i++) {
                     if (mainArray[i] !== null) {
-                        const fabricPath = new fabric.Path(mainArray[i]);
-                        fabricPath.set({
-                            selectable: true,
-                            hasControls: true,
-                            fill: 'transparent',
-                            stroke: 'black',
-                            strokeWidth: 0.4,
-                        });
-                        fabricPaths.push(fabricPath);
+                        createPath(mainArray[i])
                     }
                 }
             } else {
@@ -107,79 +123,54 @@ export const split = (canvas) => {
                         lastX = paths[i][paths[i].length - 2];
                         lastY = paths[i][paths[i].length - 1];
                     }
-            
-                    // Create new Fabric.js path
-                    const fabricPath = new fabric.Path(newLine);
-                    fabricPath.set({
-                        selectable: true,
-                        hasControls: true,
-                        fill: 'transparent',
-                        stroke: 'black',
-                        strokeWidth: 0.4,
-                    });
-                    fabricPaths.push(fabricPath);
+
+                    createPath(newLine);
                 }
             }
+        } else if (activeObject.type === 'rect') {
+            fabricPaths = [];
+            const topLeft = { x: activeObject.left, y: activeObject.top };
+            const topRight = { x: activeObject.left + activeObject.width, y: activeObject.top };
+            const bottomLeft = { x: activeObject.left, y: activeObject.top + activeObject.height };
+            const bottomRight = { x: activeObject.left + activeObject.width, y: activeObject.top + activeObject.height };
 
-            
+            createLine(topLeft.x, topLeft.y, topRight.x, topRight.y);
+            createLine(topRight.x, topRight.y, bottomRight.x, bottomRight.y);
+            createLine(bottomRight.x, bottomRight.y,  bottomLeft.x, bottomLeft.y);
+            createLine(bottomLeft.x, bottomLeft.y, topLeft.x, topLeft.y);
 
+        } else if (activeObject.type === 'polygon') {
+            fabricPaths = []
+            const points = activeObject.points;
 
-            console.log('Paths : ', paths)
-            // for (let i = 0; i <= paths.length; i++) {
-            //     const line = paths[i] ? paths[i].join(' ') : null;
-            //     const command = paths[i] ? paths[i][0] : null;
+            for (let i=0; i < points.length; i++) {
+                const start = points[i];
+                const end = points[(i + 1) % points.length];
+                createLine(start.x, start.y, end.x, end.y)
+            }
 
-            //     if (command === 'M' || i === paths.length) {
-            //         if (array.length) mainArray.push(array.join(' '));
-            //         array = []
-            //     }
-            //     array.push(line);
-            // }
-            
-            // let lastX = 0;
-            // let lastY = 0;
-            // for (let i = 0; i < paths.length; i++) {
-            //     const command = paths[i][0];
-            //     let newLine = '';
-        
-            //     if (command === 'M') {
-            //         // Move command (start new contour)
-            //         lastX = paths[i][1];
-            //         lastY = paths[i][2];
-            //         newLine = `M ${lastX} ${lastY}`;
-            //     } else {
-            //         newLine = `M ${lastX} ${lastY} ${paths[i].join(' ')}`;
-            //         lastX = paths[i][paths[i].length - 2];
-            //         lastY = paths[i][paths[i].length - 1];
-            //     }
-        
-            //     // Create new Fabric.js path
-            //     const fabricPath = new fabric.Path(newLine);
-            //     fabricPath.set({
-            //         selectable: true,
-            //         hasControls: true,
-            //         fill: 'transparent',
-            //         stroke: 'black',
-            //         strokeWidth: 0.4,
-            //     });
-            //     fabricPaths.push(fabricPath);
-            // }
+        } else if (activeObject.type === 'triangle') {
+            fabricPaths = [];
+            let left = activeObject.left;
+            let top = activeObject.top;
+            let width = activeObject.width;
+            let height = activeObject.height;
 
-            // let fabricPaths = [];
-            // for (let i = 0; i < mainArray.length; i++) {
-            //     if (mainArray[i] !== null) {
-            //         const fabricPath = new fabric.Path(mainArray[i]);
-            //         fabricPath.set({
-            //             selectable: true,
-            //             hasControls: true,
-            //             fill: 'transparent',
-            //             stroke: 'black',
-            //             strokeWidth: 0.4,
-            //         });
-            //         fabricPaths.push(fabricPath);
-            //     }
-            // }
+            let topX = left + width / 2;
+            let topY = top;
 
+            let bottomLeftX = left;
+            let bottomLeftY = top + height;
+
+            let bottomRightX = left + width;
+            let bottomRightY = top + height;
+
+            createLine(topX, topY, bottomLeftX, bottomLeftY);
+            createLine(bottomLeftX, bottomLeftY, bottomRightX, bottomRightY);
+            createLine(bottomRightX, bottomRightY, topX, topY);
+        }
+
+        if (fabricPaths.length > 0) {
             const selection = new fabric.ActiveSelection(fabricPaths, { canvas: canvas });
             selection.set({
                 top: activeObject.top,
@@ -193,8 +184,6 @@ export const split = (canvas) => {
             canvas.discardActiveObject();
             selection.toActiveSelection();
             canvas.remove(activeObject);
-        } else {
-            console.log('The Element is not a PATH : ', activeObject);
         }
     }
     canvas.renderAll();

@@ -332,11 +332,11 @@ export const CommunicationProvider = ({ children }) => {
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
  
                 // SD:100.00,/sd/job.gcode
-                // console.log(
-                //     'Data : ', data,
-                //     '\nSplits : ', data.split('|'),
-                //     '\nSD Percent : ', sdPercent, ' <-> ', percentage
-                // );
+                console.log(
+                    'Data : ', data,
+                    '\nSplits : ', data.split('|'),
+                    '\nSD Percent : ', sdPercent, ' <-> ', percentage
+                );
 
                 dotRef.current.set({
                     top: (550 - y) * 96 / 25.4,
@@ -344,7 +344,7 @@ export const CommunicationProvider = ({ children }) => {
                 });
                 canvas.renderAll();
 
-                // console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
+                console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
             } else {
                 if (message.includes('/job.gcode job sent')) {
                     console.log('The Indicator found', job);
