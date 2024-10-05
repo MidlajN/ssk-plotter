@@ -9,20 +9,32 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
     return (
       <Sidebar>
         <SidebarItem 
-          icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563' } /> } 
+          icon={ <MousePointer2Icon size={22} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563' } /> } 
           text={'Select'} 
           setTool={setTool} 
           setExpanded={setExpanded}
         />
         <SidebarItem 
-          icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563' }  /> } 
+          icon={ <PenLine size={22} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
+          text={'Lines'} 
+          setTool={setTool} 
+          setExpanded={setExpanded}
+        />
+        <SidebarItem 
+          icon={ <PenTool size={22} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
+          text={'Pen'} 
+          setTool={setTool}
+          setExpanded={setExpanded}
+        />
+        <SidebarItem 
+          icon={ <Boxes size={22} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563' }  /> } 
           text={'Elements'} 
           setTool={setTool}
           setExpanded={setExpanded}
           // canvasFunction={ () => info(canvas) }
         />
         <SidebarItem 
-          icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563' } /> } 
+          icon={ <Group size={22} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563' } /> } 
           text={'Group'} 
           setTool={setTool}
           setExpanded={setExpanded}
@@ -36,25 +48,13 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
           canvasFunction={ () => split(canvas) }
         />
         {/* <SidebarItem 
-          icon={ <Spline size={25} strokeWidth={1.5} color={ tool === 'Curves' ? '#1c8096' : '#4b5563'} /> } 
+          icon={ <Spline size={22} strokeWidth={1.5} color={ tool === 'Curves' ? '#1c8096' : '#4b5563'} /> } 
           text={'Curves'} 
           setTool={setTool}
           setExpanded={setExpanded}
         /> */}
         <SidebarItem 
-          icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
-          text={'Lines'} 
-          setTool={setTool} 
-          setExpanded={setExpanded}
-        />
-        <SidebarItem 
-          icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
-          text={'Pen'} 
-          setTool={setTool}
-          setExpanded={setExpanded}
-        />
-        <SidebarItem 
-          icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
+          icon={ <CloudUpload size={22} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
           text={'Import'} 
           setTool={setTool} 
           setExpanded={setExpanded}
@@ -67,7 +67,7 @@ export default function Sidebar({ children }) {
 return (
     <aside 
       className="
-        h-full w-[3%] min-w-14 max-[900px]:h-fit max-[900px]:absolute max-[900px]:z-50 
+        h-full px- min-w-14 max-[900px]:h-fit max-[900px]:absolute max-[900px]:z-50 
         top-[50%] max-[900px]:transform max-[900px]:-translate-y-[50%] max-[900px]:left-1 
         transition-all duration-500
       "> 
@@ -108,11 +108,9 @@ export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction }
             {icon}
             <div
                 className={`
-                    absolute z-10 md:left-full rounded-md px-2 py-1 ml-6
-                    bg-orange-100 text-orange-800 text-sm
-                    invisible opacity-20 md:-translate-x-3 transition-all
-                    group-hover:visible group-hover:opacity-100 md:group-hover:translate-x-0 
-                    -bottom-4 md:bottom-auto -translate-x-1/2
+                    absolute z-10 md:left-full rounded-md px-2 py-1 lg:ml-6 bg-orange-100 text-orange-800 text-sm invisible opacity-20 
+                    lg:translate-y-0 lg:-translate-x-3 -translate-x-1/2 group-hover:-translate-y-2 -bottom-4 lg:bottom-auto transition-all
+                    group-hover:visible group-hover:opacity-100 lg:group-hover:translate-x-0 lg:group-hover:translate-y-0
                 `}
             >
                 {text}
@@ -121,4 +119,3 @@ export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction }
         </li>
     )
 }
-

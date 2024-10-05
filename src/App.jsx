@@ -22,13 +22,11 @@ export default function Home() {
   const [ strokeColor, setStrokeColor ] = useState('#000000');
   const [ element, setElement ] = useState('rectangle');
 
-
   // ---- For Debug Purposes ----
   const { setResponse, response } = useCom();
   useEffect(() => {
     setResponse({ ...response, pageId: 0 })
   }, [])
-
 
   useEditorSetup(canvas, tool, strokeColor, element);
 
@@ -51,7 +49,7 @@ export default function Home() {
             <div className={`p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center lg:hidden ${ tool !== 'Plot' ? '' : 'hidden' }`}>
               <div className="bg-slate-300 rounded-s-md">
                 <SidebarItem 
-                  icon={ <MousePointer2Icon size={25} strokeWidth={1.5} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
+                  icon={ <MousePointer2Icon size={25} strokeWidth={2.3} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
                   text={'Select'} 
                   setTool={setTool} 
                   setExpanded={setExpanded}
@@ -59,7 +57,7 @@ export default function Home() {
               </div>
               <div className="bg-slate-200">
                 <SidebarItem 
-                  icon={ <Boxes size={25} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
+                  icon={ <Boxes size={25} strokeWidth={1.8} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
                   text={'Elements'} 
                   setTool={setTool}
                   setExpanded={setExpanded}
@@ -68,7 +66,7 @@ export default function Home() {
               </div>
               <div className="bg-slate-200">
                 <SidebarItem 
-                  icon={ <Group size={25} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
+                  icon={ <Group size={25} strokeWidth={2.2} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
                   text={'Group'} 
                   setTool={setTool}
                   setExpanded={setExpanded}
@@ -86,7 +84,7 @@ export default function Home() {
               </div>
               <div className="bg-slate-200">
                 <SidebarItem 
-                  icon={ <PenLine size={25} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
+                  icon={ <PenLine size={25} strokeWidth={2.3} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
                   text={'Lines'} 
                   setTool={setTool} 
                   setExpanded={setExpanded}
@@ -94,7 +92,7 @@ export default function Home() {
               </div>
               <div className="bg-slate-200">
                 <SidebarItem 
-                  icon={ <PenTool size={25} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
+                  icon={ <PenTool size={25} strokeWidth={2} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
                   text={'Pen'} 
                   setTool={setTool}
                   setExpanded={setExpanded}
@@ -102,7 +100,7 @@ export default function Home() {
               </div>
               <div className="bg-slate-200 rounded-e-md">
                 <SidebarItem 
-                  icon={ <CloudUpload size={25} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
+                  icon={ <CloudUpload size={25} strokeWidth={2} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
                   text={'Import'} 
                   setTool={setTool} 
                   setExpanded={setExpanded}
@@ -279,7 +277,6 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
             if (pointer.x < startPointer.x) object.set({ left: pointer.x });
             if (pointer.y < startPointer.y) object.set({ top: pointer.y });
           }
-
           canvas.requestRenderAll();
         }
       });

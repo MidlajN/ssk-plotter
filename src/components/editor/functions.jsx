@@ -1,6 +1,4 @@
 /* eslint-disable no-undef */
-import { comma } from 'postcss/lib/list';
-import { act } from 'react';
 import ReactDOMServer from 'react-dom/server'
 
 /**
