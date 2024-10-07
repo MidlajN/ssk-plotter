@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
 import useCanvas, { useCom } from "../../context";
 import './editor.css';
+import { SetupModal } from "../modal";
 
 
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
@@ -19,28 +20,30 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                 const activeObject = canvas.getActiveObjects();
                 if (activeObject.length === 1) {
                     const color = activeObject[0].get('stroke');
-                    setStrokeColor(color);
+                    if (color) setStrokeColor(color);
                 }
             })
 
-            return () => {
-                canvas.off('mouse:down');
-            }
-        }
-
-    }, [canvas])
-
-    useEffect(() => {
-        if (canvas) {
-            const activeObject = canvas.getActiveObjects();
-            if (activeObject) {
-                activeObject.forEach(obj => {
+            const setUpColor = (objects) => {
+                console.log(objects)
+                objects.forEach(obj => {
+                    if (obj.type === 'group') {
+                        setUpColor(obj.getObjects())
+                    }
                     obj.set('stroke', strokeColor);
                 })
+            }
+
+            let activeObject = canvas.getActiveObjects();
+            if (activeObject) {
+                setUpColor(activeObject);
                 canvas.renderAll();
             }
+
+            return () => canvas.off('mouse:down');
         }
-    }, [strokeColor])
+
+    }, [canvas, strokeColor])
 
     useEffect(() => {
         if (tool === 'Elements') {
