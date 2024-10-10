@@ -26,6 +26,7 @@ export default function Home() {
   const { setResponse, response } = useCom();
   useEffect(() => {
     setResponse({ ...response, pageId: 0 })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEditorSetup(canvas, tool, strokeColor, element);
@@ -57,6 +58,22 @@ export default function Home() {
               </div>
               <div className="bg-slate-200">
                 <SidebarItem 
+                  icon={ <PenLine size={25} strokeWidth={2.3} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Lines'} 
+                  setTool={setTool} 
+                  setExpanded={setExpanded}
+                />
+              </div>
+              <div className="bg-slate-200">
+                <SidebarItem 
+                  icon={ <PenTool size={25} strokeWidth={2} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
+                  text={'Pen'} 
+                  setTool={setTool}
+                  setExpanded={setExpanded}
+                />
+              </div>
+              <div className="bg-slate-200">
+                <SidebarItem 
                   icon={ <Boxes size={25} strokeWidth={1.8} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
                   text={'Elements'} 
                   setTool={setTool}
@@ -82,22 +99,7 @@ export default function Home() {
                   canvasFunction={ () => split(canvas) }
                 />
               </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <PenLine size={25} strokeWidth={2.3} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Lines'} 
-                  setTool={setTool} 
-                  setExpanded={setExpanded}
-                />
-              </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <PenTool size={25} strokeWidth={2} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Pen'} 
-                  setTool={setTool}
-                  setExpanded={setExpanded}
-                />
-              </div>
+              
               <div className="bg-slate-200 rounded-e-md">
                 <SidebarItem 
                   icon={ <CloudUpload size={25} strokeWidth={2} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 

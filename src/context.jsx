@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
@@ -7,7 +8,6 @@ import 'fabric-history';
 
 const CanvasContext = createContext(null);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export default function useCanvas() {
     return useContext(CanvasContext);
 }

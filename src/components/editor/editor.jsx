@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
 import useCanvas, { useCom } from "../../context";
 import './editor.css';
-import { SetupModal } from "../modal";
 
 
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {

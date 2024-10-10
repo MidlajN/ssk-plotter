@@ -2,36 +2,40 @@
 import tinycolor from "tinycolor2";
 import { Converter } from "svg-to-gcode";
 
-
+// TO FIX 
 const returnObjs = (objects) => {
     const newObjects = []
 
-    const processObject = (object, transformMatrix = null) => {
-        if (object.get('type') ===  'group') {
-            object.getObjects().forEach(innerObject => {
-                processObject(innerObject, object.calcTransformMatrix())
-            });
-        } else {
-            object.clone(clonedObject => {
-                if (transformMatrix) {
-                    const originalLeft = clonedObject.left;
-                    const originalTop = clonedObject.top;
+    // const processObject = (object, transformMatrix = null) => {
+    //     if (object.get('type') ===  'group') {
+    //         object.getObjects().forEach(innerObject => {
+    //             processObject(innerObject, object.calcTransformMatrix())
+    //         });
+    //     } else {
+    //         object.clone(clonedObject => {
+    //             if (transformMatrix) {
+    //                 const originalLeft = clonedObject.left;
+    //                 const originalTop = clonedObject.top;
 
-                    clonedObject.set({
-                        left: originalLeft * transformMatrix[0] + originalTop * transformMatrix[2] + transformMatrix[4],
-                        top: originalLeft * transformMatrix[1] + originalTop * transformMatrix[3] + transformMatrix[5],
-                        angle: clonedObject.angle + object.angle,
-                        scaleX: clonedObject.scaleX * object.scaleX,
-                        scaleY: clonedObject.scaleY * object.scaleY
-                    })
-                }
-                newObjects.push(clonedObject);
-            })  
-        }
-    }
+    //                 clonedObject.set({
+    //                     left: originalLeft * transformMatrix[0] + originalTop * transformMatrix[2] + transformMatrix[4],
+    //                     top: originalLeft * transformMatrix[1] + originalTop * transformMatrix[3] + transformMatrix[5],
+    //                     angle: clonedObject.angle + object.angle,
+    //                     scaleX: clonedObject.scaleX * object.scaleX,
+    //                     scaleY: clonedObject.scaleY * object.scaleY
+    //                 })
+    //             }
+    //             newObjects.push(clonedObject);
+    //         })  
+    //     }
+    // }
 
     objects.forEach(obj => {
-        if (obj.get('name') !== 'ToolHead') processObject(obj);
+        if (obj.get('name') !== 'ToolHead') {
+            // console.log(obj.toSVG());
+            // processObject(obj)
+            newObjects.push(obj)
+        }
     })
 
     return newObjects
@@ -59,6 +63,7 @@ export const returnSvgElements = (objects, width, height) => {
 
             objects[stroke].forEach(obj => {
                 const svg = obj.toSVG();
+                console.log('SVG FROM G : ', svg);
                 groupSVG += svg;
             });
         } else {
@@ -103,6 +108,7 @@ export const convertToGcode = async (svgElements, colors, config) => {
             tolerance: 0.1
         }
 
+        console.log('Element From to convertToGcode : ', element.svg)
         const converter = new Converter(settings);
         const [ code ] = await converter.convert(element.svg);
         const gCodeLines = code.split('\n');
