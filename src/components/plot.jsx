@@ -67,26 +67,26 @@ export const Plot = () => {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const plot =  async () => {
-        // setProgress({ uploading: false, converting: true, progress: 10 });
-        // setJob({ ...job, connected: true });
-        // setSetupModal(true);
-        // await delay(500);
+        setProgress({ uploading: false, converting: true, progress: 10 });
+        setJob({ ...job, connected: true });
+        setSetupModal(true);
+        await delay(500);
 
         const groupedObjects = returnGroupedObjects(canvas)
 
         const svgElements = returnSvgElements(groupedObjects, canvas.getWidth(), canvas.getHeight());
         sortSvgElements(svgElements, colors);
 
-        // setProgress({ uploading: false, converting: true, progress: 40 });
-        // await delay(500);
+        setProgress({ uploading: false, converting: true, progress: 40 });
+        await delay(500);
 
         const gcodes = await convertToGcode(svgElements, colors, config);
         console.log('Gcode Generated : \n', gcodes.join('\n'))
 
-        // setProgress({ uploading: false, converting: true, progress: 80 });
-        // await delay(500);
+        setProgress({ uploading: false, converting: true, progress: 80 });
+        await delay(500);
 
-        // uploadToMachine(gcodes);
+        uploadToMachine(gcodes);
     };
 
     useEffect(() => {
@@ -98,7 +98,7 @@ export const Plot = () => {
         return () => {
             canvas.selection = true;
             canvas.getObjects().forEach(obj => {
-                if (obj.name !== 'ToolHead') {
+                if (obj.name !== 'ToolHead' && obj.name !== 'BedSize') {
                     obj.set({ selectable: true })
                 }
             });
@@ -213,7 +213,7 @@ export const Plot = () => {
 
                 <div className="flex w-full min-w-80 items-end justify-between gap-1 pt-2 lg:pt-12">
                     { !job.connected ? (
-                        <ActionButton label={'Ready'} Icon={Plug} onclick={ plot } bgColor={'#0e505c'}/>
+                        <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
                     ) : (
                         <>
                             { job.started ? (

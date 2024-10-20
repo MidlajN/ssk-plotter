@@ -31,9 +31,10 @@ const returnObjs = (objects) => {
     // }
 
     objects.forEach(obj => {
-        if (obj.get('name') !== 'ToolHead') {
+        if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
             // console.log(obj.toSVG());
             // processObject(obj)
+            console.log(obj)
             newObjects.push(obj)
         }
     })
@@ -105,7 +106,13 @@ export const convertToGcode = async (svgElements, colors, config) => {
             feedRate: config.feedRate,
             seekRate: config.seekRate,
             zValue: color.zValue,
-            tolerance: 0.1
+            tolerance: 0.1,
+            ignoreNegative: true,
+            minimumArea: 2.5,
+            bedSize: {
+                width: 420,
+                height: 297
+            }
         }
 
         console.log('Element From to convertToGcode : ', element.svg)
@@ -119,8 +126,16 @@ export const convertToGcode = async (svgElements, colors, config) => {
         cleanedGcodeLines.splice(0, 4);
         cleanedGcodeLines.splice(1, 1);
 
-        return color.command + '\n' + cleanedGcodeLines.join('\n');
+        return color.penPick.join('\n') + '\n' + cleanedGcodeLines.join('\n') + color.penDrop.join('\n');
     }));
 
-    return ['$H', 'G10 L20 P0 X0 Y0 Z0', `G1 F${config.feedRate}`, 'G0 X50Y50\n', ...gcodes, 'G0 X680Y540']
+    return [
+        // '$H', 
+        'G0 X0Y0',
+        'G10 L20 P0 X0 Y0 Z0', 
+        `G0 ${config.jogSpeed}`,
+        `G1 F${config.feedRate} `, 
+        ...gcodes, 
+        'G0 X700Y450Z0'
+    ]
 }

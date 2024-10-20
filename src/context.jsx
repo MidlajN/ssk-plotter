@@ -28,13 +28,36 @@ export const CanvasProvider = ({ children }) => {
         fabric.Object.prototype.noScaleCache = true;
 
         const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-            width: fabric.util.parseUnit('690mm'),
-            height: fabric.util.parseUnit('550mm'),
+            width: fabric.util.parseUnit('680mm'),
+            height: fabric.util.parseUnit('450mm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
             centeredRotation: true
         })
+
+        const rect = new fabric.Rect({
+            stroke: '#000',
+            fill: 'transparent',
+            strokeWidth: 1,
+            width: fabric.util.parseUnit('420mm'),
+            height: fabric.util.parseUnit('297mm'),
+            left: 0,
+            top: fabric.util.parseUnit('152mm'),
+            originY: 'top',
+            strokeDashArray: [3],
+            selectable: false,
+            lockMovementX: true,
+            lockMovementY: true,
+            lockRotation: true,
+            lockScalingX: true,
+            lockScalingY: true,
+            name: 'BedSize',
+            hoverCursor: 'auto'
+        })
+
+        fabricCanvas.add(rect)
+        fabricCanvas.renderAll()
 
         setCanvas(fabricCanvas);
         return () => fabricCanvas.dispose();
@@ -116,21 +139,69 @@ export const CommunicationProvider = ({ children }) => {
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
-        { color: '#ff0000', name: 'Red', zValue: -9, command: "G6.1" },
-        { color: '#ffa500', name: 'Orange', zValue: -9.8, command: "G6.6" },
-        { color: '#000000', name: 'Black', zValue: -10.2, command: "G6.7" },
-        { color: '#227fe3', name: 'Blue', zValue: -9.8, command: "G6.5" },
-        { color: '#ffff00', name: 'Yellow', zValue: -9.5, command: "G6.3" },
-        { color: '#008000', name: 'Green', zValue: -9.9, command: "G6.4" },
-        { color: '#ffc0cb', name: 'Pink', zValue: -9.5, command: "G6.2" },
-        { color: '#a52a2a', name: 'Brown', zValue: -9.5, command: "G6.8" },
+        { 
+            color: '#ffff00', 
+            name: 'Yellow', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X799.9','G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 X799.9Z-16', 'G0 Y50', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ]
+        },
+        { 
+            color: '#008000', 
+            name: 'Green', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X763.3','G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X763.3Z-16', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ]
+        },
+        { 
+            color: '#5e5e5e', 
+            name: 'Gray', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X724.8','G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X724.8Z-16', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ]
+        },
+        { 
+            color: '#227fe3', 
+            name: 'Blue', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X687.3', 'G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X687.3Z-16', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ] 
+        },
+        { 
+            color: '#a020f0', 
+            name: 'Purple', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X650.9', 'G0 Z-26.3', 'G0 Y2.6', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X650.9Z-16', 'G0 Y2.6', 'G0 Z-26.3', 'G0 Y50' ]
+        },
+        { 
+            color: '#ffc0cb', 
+            name: 'Pink', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X612.8','G0 Z-26.3', 'G0 Y2.6', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X612.8Z-16', 'G0 Y2.6', 'G0 Z-26.3', 'G0 Y50' ]
+        },
+        { 
+            color: '#ffa500', 
+            name: 'Orange', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X574.7','G0 Z-26.3', 'G0 Y2.8', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X574.7Z-16', 'G0 Y2.8', 'G0 Z-26.3', 'G0 Y50' ]
+        },
+        { 
+            color: '#ff0000', 
+            name: 'Red', 
+            zValue: -33.4, 
+            penPick: [ 'G0 Y50', 'G0 X536.6','G0 Z-26.3', 'G0 Y2.9', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
+            penDrop: [ 'G0 Y50', 'G0 X536.6Z-16', 'G0 Y2.9', 'G0 Z-26.3', 'G0 Y50' ]
+        },
     ]);
     const [ config, setConfig ] = useState({
-        // url: window.location.hostname,
-        url: '192.168.0.1',
+        url: window.location.hostname,
+        // url: '192.168.0.1',
         feedRate: 10000,
         jogSpeed: 12000,
-        zOffset: 10,
+        zOffset: 5,
         open: false
     });
 
@@ -221,10 +292,10 @@ export const CommunicationProvider = ({ children }) => {
         console.log('Page ID ', response.pageId)
         sendToMachine('$H\n$Report/interval=50');
 
-        dotRef.current = new fabric.Path('M -50,0 L 50,0 M 0,-50 L 0,50 M -25,-25 V-25,25 H25,25 V25,-25 Z', {
-            stroke: '#2a334e28', 
-            strokeWidth: 8,
-            fill: '#2a334e28',
+        dotRef.current = new fabric.Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
+            // stroke: '#2a334e28', 
+            // strokeWidth: 8,
+            fill: '#223265de',
             originX: 'center',
             originY: 'center',
             lockMovementX: true,
@@ -232,7 +303,7 @@ export const CommunicationProvider = ({ children }) => {
             lockScalingX: true,
             lockScalingY: true,
             lockRotation: true,
-            top: 550 * 96 / 25.4,
+            top: 450 * 96 / 25.4,
             left: 0,
             // top: 900,
             // left: 600,
@@ -339,7 +410,7 @@ export const CommunicationProvider = ({ children }) => {
                 );
 
                 dotRef.current.set({
-                    top: (550 - y) * 96 / 25.4,
+                    top: (450 - y) * 96 / 25.4,
                     left: x * 96 / 25.4,
                 });
                 canvas.renderAll();

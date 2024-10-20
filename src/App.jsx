@@ -19,7 +19,7 @@ export default function Home() {
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
-  const [ strokeColor, setStrokeColor ] = useState('#000000');
+  const [ strokeColor, setStrokeColor ] = useState('#5e5e5e');
   const [ element, setElement ] = useState('rectangle');
 
   // ---- For Debug Purposes ----
@@ -162,7 +162,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       canvas.defaultCursor = 'auto';
 
       canvas.getObjects().forEach(obj => {
-        if (obj.name !== 'ToolHead') {
+        if (obj.name !== 'ToolHead' && obj.name !== 'BedSize' ) {
           obj.set({
             selectable: true
           })

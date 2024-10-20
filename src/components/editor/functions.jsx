@@ -285,7 +285,7 @@ export const selectAllObject = (canvas) => {
     if (['tool', 'Elements', 'Pen', 'Plot'].includes(canvas.mode)) return;
 
     canvas.discardActiveObject();
-    const objects = canvas.getObjects().filter(obj => obj.get('name') !== 'ToolHead');
+    const objects = canvas.getObjects().filter(obj => obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize');
     const selection = new fabric.ActiveSelection(objects, { canvas: canvas });
     canvas.setActiveObject(selection);
     canvas.requestRenderAll();
