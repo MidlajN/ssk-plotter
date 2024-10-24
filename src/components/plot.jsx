@@ -20,6 +20,7 @@ import {
 import useCanvas, { useCom } from "../context";
 import { SetupModal } from "./modal";
 import { returnGroupedObjects, returnSvgElements, sortSvgElements, convertToGcode } from "./convert";
+import { motion } from "framer-motion";
 
 
 export const Plot = () => {
@@ -114,18 +115,28 @@ export const Plot = () => {
 
     const JogButton = ({gcode, Icon, className}) => {
         return (
-            <button className={`${className} p-3 bg-[#1C274C] rounded flex justify-center items-center`} onClick={ () => sendToMachine(gcode) }>
+            <motion.button
+                className={`${className} p-3 bg-[#1C274C] rounded flex justify-center items-center`}
+                onClick={ () => sendToMachine(gcode) }
+                whileTap={{ scale: 0.95 }}
+            >
                 <Icon size={20} strokeWidth={gcode === '$H' ? 2 : 4} color={gcode === '$H' ? '#ffffff' : '#F5762E'} />
-            </button>
+            </motion.button>
         )
     }
 
     const ActionButton = ({ label, Icon, onclick, bgColor }) => {
         return (
-            <button className={`flex items-center justify-center gap-1 py-3 px-8 rounded-md`} style={{ background: bgColor }} onClick={ onclick }>
+
+            <motion.button
+                style={{ background: bgColor }}
+                className="flex items-center justify-center gap-1 py-3 px-8 rounded-md"
+                onClick={ onclick }
+                whileTap={{ scale: 0.95,  }}
+            >
                 <Icon size={18} strokeWidth={2} color="#FFFFFF"/>
                 <span className="text-[#ffffff] font-medium text-[16px]"> { label } </span>
-            </button>
+            </motion.button>
         )
     }
 

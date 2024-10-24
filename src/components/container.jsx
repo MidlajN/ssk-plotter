@@ -21,7 +21,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
         <section className={`h-full w-full ${ hideSideBar ? '' : 'lg:w-[97%]' } flex flex-col lg:flex-row canvas-section overflow-hidden relative max-w-[100vw] max-h-[100vh]`}>
             <div className={`canvas ${ expanded ? 'lg:w-[80%] h-full' : 'w-[100%]' } relative overflow-hidden transition-all duration-500`}>
                 <TransformWrapper
-                    initialScale={0.5} 
+                    initialScale={0.4} 
                     maxScale={1}
                     minScale={.3} 
                     limitToBounds={ false }

@@ -292,7 +292,7 @@ export const selectAllObject = (canvas) => {
 }
 
 
-export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) => {
+export const handleKeyDown = ( copiedObject, setCopiedObject, canvas,  ) => (e) => {
     if (e.ctrlKey && e.key === 'c') {
         copyObject(setCopiedObject, canvas);
     } else if (e.ctrlKey && e.key === 'v') {
@@ -305,13 +305,17 @@ export const handleKeyDown = ( copiedObject, setCopiedObject, canvas ) => (e) =>
     } else if (e.ctrlKey && e.key === 'g') {
         group(canvas);
         e.preventDefault();
-    } else if (e.ctrlKey && e.key === 'z') {
-        canvas.undo();
-        e.preventDefault();
-    } else if (e.ctrlKey && e.key === 'y') {
-        canvas.redo();
-        e.preventDefault();
-    }
+    } 
+    // else if (e.ctrlKey && e.key === 'z') {
+    //     // canvas.undo();
+    //     console.log('Undo Clicked', undo)
+    //     undo()
+    //     e.preventDefault();
+    // } else if (e.ctrlKey && e.key === 'y') {
+    //     redo()
+    //     // canvas.redo();
+    //     e.preventDefault();
+    // }
 };
 
 export const info = (canvas) => {

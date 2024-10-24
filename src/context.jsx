@@ -17,7 +17,9 @@ export const CanvasProvider = ({ children }) => {
     const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
-    
+    let undoStack = [];
+    let redoStack = [];
+    let isUndoRedo = false;
 
     useEffect(() => {
         fabric.Object.prototype.cornerStyle = 'circle';
@@ -36,27 +38,6 @@ export const CanvasProvider = ({ children }) => {
             centeredRotation: true
         })
 
-        const rect = new fabric.Rect({
-            stroke: '#000',
-            fill: 'transparent',
-            strokeWidth: 1,
-            width: fabric.util.parseUnit('420mm'),
-            height: fabric.util.parseUnit('297mm'),
-            left: 0,
-            top: fabric.util.parseUnit('152mm'),
-            originY: 'top',
-            strokeDashArray: [3],
-            selectable: false,
-            lockMovementX: true,
-            lockMovementY: true,
-            lockRotation: true,
-            lockScalingX: true,
-            lockScalingY: true,
-            name: 'BedSize',
-            hoverCursor: 'auto'
-        })
-
-        fabricCanvas.add(rect)
         fabricCanvas.renderAll()
 
         setCanvas(fabricCanvas);
@@ -100,13 +81,83 @@ export const CanvasProvider = ({ children }) => {
             })
             canvas.renderAll();
         }
+
     }, [canvas, objectValues]);
 
+    const undo = () => {
+        if (undoStack.length > 0) {
+            const prevState = undoStack.pop();
+            // redoStack.push(prevState)
+            redoStack.push(JSON.stringify(canvas.toJSON()));
+            isUndoRedo = true
+
+            if (prevState) {
+                canvas.loadFromJSON(prevState, () => {
+                    canvas.renderAll();
+                    isUndoRedo = false
+                })
+            }
+        }
+    }
+
+    const redo = () => {
+        if (redoStack.length > 0) {
+            const stateToRedo = redoStack.pop();
+            // undoStack.push(stateToRedo);
+            undoStack.push(JSON.stringify(canvas.toJSON()));
+            isUndoRedo = true
+
+            canvas.loadFromJSON(stateToRedo, () => {
+                canvas.renderAll();
+                isUndoRedo = false
+            })
+        }
+    }
+
     useEffect(() => {
-        window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas ));
+        if (!canvas) return ;
+
+        const saveState = () => {
+            if (isUndoRedo) return;
+            redoStack = [];
+            const currentState = JSON.stringify(canvas.toJSON());
+            undoStack.push(currentState)
+        }
+
+        canvas.on('object:added', saveState);
+        canvas.on('object:modified', saveState);
+        canvas.on('object:removed', saveState);
+
+        // saveState()
+
+        return () => {
+            canvas.off('object:added', saveState);
+            canvas.off('object:modified', saveState);
+            canvas.off('object:removed', saveState);
+        }
+    }, [canvas])
+
+    useEffect(() => {
+        const handleKey = (e) => {
+            if (e.ctrlKey && e.key === 'z') {
+                // canvas.undo();
+                // console.log('Undo Clicked', undo)
+                undo()
+                e.preventDefault();
+            } else if (e.ctrlKey && e.key === 'y') {
+                console.log('Redo Clicked')
+                redo()
+                // canvas.redo();
+                e.preventDefault();
+            } else {
+                handleKeyDown( copiedObject, setCopiedObject, canvas )
+            }
+        }
+        // window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas, undo, redo ));
+        window.addEventListener('keydown', handleKey);
 
         return () => { 
-            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keydown', handleKey);
         };
     }, [canvas, copiedObject]);
 
@@ -143,57 +194,57 @@ export const CommunicationProvider = ({ children }) => {
             color: '#ffff00', 
             name: 'Yellow', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X799.9','G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 X799.9Z-16', 'G0 Y50', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y50', 'G53 X799.9Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y50', 'G53 X799.9Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y50' ]
         },
         { 
             color: '#008000', 
             name: 'Green', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X763.3','G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X763.3Z-16', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y60', 'G53 X763.3Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X763.3Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ]
         },
         { 
             color: '#5e5e5e', 
             name: 'Gray', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X724.8','G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X724.8Z-16', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y60', 'G53 X724.8Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X724.8Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ]
         },
         { 
             color: '#227fe3', 
             name: 'Blue', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X687.3', 'G0 Z-26.3', 'G0 Y1.2', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X687.3Z-16', 'G0 Y1.2', 'G0 Z-26.3', 'G0 Y50' ] 
+            penPick: [ 'G53 Y60', 'G53 X687.3Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X687.3Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ] 
         },
         { 
             color: '#a020f0', 
             name: 'Purple', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X650.9', 'G0 Z-26.3', 'G0 Y2.6', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X650.9Z-16', 'G0 Y2.6', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y60', 'G53 X650.9Z-26.3', 'G53 Y2.6', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X650.9Z-16', 'G53 Y2.6', 'G53 Z-26.3', 'G53 Y60' ]
         },
         { 
             color: '#ffc0cb', 
             name: 'Pink', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X612.8','G0 Z-26.3', 'G0 Y2.6', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X612.8Z-16', 'G0 Y2.6', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y60', 'G53 X612.8Z-26.3', 'G53 Y2.6', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X612.8Z-16', 'G53 Y2.6', 'G53 Z-26.3', 'G53 Y60' ]
         },
         { 
             color: '#ffa500', 
             name: 'Orange', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X574.7','G0 Z-26.3', 'G0 Y2.8', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X574.7Z-16', 'G0 Y2.8', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y60', 'G53 X574.7Z-26.3', 'G53 Y2.8', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X574.7Z-16', 'G53 Y2.8', 'G53 Z-26.3', 'G53 Y60' ]
         },
         { 
             color: '#ff0000', 
             name: 'Red', 
             zValue: -33.4, 
-            penPick: [ 'G0 Y50', 'G0 X536.6','G0 Z-26.3', 'G0 Y2.9', 'G0 Z-16', 'G0 Y60', 'G0 X420' ],
-            penDrop: [ 'G0 Y50', 'G0 X536.6Z-16', 'G0 Y2.9', 'G0 Z-26.3', 'G0 Y50' ]
+            penPick: [ 'G53 Y60', 'G53 X536.6Z-26.3', 'G53 Y2.9', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X536.6Z-16', 'G53 Y2.9', 'G53 Z-26.3', 'G53 Y60' ]
         },
     ]);
     const [ config, setConfig ] = useState({
@@ -290,7 +341,7 @@ export const CommunicationProvider = ({ children }) => {
         if (response.pageId === '') return;
 
         console.log('Page ID ', response.pageId)
-        sendToMachine('$H\n$Report/interval=50');
+        sendToMachine('$Report/interval=50');
 
         dotRef.current = new fabric.Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
             // stroke: '#2a334e28', 
@@ -456,6 +507,13 @@ export const CommunicationProvider = ({ children }) => {
                 switch (true) {
                     case key === 'error' && value === 8:
                         handleSocketMessage('The Machine is in Alarm state \nChanging...\n', '$X');
+                        break;
+                    case key === 'error' && value === 152:
+                        handleSocketMessage('Boot Error \nRestarting...\n', '$bye');
+                        setTimeout(() => {
+                            ws.close();
+                            setJob({ ...job, connected: false})
+                        }, [5000])
                         break;
                     case key === 'ALARM' && value === 1:
                         handleSocketMessage('Hard Limit Triggered \nRe-Homing...\n', '$H');
