@@ -2,9 +2,9 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
-import { fabric } from "fabric";
-import { handleKeyDown } from "./components/editor/functions";
-import 'fabric-history';
+import { FabricObject, Canvas, util, Path } from "fabric";
+import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "./components/editor/functions";
+// import 'fabric-history';
 
 const CanvasContext = createContext(null);
 
@@ -17,55 +17,53 @@ export const CanvasProvider = ({ children }) => {
     const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
+    
     let undoStack = [];
     let redoStack = [];
     let isUndoRedo = false;
 
     useEffect(() => {
-        fabric.Object.prototype.cornerStyle = 'circle';
-        fabric.Object.prototype.cornerColor = '#7f77eb85';
-        fabric.Object.prototype.transparentCorners = false;
-        fabric.Object.prototype.cornerSize = 15;
-        fabric.Object.prototype.borderScaleFactor = 3;
-        fabric.Object.prototype.noScaleCache = true;
+        FabricObject.ownDefaults.cornerStyle = 'circle';
+        FabricObject.ownDefaults.cornerColor = '#7f77eb85';
+        FabricObject.ownDefaults.transparentCorners = false;
+        FabricObject.ownDefaults.cornerSize = 15;
+        FabricObject.ownDefaults.borderScaleFactor = 3;
+        FabricObject.ownDefaults.noScaleCache = true;
 
-        const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-            width: fabric.util.parseUnit('680mm'),
-            height: fabric.util.parseUnit('450mm'),
+        const fabricCanvas = new Canvas(canvasRef.current, {
+            width: util.parseUnit('680mm'),
+            height: util.parseUnit('450mm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
             centeredRotation: true
         })
 
-        fabricCanvas.renderAll()
-
         setCanvas(fabricCanvas);
         return () => fabricCanvas.dispose();
     }, []);
 
+    // useEffect(() => {
+    //     if (canvas === null) return;
 
-    useEffect(() => {
-        if (canvas === null) return;
+    //     canvas.on('object:modified', () => {
+    //         const activeObject = canvas.getActiveObject();
 
-        canvas.on('object:modified', () => {
-            const activeObject = canvas.getActiveObject();
+    //         if (activeObject) {
+    //             const x = parseFloat(activeObject.left.toFixed(2));
+    //             const y = parseFloat(activeObject.top.toFixed(2));
+    //             const scaleX = parseFloat(activeObject.scaleX.toFixed(2));
+    //             const scaleY = parseFloat(activeObject.scaleY.toFixed(2));
+    //             const angle = parseFloat(activeObject.angle.toFixed(2));
 
-            if (activeObject) {
-                const x = parseFloat(activeObject.left.toFixed(2));
-                const y = parseFloat(activeObject.top.toFixed(2));
-                const scaleX = parseFloat(activeObject.scaleX.toFixed(2));
-                const scaleY = parseFloat(activeObject.scaleY.toFixed(2));
-                const angle = parseFloat(activeObject.angle.toFixed(2));
+    //             setObjectValues({ x: x, y: y, scaleX: scaleX, scaleY: scaleY, rotateAngle: angle });
+    //         }
+    //     });
 
-                setObjectValues({ x: x, y: y, scaleX: scaleX, scaleY: scaleY, rotateAngle: angle });
-            }
-        });
-
-        return () => {
-            canvas.off('object:modified');
-        }
-    }, [canvas, objectValues]);
+    //     return () => {
+    //         canvas.off('object:modified');
+    //     }
+    // }, [canvas, objectValues]);
 
     useEffect(() => {
         if (!canvas) return;
@@ -87,48 +85,72 @@ export const CanvasProvider = ({ children }) => {
     const undo = () => {
         if (undoStack.length > 0) {
             const prevState = undoStack.pop();
-            // redoStack.push(prevState)
-            redoStack.push(JSON.stringify(canvas.toJSON()));
+            redoStack.push(prevState)
+            // redoStack.push(JSON.stringify(canvas));
             isUndoRedo = true
 
-            if (prevState) {
-                canvas.loadFromJSON(prevState, () => {
+            console.log(
+                'From Function undo() ',
+                '\nUndo Stack : ', undoStack.length, 
+                '\nRedo Stack : ', redoStack.length,
+                '\nPrevState : ', JSON.parse(prevState),
+                '\nCanvas JSON : ', canvas.toJSON()
+            )
+
+            // canvas.clear();
+            // if (prevState) {
+                canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
                     canvas.renderAll();
-                    isUndoRedo = false
+                    isUndoRedo = false;
                 })
-            }
+            // }
         }
     }
 
     const redo = () => {
         if (redoStack.length > 0) {
             const stateToRedo = redoStack.pop();
-            // undoStack.push(stateToRedo);
-            undoStack.push(JSON.stringify(canvas.toJSON()));
+            // undoStack.push(JSON.stringify(canvas));
+            undoStack.push(stateToRedo);
+            console.log(
+                'From Function redo() ',
+                '\nUndo Stack : ', undoStack.length, 
+                '\nRedo Stack : ', redoStack.length,
+            )
             isUndoRedo = true
-
-            canvas.loadFromJSON(stateToRedo, () => {
+            
+            // canvas.clear();
+            canvas.loadFromJSON(stateToRedo).then(() => {
                 canvas.renderAll();
-                isUndoRedo = false
+                isUndoRedo = false;
             })
         }
     }
 
+    
     useEffect(() => {
         if (!canvas) return ;
 
         const saveState = () => {
             if (isUndoRedo) return;
             redoStack = [];
-            const currentState = JSON.stringify(canvas.toJSON());
-            undoStack.push(currentState)
+            const currentState = JSON.stringify(canvas);
+            undoStack.push(currentState);
+            console.log(
+                'isUndoRedo From saveState() :', isUndoRedo,
+                '\nUndo Stack : ', undoStack.length, 
+                '\nRedo Stack : ', redoStack.length,
+                '\ncanvas JSON : ', canvas.toJSON(),
+                '\nundoStack : ', undoStack,
+                // '\ncurrentState : ', currentState
+            )
         }
+
+        // saveState()
 
         canvas.on('object:added', saveState);
         canvas.on('object:modified', saveState);
         canvas.on('object:removed', saveState);
-
-        // saveState()
 
         return () => {
             canvas.off('object:added', saveState);
@@ -139,20 +161,28 @@ export const CanvasProvider = ({ children }) => {
 
     useEffect(() => {
         const handleKey = (e) => {
-            if (e.ctrlKey && e.key === 'z') {
-                // canvas.undo();
-                // console.log('Undo Clicked', undo)
+            if (e.ctrlKey && e.key === 'c') {
+                copyObject(setCopiedObject, canvas);
+            } else if (e.ctrlKey && e.key === 'v') {
+                pasteObject(copiedObject, canvas);
+            } else if (e.key === 'Delete') {
+                deleteObject(canvas);
+            } else if (e.ctrlKey && e.key === 'a') {
+                selectAllObject(canvas);
+                e.preventDefault();
+            } else if (e.ctrlKey && e.key === 'g') {
+                group(canvas);
+                e.preventDefault();
+            } else if (e.ctrlKey && e.key === 'z') {
                 undo()
                 e.preventDefault();
             } else if (e.ctrlKey && e.key === 'y') {
-                console.log('Redo Clicked')
                 redo()
-                // canvas.redo();
                 e.preventDefault();
-            } else {
-                handleKeyDown( copiedObject, setCopiedObject, canvas )
             }
         }
+
+
         // window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas, undo, redo ));
         window.addEventListener('keydown', handleKey);
 
@@ -343,7 +373,7 @@ export const CommunicationProvider = ({ children }) => {
         console.log('Page ID ', response.pageId)
         sendToMachine('$Report/interval=50');
 
-        dotRef.current = new fabric.Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
+        dotRef.current = new Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
             // stroke: '#2a334e28', 
             // strokeWidth: 8,
             fill: '#223265de',

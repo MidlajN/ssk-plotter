@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import ReactDOMServer from 'react-dom/server'
+import { loadSVGFromString, util } from 'fabric';
 
 /**
  * Handles the uploaded file, loads SVG content, and adds it to the canvas.
@@ -14,8 +15,8 @@ export const handleFile = (file, canvas) => {
     reader.onload = (e) => {
         const svg = e.target.result;
     
-        fabric.loadSVGFromString(svg, (objects, options) => {
-            const obj = fabric.util.groupSVGElements(objects, options);
+        loadSVGFromString(svg, (objects, options) => {
+            const obj = util.groupSVGElements(objects, options);
             console.log("Svg from file -->> \n",objects, options, obj)
 
             // Set styles after object is loaded
@@ -293,19 +294,19 @@ export const selectAllObject = (canvas) => {
 
 
 export const handleKeyDown = ( copiedObject, setCopiedObject, canvas,  ) => (e) => {
-    if (e.ctrlKey && e.key === 'c') {
-        copyObject(setCopiedObject, canvas);
-    } else if (e.ctrlKey && e.key === 'v') {
-        pasteObject(copiedObject, canvas);
-    } else if (e.key === 'Delete') {
-        deleteObject(canvas);
-    } else if (e.ctrlKey && e.key === 'a') {
-        selectAllObject(canvas);
-        e.preventDefault();
-    } else if (e.ctrlKey && e.key === 'g') {
-        group(canvas);
-        e.preventDefault();
-    } 
+    // if (e.ctrlKey && e.key === 'c') {
+    //     copyObject(setCopiedObject, canvas);
+    // } else if (e.ctrlKey && e.key === 'v') {
+    //     pasteObject(copiedObject, canvas);
+    // } else if (e.key === 'Delete') {
+    //     deleteObject(canvas);
+    // } else if (e.ctrlKey && e.key === 'a') {
+    //     selectAllObject(canvas);
+    //     e.preventDefault();
+    // } else if (e.ctrlKey && e.key === 'g') {
+    //     group(canvas);
+    //     e.preventDefault();
+    // } 
     // else if (e.ctrlKey && e.key === 'z') {
     //     // canvas.undo();
     //     console.log('Undo Clicked', undo)

@@ -4,7 +4,9 @@
 import { useEffect, useState } from "react";
 import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
 import useCanvas, { useCom } from "../../context";
+import { loadSVGFromString, util } from "fabric";
 import './editor.css';
+
 
 
 export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
@@ -137,26 +139,39 @@ export function Elements({element, setElement}) {
 
 export function Import() {
     const { canvas } = useCanvas();
-    const handleFile = (file) => {
+    const handleFile = async (file) => {
         if (file.type !== 'image/svg+xml') return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             const svg = e.target.result;
-            fabric.loadSVGFromString(svg, (objects, options) => {
-                objects.forEach(object => {
-                    object.set({
-                        stroke: 'black',
-                        strokeWidth: 1,
-                        fill: 'transparent'
-                    })
+            const loadedSvg = await loadSVGFromString(svg)
+            console.log(loadedSvg)
+            loadedSvg.objects.forEach(obj => {
+                obj.set({
+                    stroke: 'black',
+                    strokeWidth: 1,
+                    fill: 'transparent'
                 })
-                const svgObj = fabric.util.groupSVGElements(objects, options);
-                svgObj.set({ selectable: true, hasControls: true, });
-                console.log("Svg objects from import -->>",objects, options, svgObj)
-                canvas.add(svgObj);
-                canvas.renderAll();
             })
+            const svgObj = util.groupSVGElements(loadedSvg.objects, loadedSvg.options);
+            canvas.add(svgObj);
+            canvas.renderAll();
+            // loadSVGFromString(svg, (objects, options) => {
+            //     console.log(objects)
+            //     objects.forEach(object => {
+            //         object.set({
+            //             stroke: 'black',
+            //             strokeWidth: 1,
+            //             fill: 'transparent'
+            //         })
+            //     })
+            //     const svgObj = util.groupSVGElements(objects, options);
+            //     svgObj.set({ selectable: true, hasControls: true, });
+            //     console.log("Svg objects from import -->>",objects, options, svgObj)
+            //     canvas.add(svgObj);
+            //     canvas.renderAll();
+            // })
         }
         reader.readAsText(file);
     }

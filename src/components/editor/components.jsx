@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import { Polygon, Rect, Ellipse, Triangle } from "fabric";
 
 export const createHexagon = (center, radius) => {
     const points = [];
@@ -9,7 +9,7 @@ export const createHexagon = (center, radius) => {
         });
     }
 
-    return new fabric.Polygon(points, {
+    return new Polygon(points, {
         fill: 'yellow',
         stroke: 'black',
         strokeWidth: 2,
@@ -20,21 +20,21 @@ export const createHexagon = (center, radius) => {
 
 
 export const prebuiltComponents = {
-    rectangle: new fabric.Rect({
+    rectangle: new Rect({
         width: 0,
         height: 0,
         fill: 'transparent',
         stroke: 'black',
         strokeWidth: 3,
     }),
-    circle: new fabric.Ellipse({
+    circle: new Ellipse({
         rx: 0,
         ry: 0,
         fill: 'transparent',
         stroke: 'black',
         strokeWidth:3,
     }),
-    triangle: new fabric.Triangle({
+    triangle: new Triangle({
         width: 0,
         height: 0,
         fill: 'transparent',

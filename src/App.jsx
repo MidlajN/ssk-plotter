@@ -6,7 +6,7 @@ import { Default, Import } from "./components/editor/editor";
 import { Plot } from "./components/plot.jsx";
 import useCanvas, { useCom } from "./context.jsx";
 import { SideNav } from "./components/sidebar";
-import { fabric } from "fabric";
+import { Line } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import { SidebarItem } from "./components/sidebar";
 import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil } from "lucide-react";
@@ -210,7 +210,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
 
         if (!mouseDown) {
           mouseDown = true;
-          line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+          line = new Line([pointer.x, pointer.y, pointer.x, pointer.y], {
             id: 'added-line',
             stroke: strokeColor,
             strokeWidth: 3,
