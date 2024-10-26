@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import ReactDOMServer from 'react-dom/server'
-import { loadSVGFromString, util } from 'fabric';
+import { loadSVGFromString, util, Path, Line, ActiveSelection, Group } from 'fabric';
+// import { object } from 'framer-motion/client';
 
 /**
  * Handles the uploaded file, loads SVG content, and adds it to the canvas.
@@ -37,13 +38,13 @@ export const handleFile = (file, canvas) => {
  *
  * @return {void} No return value
  */
-export const split = (canvas) => {
+export const split = (canvas, saveState) => {
     const activeObject = canvas.getActiveObject();
     if (!activeObject || activeObject.get('type') === 'activeSelection') return;
     let fabricPaths = [];
 
     const createLine = (x,y, x1, y1) => {
-        const line = new fabric.Line([ x,y, x1, y1 ], {
+        const line = new Line([ x,y, x1, y1 ], {
             selectable: true,
             hasControls: true,
             fill: 'transparent',
@@ -54,7 +55,7 @@ export const split = (canvas) => {
     }
 
     const createPath = (path) => {
-        const fabricPath = new fabric.Path(path);
+        const fabricPath = new Path(path);
         fabricPath.set({
             selectable: true,
             hasControls: true,
@@ -66,7 +67,7 @@ export const split = (canvas) => {
     }
     
     if (activeObject.get('type') === 'group') {
-        activeObject.toActiveSelection();
+        canvas.add(...activeObject.removeAll());
         canvas.remove(activeObject);
     } else {
         if (activeObject.path) {
@@ -170,8 +171,10 @@ export const split = (canvas) => {
         }
 
         if (fabricPaths.length > 0) {
-            const selection = new fabric.ActiveSelection(fabricPaths, { canvas: canvas });
-            selection.set({
+            canvas.off('object:added', saveState);
+
+            const group = new Group(fabricPaths);
+            group.set({
                 top: activeObject.top,
                 left: activeObject.left,
                 scaleX: activeObject.scaleX,
@@ -179,10 +182,9 @@ export const split = (canvas) => {
                 angle: activeObject.angle
             });
 
-            console.log('Selection : ', selection)
-            canvas.discardActiveObject();
-            selection.toActiveSelection();
+            canvas.add(...group.removeAll())
             canvas.remove(activeObject);
+            canvas.on('object:added', saveState);
         }
     }
     canvas.renderAll();
@@ -194,7 +196,9 @@ export const split = (canvas) => {
  */
 export const group = (canvas) => {
     const activeObject = canvas.getActiveObject();
-    if (!activeObject || activeObject.get('type') !== 'activeSelection') return;
+    console.log(activeObject.get('type'));
+    if (!activeObject || activeObject.get('type') !== 'activeselection') return;
+    console.log(activeObject.get('type'));
     activeObject.toGroup();
     canvas.renderAll();
 }
@@ -287,7 +291,7 @@ export const selectAllObject = (canvas) => {
 
     canvas.discardActiveObject();
     const objects = canvas.getObjects().filter(obj => obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize');
-    const selection = new fabric.ActiveSelection(objects, { canvas: canvas });
+    const selection = new ActiveSelection(objects, { canvas: canvas });
     canvas.setActiveObject(selection);
     canvas.requestRenderAll();
 }

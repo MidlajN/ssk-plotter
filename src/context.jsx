@@ -82,44 +82,34 @@ export const CanvasProvider = ({ children }) => {
 
     }, [canvas, objectValues]);
 
+    const saveState = () => {
+        if (isUndoRedo) return;
+        redoStack = [];
+        const currentState = JSON.stringify(canvas);
+        console.log('Current State ', JSON.parse(currentState))
+        undoStack.push(currentState);
+        if (undoStack.length > 15) undoStack.shift()
+    }
+
     const undo = () => {
-        if (undoStack.length > 0) {
-            const prevState = undoStack.pop();
-            redoStack.push(prevState)
-            // redoStack.push(JSON.stringify(canvas));
+        if (undoStack.length > 1) {
+            const currentState = undoStack.pop();
+            redoStack.push(currentState)
             isUndoRedo = true
 
-            console.log(
-                'From Function undo() ',
-                '\nUndo Stack : ', undoStack.length, 
-                '\nRedo Stack : ', redoStack.length,
-                '\nPrevState : ', JSON.parse(prevState),
-                '\nCanvas JSON : ', canvas.toJSON()
-            )
-
-            // canvas.clear();
-            // if (prevState) {
-                canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
-                    canvas.renderAll();
-                    isUndoRedo = false;
-                })
-            // }
+            canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
+                canvas.renderAll();
+                isUndoRedo = false;
+            })
         }
     }
 
     const redo = () => {
         if (redoStack.length > 0) {
             const stateToRedo = redoStack.pop();
-            // undoStack.push(JSON.stringify(canvas));
             undoStack.push(stateToRedo);
-            console.log(
-                'From Function redo() ',
-                '\nUndo Stack : ', undoStack.length, 
-                '\nRedo Stack : ', redoStack.length,
-            )
             isUndoRedo = true
             
-            // canvas.clear();
             canvas.loadFromJSON(stateToRedo).then(() => {
                 canvas.renderAll();
                 isUndoRedo = false;
@@ -131,22 +121,7 @@ export const CanvasProvider = ({ children }) => {
     useEffect(() => {
         if (!canvas) return ;
 
-        const saveState = () => {
-            if (isUndoRedo) return;
-            redoStack = [];
-            const currentState = JSON.stringify(canvas);
-            undoStack.push(currentState);
-            console.log(
-                'isUndoRedo From saveState() :', isUndoRedo,
-                '\nUndo Stack : ', undoStack.length, 
-                '\nRedo Stack : ', redoStack.length,
-                '\ncanvas JSON : ', canvas.toJSON(),
-                '\nundoStack : ', undoStack,
-                // '\ncurrentState : ', currentState
-            )
-        }
-
-        // saveState()
+        saveState()
 
         canvas.on('object:added', saveState);
         canvas.on('object:modified', saveState);
@@ -161,6 +136,8 @@ export const CanvasProvider = ({ children }) => {
 
     useEffect(() => {
         const handleKey = (e) => {
+            const keyStroke = e.key.toLowerCase();
+            console.log('keystroke : ', keyStroke)
             if (e.ctrlKey && e.key === 'c') {
                 copyObject(setCopiedObject, canvas);
             } else if (e.ctrlKey && e.key === 'v') {
@@ -182,7 +159,6 @@ export const CanvasProvider = ({ children }) => {
             }
         }
 
-
         // window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas, undo, redo ));
         window.addEventListener('keydown', handleKey);
 
@@ -198,6 +174,7 @@ export const CanvasProvider = ({ children }) => {
                 canvasRef, 
                 objectValues, 
                 setObjectValues, 
+                saveState
             }}
         >
             { children }
@@ -373,6 +350,7 @@ export const CommunicationProvider = ({ children }) => {
         console.log('Page ID ', response.pageId)
         sendToMachine('$Report/interval=50');
 
+        // The Current Undo/Redo Changes the behaviour of this dotRef, ToDO : Rework this method to a different approach
         dotRef.current = new Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
             // stroke: '#2a334e28', 
             // strokeWidth: 8,

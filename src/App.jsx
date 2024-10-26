@@ -6,7 +6,7 @@ import { Default, Import } from "./components/editor/editor";
 import { Plot } from "./components/plot.jsx";
 import useCanvas, { useCom } from "./context.jsx";
 import { SideNav } from "./components/sidebar";
-import { Line } from "fabric";
+import { Line, PencilBrush } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
 import { SidebarItem } from "./components/sidebar";
 import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil } from "lucide-react";
@@ -15,7 +15,7 @@ import { componentToUrl } from "./components/editor/functions.jsx";
 import { SplitSvg } from "./components/icons.jsx";
 
 export default function Home() {
-  const { canvas } = useCanvas();
+  const { canvas, saveState } = useCanvas();
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
@@ -96,7 +96,7 @@ export default function Home() {
                   text={'Split'} 
                   setTool={setTool} 
                   setExpanded={setExpanded}
-                  canvasFunction={ () => split(canvas) }
+                  canvasFunction={ () => split(canvas, saveState) }
                 />
               </div>
               
@@ -185,7 +185,9 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
     }
 
     if (tool === 'Pen') {
+      console.log('strokeColor : ', strokeColor)
       canvas.isDrawingMode = true;
+      canvas.freeDrawingBrush = new PencilBrush(canvas);
       canvas.freeDrawingBrush.color = strokeColor;
       canvas.freeDrawingBrush.width = 3;
 
@@ -206,6 +208,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       let mouseDown = false;
 
       canvas.on('mouse:down', (event) => {
+        canvas.off('object:added')
         const pointer = canvas.getPointer(event.e);
 
         if (!mouseDown) {
@@ -238,6 +241,8 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       canvas.on('mouse:up', () => {
         line.setCoords();
         mouseDown = false;
+        canvas.on('object:added')
+        canvas.fire('object:modified', { target: line });
       });
 
       return resetCanvas;
@@ -250,6 +255,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       let startPointer;
 
       canvas.on('mouse:down', (event) => {
+        canvas.off('object:added')
         mouseDown = true;
         startPointer = canvas.getPointer(event.e);
 
@@ -284,8 +290,10 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       });
 
       canvas.on('mouse:up', () => {
+        canvas.on('object:added')
         object.setCoords();
         mouseDown = false;
+        canvas.fire('object:modified', { target: object });
       });
 
       return resetCanvas;
