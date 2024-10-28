@@ -5,14 +5,11 @@ import Container from "./components/container.jsx";
 import { Default, Import } from "./components/editor/editor";
 import { Plot } from "./components/plot.jsx";
 import useCanvas, { useCom } from "./context.jsx";
-import { SideNav } from "./components/sidebar";
+import { BottomNav, SideNav } from "./components/sidebar";
 import { Line, PencilBrush } from "fabric";
 import { prebuiltComponents } from "./components/editor/components.jsx";
-import { SidebarItem } from "./components/sidebar";
-import { CloudUpload, MousePointer2Icon, Boxes, Group, PenLine, PenTool, Pencil } from "lucide-react";
-import { split, group } from "./components/editor/functions.jsx";
+import { PenTool, Pencil } from "lucide-react";
 import { componentToUrl } from "./components/editor/functions.jsx";
-import { SplitSvg } from "./components/icons.jsx";
 
 export default function Home() {
   const { canvas, saveState } = useCanvas();
@@ -29,7 +26,7 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEditorSetup(canvas, tool, strokeColor, element);
+  useEditorSetup(canvas, tool, strokeColor, element, saveState);
 
   return (
     <>
@@ -47,68 +44,8 @@ export default function Home() {
           </div>
 
           <Container expanded={ expanded } setExpanded={ setExpanded } hideSideBar={ hideSideBar }>
-            <div className={`p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center lg:hidden ${ tool !== 'Plot' ? '' : 'hidden' }`}>
-              <div className="bg-slate-300 rounded-s-md">
-                <SidebarItem 
-                  icon={ <MousePointer2Icon size={25} strokeWidth={2.3} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Select'} 
-                  setTool={setTool} 
-                  setExpanded={setExpanded}
-                />
-              </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <PenLine size={25} strokeWidth={2.3} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Lines'} 
-                  setTool={setTool} 
-                  setExpanded={setExpanded}
-                />
-              </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <PenTool size={25} strokeWidth={2} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Pen'} 
-                  setTool={setTool}
-                  setExpanded={setExpanded}
-                />
-              </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <Boxes size={25} strokeWidth={1.8} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
-                  text={'Elements'} 
-                  setTool={setTool}
-                  setExpanded={setExpanded}
-                  // canvasFunction={ () => info(canvas) }
-                />
-              </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <Group size={25} strokeWidth={2.2} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Group'} 
-                  setTool={setTool}
-                  setExpanded={setExpanded}
-                  canvasFunction={ () => group(canvas) }
-                />
-              </div>
-              <div className="bg-slate-200">
-                <SidebarItem 
-                  icon={ <SplitSvg /> } 
-                  text={'Split'} 
-                  setTool={setTool} 
-                  setExpanded={setExpanded}
-                  canvasFunction={ () => split(canvas, saveState) }
-                />
-              </div>
-              
-              <div className="bg-slate-200 rounded-e-md">
-                <SidebarItem 
-                  icon={ <CloudUpload size={25} strokeWidth={2} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
-                  text={'Import'} 
-                  setTool={setTool} 
-                  setExpanded={setExpanded}
-                />
-              </div>
-            </div>
+            <BottomNav tool={tool} setExpanded={setExpanded} setTool={setTool} />
+
             <div className={ `h-full transition-all duration-[2s] overflow-hidden ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
               { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement} />}
               { tool === 'Import' && <Import /> }
@@ -150,7 +87,7 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
 }
 
 
-const useEditorSetup = (canvas, tool, strokeColor, element) => {
+const useEditorSetup = (canvas, tool, strokeColor, element, saveState) => {
   useEffect(() => {
     if (!canvas) return;
 
@@ -208,7 +145,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       let mouseDown = false;
 
       canvas.on('mouse:down', (event) => {
-        canvas.off('object:added')
+        canvas.off('object:added', saveState)
         const pointer = canvas.getPointer(event.e);
 
         if (!mouseDown) {
@@ -241,7 +178,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       canvas.on('mouse:up', () => {
         line.setCoords();
         mouseDown = false;
-        canvas.on('object:added')
+        canvas.on('object:added', saveState)
         canvas.fire('object:modified', { target: line });
       });
 
@@ -255,7 +192,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       let startPointer;
 
       canvas.on('mouse:down', (event) => {
-        canvas.off('object:added')
+        canvas.off('object:added', saveState)
         mouseDown = true;
         startPointer = canvas.getPointer(event.e);
 
@@ -290,7 +227,7 @@ const useEditorSetup = (canvas, tool, strokeColor, element) => {
       });
 
       canvas.on('mouse:up', () => {
-        canvas.on('object:added')
+        canvas.on('object:added', saveState)
         object.setCoords();
         mouseDown = false;
         canvas.fire('object:modified', { target: object });

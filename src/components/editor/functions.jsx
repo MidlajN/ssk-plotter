@@ -173,14 +173,17 @@ export const split = (canvas, saveState) => {
         if (fabricPaths.length > 0) {
             canvas.off('object:added', saveState);
 
-            const group = new Group(fabricPaths);
-            group.set({
-                top: activeObject.top,
-                left: activeObject.left,
-                scaleX: activeObject.scaleX,
-                scaleY: activeObject.scaleY,
-                angle: activeObject.angle
+            const group = new Group(fabricPaths, {
+                // absolutePositioned: true
             });
+            console.log(group, ...fabricPaths)
+            // group.set({
+            //     top: activeObject.top,
+            //     left: activeObject.left,
+            //     scaleX: activeObject.scaleX,
+            //     scaleY: activeObject.scaleY,
+            //     angle: activeObject.angle
+            // });
 
             canvas.add(...group.removeAll())
             canvas.remove(activeObject);
@@ -194,12 +197,22 @@ export const split = (canvas, saveState) => {
 /**
  * Function to group selected objects together.
  */
-export const group = (canvas) => {
+export const group = (canvas, saveState) => {
     const activeObject = canvas.getActiveObject();
-    console.log(activeObject.get('type'));
+    const objects = activeObject.getObjects();
     if (!activeObject || activeObject.get('type') !== 'activeselection') return;
-    console.log(activeObject.get('type'));
-    activeObject.toGroup();
+
+    canvas.off('object:removed', saveState);
+    objects.forEach(obj => canvas.remove(obj));
+    canvas.discardActiveObject();
+    const group = new Group(objects, {
+        subTargetCheck: true,
+        // interactive: true
+    })
+    canvas.add(group);
+    canvas.setActiveObject(group);
+    canvas.on('object:removed', saveState);
+    
     canvas.renderAll();
 }
 
@@ -296,32 +309,31 @@ export const selectAllObject = (canvas) => {
     canvas.requestRenderAll();
 }
 
-
-export const handleKeyDown = ( copiedObject, setCopiedObject, canvas,  ) => (e) => {
-    // if (e.ctrlKey && e.key === 'c') {
-    //     copyObject(setCopiedObject, canvas);
-    // } else if (e.ctrlKey && e.key === 'v') {
-    //     pasteObject(copiedObject, canvas);
-    // } else if (e.key === 'Delete') {
-    //     deleteObject(canvas);
-    // } else if (e.ctrlKey && e.key === 'a') {
-    //     selectAllObject(canvas);
-    //     e.preventDefault();
-    // } else if (e.ctrlKey && e.key === 'g') {
-    //     group(canvas);
-    //     e.preventDefault();
-    // } 
-    // else if (e.ctrlKey && e.key === 'z') {
-    //     // canvas.undo();
-    //     console.log('Undo Clicked', undo)
-    //     undo()
-    //     e.preventDefault();
-    // } else if (e.ctrlKey && e.key === 'y') {
-    //     redo()
-    //     // canvas.redo();
-    //     e.preventDefault();
-    // }
-};
+// export const handleKeyDown = ( copiedObject, setCopiedObject, canvas,  ) => (e) => {
+//     if (e.ctrlKey && e.key === 'c') {
+//         copyObject(setCopiedObject, canvas);
+//     } else if (e.ctrlKey && e.key === 'v') {
+//         pasteObject(copiedObject, canvas);
+//     } else if (e.key === 'Delete') {
+//         deleteObject(canvas);
+//     } else if (e.ctrlKey && e.key === 'a') {
+//         selectAllObject(canvas);
+//         e.preventDefault();
+//     } else if (e.ctrlKey && e.key === 'g') {
+//         group(canvas);
+//         e.preventDefault();
+//     } 
+//     else if (e.ctrlKey && e.key === 'z') {
+//         // canvas.undo();
+//         console.log('Undo Clicked', undo)
+//         undo()
+//         e.preventDefault();
+//     } else if (e.ctrlKey && e.key === 'y') {
+//         redo()
+//         // canvas.redo();
+//         e.preventDefault();
+//     }
+// };
 
 export const info = (canvas) => {
     if (!canvas && !canvas.getActiveObject()) return;

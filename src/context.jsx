@@ -29,6 +29,8 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.cornerSize = 15;
         FabricObject.ownDefaults.borderScaleFactor = 3;
         FabricObject.ownDefaults.noScaleCache = true;
+        FabricObject.ownDefaults.selectable = true;
+        FabricObject.customProperties = ['name', 'selectable']
 
         const fabricCanvas = new Canvas(canvasRef.current, {
             width: util.parseUnit('680mm'),
@@ -97,6 +99,7 @@ export const CanvasProvider = ({ children }) => {
             redoStack.push(currentState)
             isUndoRedo = true
 
+            console.log('Undo State : ', undoStack[undoStack.length - 1])
             canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
                 canvas.renderAll();
                 isUndoRedo = false;
@@ -427,7 +430,6 @@ export const CommunicationProvider = ({ children }) => {
             }
         });
 
-        canvas.on('mouse:up', () => { snapped = false; });
 
         canvas.add(dotRef.current);
         canvas.renderAll();

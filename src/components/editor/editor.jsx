@@ -32,12 +32,14 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                         setUpColor(obj.getObjects())
                     }
                     obj.set('stroke', strokeColor);
-                })
+                });
+                
             }
 
             let activeObject = canvas.getActiveObjects();
-            if (activeObject) {
+            if (activeObject.length > 0) {
                 setUpColor(activeObject);
+                canvas.fire('object:modified');
                 canvas.renderAll();
             }
 
