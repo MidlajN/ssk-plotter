@@ -277,7 +277,7 @@ export const pasteObject = (copiedObject, canvas) => {
 export const deleteObject = (canvas) => {
     if (canvas && canvas.getActiveObject()) {
         const activeObject = canvas.getActiveObject();
-        if (activeObject.get('type') === 'activeSelection') {
+        if (activeObject.get('type') === 'activeselection') {
             activeObject.forEachObject((obj) => {
                 canvas.remove(obj);
             });

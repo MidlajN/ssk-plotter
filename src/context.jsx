@@ -17,6 +17,8 @@ export const CanvasProvider = ({ children }) => {
     const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
+    // const [ tool, setTool ] = useState('Select');
+    const toolRef = useRef('Select')
     
     let undoStack = [];
     let redoStack = [];
@@ -29,9 +31,9 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.cornerSize = 15;
         FabricObject.ownDefaults.borderScaleFactor = 3;
         FabricObject.ownDefaults.noScaleCache = true;
-        // FabricObject.ownDefaults.selectable = true;
-        FabricObject.customProperties = ['name']
-
+        FabricObject.ownDefaults.strokeUniform = true;
+        FabricObject.customProperties = ['name'];
+        
         const fabricCanvas = new Canvas(canvasRef.current, {
             width: util.parseUnit('680mm'),
             height: util.parseUnit('450mm'),
@@ -41,39 +43,32 @@ export const CanvasProvider = ({ children }) => {
             centeredRotation: true
         })
 
-        // const rect = new Rect({
-        //     width: 100,
-        //     height: 100
-        // });
-        // rect.clone()
-
         fabricCanvas.renderAll()
 
         setCanvas(fabricCanvas);
         return () => fabricCanvas.dispose();
     }, []);
 
-    // useEffect(() => {
-    //     if (canvas === null) return;
+    useEffect(() => {
+        if (!canvas) return;
 
-    //     canvas.on('object:modified', () => {
-    //         const activeObject = canvas.getActiveObject();
+        const updateObjectVals = () => {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject) {
+                const x = parseFloat(activeObject.left.toFixed(2));
+                const y = parseFloat(activeObject.top.toFixed(2));
+                const scaleX = parseFloat(activeObject.scaleX.toFixed(2));
+                const scaleY = parseFloat(activeObject.scaleY.toFixed(2));
+                const angle = parseFloat(activeObject.angle.toFixed(2));
 
-    //         if (activeObject) {
-    //             const x = parseFloat(activeObject.left.toFixed(2));
-    //             const y = parseFloat(activeObject.top.toFixed(2));
-    //             const scaleX = parseFloat(activeObject.scaleX.toFixed(2));
-    //             const scaleY = parseFloat(activeObject.scaleY.toFixed(2));
-    //             const angle = parseFloat(activeObject.angle.toFixed(2));
+                setObjectValues({ x: x, y: y, scaleX: scaleX, scaleY: scaleY, rotateAngle: angle });
+            }
+        }
 
-    //             setObjectValues({ x: x, y: y, scaleX: scaleX, scaleY: scaleY, rotateAngle: angle });
-    //         }
-    //     });
+        canvas.on('object:modified', updateObjectVals);
 
-    //     return () => {
-    //         canvas.off('object:modified');
-    //     }
-    // }, [canvas, objectValues]);
+        return () => canvas.off('object:modified', updateObjectVals);
+    }, [canvas]);
 
     useEffect(() => {
         if (!canvas) return;
@@ -114,6 +109,13 @@ export const CanvasProvider = ({ children }) => {
                         selectable: false
                     })
                 }
+                if (toolRef.current === 'Lines') {
+                    canvas.getObjects().forEach(obj => {
+                        obj.set({
+                            selectable: false
+                        });
+                    });
+                }
                 canvas.renderAll();
                 isUndoRedo = false;
             })
@@ -132,6 +134,13 @@ export const CanvasProvider = ({ children }) => {
                     object.set({
                         selectable: false
                     })
+                }
+                if (toolRef.current === 'Lines') {
+                    canvas.getObjects().forEach(obj => {
+                        obj.set({
+                            selectable: false
+                        });
+                    });
                 }
                 canvas.renderAll();
                 isUndoRedo = false;
@@ -159,23 +168,22 @@ export const CanvasProvider = ({ children }) => {
     useEffect(() => {
         const handleKey = (e) => {
             const keyStroke = e.key.toLowerCase();
-            console.log('keystroke : ', keyStroke)
-            if (e.ctrlKey && e.key === 'c') {
+            if (e.ctrlKey && keyStroke === 'c') {
                 copyObject(setCopiedObject, canvas);
-            } else if (e.ctrlKey && e.key === 'v') {
+            } else if (e.ctrlKey && keyStroke === 'v') {
                 pasteObject(copiedObject, canvas);
-            } else if (e.key === 'Delete') {
+            } else if (keyStroke === 'delete') {
                 deleteObject(canvas);
-            } else if (e.ctrlKey && e.key === 'a') {
+            } else if (e.ctrlKey && keyStroke === 'a') {
                 selectAllObject(canvas);
                 e.preventDefault();
-            } else if (e.ctrlKey && e.key === 'g') {
+            } else if (e.ctrlKey && keyStroke === 'g') {
                 group(canvas);
                 e.preventDefault();
-            } else if (e.ctrlKey && e.key === 'z') {
+            } else if (e.ctrlKey && keyStroke === 'z') {
                 undo()
                 e.preventDefault();
-            } else if (e.ctrlKey && e.key === 'y') {
+            } else if (e.ctrlKey && keyStroke === 'y') {
                 redo()
                 e.preventDefault();
             }
@@ -196,7 +204,8 @@ export const CanvasProvider = ({ children }) => {
                 canvasRef, 
                 objectValues, 
                 setObjectValues, 
-                saveState
+                saveState,
+                toolRef
             }}
         >
             { children }

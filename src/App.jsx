@@ -12,7 +12,7 @@ import { PenTool, Pencil } from "lucide-react";
 import { componentToUrl } from "./components/editor/functions.jsx";
 
 export default function Home() {
-  const { canvas, saveState } = useCanvas();
+  const { canvas, saveState, toolRef } = useCanvas();
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(false);
   const [ hideSideBar, setHideSideBar ] = useState(false);
@@ -26,7 +26,7 @@ export default function Home() {
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
 
-  useEditorSetup(canvas, tool, strokeColor, element, saveState);
+  useEditorSetup(canvas, tool, strokeColor, element, saveState, toolRef);
 
   return (
     <>
@@ -87,11 +87,13 @@ const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
 }
 
 
-const useEditorSetup = (canvas, tool, strokeColor, element, saveState) => {
+const useEditorSetup = (canvas, tool, strokeColor, element, saveState, toolRef) => {
+
   useEffect(() => {
     if (!canvas) return;
 
     canvas.mode = tool;
+    toolRef.current = tool;
 
     const resetCanvas = () => {
       canvas.selection = true;
@@ -235,5 +237,5 @@ const useEditorSetup = (canvas, tool, strokeColor, element, saveState) => {
 
       return resetCanvas;
     }
-  }, [canvas, element, strokeColor, tool])
+  }, [canvas, element, saveState, strokeColor, tool])
 }
