@@ -21,10 +21,10 @@ export default function Home() {
 
   // ---- For Debug Purposes ----
   const { setResponse, response } = useCom();
-  useEffect(() => {
-    setResponse({ ...response, pageId: 0 })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // useEffect(() => {
+  //   setResponse({ ...response, pageId: 0 })
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   useEditorSetup(canvas, tool, strokeColor, element, saveState);
 

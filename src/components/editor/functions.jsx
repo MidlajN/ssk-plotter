@@ -176,7 +176,7 @@ export const split = (canvas, saveState) => {
             const group = new Group(fabricPaths, {
                 // absolutePositioned: true
             });
-            console.log(group, ...fabricPaths)
+            // console.log(group, ...fabricPaths)
             // group.set({
             //     top: activeObject.top,
             //     left: activeObject.left,
@@ -223,14 +223,15 @@ export const group = (canvas, saveState) => {
  * @param {Function} setCopiedObject - A function to set the copied object.
  */
 export const copyObject = (setCopiedObject, canvas) => {
+    console.log('Canvas from the copyObject : ', canvas)
     if (canvas) {
         const activeObject = canvas.getActiveObject();
         if (activeObject) {
-            activeObject.clone((clonedObject) => {
+            activeObject.clone().then((clonedObject) => {
                 canvas.discardActiveObject();
                 setCopiedObject(clonedObject);
-                console.log('Object copied', );
-            });
+                // console.log('Object copied', );
+            })
         } else {
             console.log('No object selected to copy');
         }
@@ -245,34 +246,28 @@ export const copyObject = (setCopiedObject, canvas) => {
  * @return {void} 
  */
 export const pasteObject = (copiedObject, canvas) => {
+    if (!copiedObject) return;
 
-    if (copiedObject) {
-        copiedObject.clone((clonedObject) => {
+    copiedObject.set({
+        left: copiedObject.left + 10,
+        top: copiedObject.top + 10,
+        evented: true,
+    });
 
-            clonedObject.set({
-                left: clonedObject.left + 10,
-                top: clonedObject.top + 10,
-                evented: true,
-            });
-
-            if (clonedObject.get('type') === 'activeSelection') {
-                clonedObject.canvas = canvas;
-                clonedObject.forEachObject((obj) => {
-                    canvas.add(obj);
-                });
-                clonedObject.setCoords();
-            } else {
-                canvas.add(clonedObject);
-            }
-            
-            copiedObject.top += 10;
-            copiedObject.left += 10;
-            canvas.setActiveObject(clonedObject);
-            canvas.requestRenderAll();
+    if (copiedObject.get('type') === 'activeselection') {
+        copiedObject.canvas = canvas;
+        copiedObject.forEachObject((obj) => {
+            canvas.add(obj);
         });
+        copiedObject.setCoords();
     } else {
-        return
+        canvas.add(copiedObject);
     }
+    
+    copiedObject.top += 10;
+    copiedObject.left += 10;
+    canvas.setActiveObject(copiedObject);
+    canvas.requestRenderAll();
 };
 
 

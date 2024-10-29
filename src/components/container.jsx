@@ -13,9 +13,6 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
         objectValues, 
     } = useCanvas();
 
-    const handlePanStart = (e) => {
-
-    }
 
     return (
         <section className={`h-full w-full ${ hideSideBar ? '' : 'lg:w-[97%]' } flex flex-col lg:flex-row canvas-section overflow-hidden relative max-w-[100vw] max-h-[100vh]`}>
@@ -26,7 +23,7 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                     minScale={.3} 
                     limitToBounds={ false }
                     panning={{ excluded: ['fabricCanvas'] }}
-                    onPanningStart={handlePanStart}
+                    // onPanningStart={handlePanStart}
                 >
                     <TransformComponent
                         contentStyle={{  margin:'auto'}} 

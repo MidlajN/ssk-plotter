@@ -2,7 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
-import { FabricObject, Canvas, util, Path } from "fabric";
+import { FabricObject, Canvas, util, Path, Rect } from "fabric";
 import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "./components/editor/functions";
 // import 'fabric-history';
 
@@ -29,8 +29,8 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.cornerSize = 15;
         FabricObject.ownDefaults.borderScaleFactor = 3;
         FabricObject.ownDefaults.noScaleCache = true;
-        FabricObject.ownDefaults.selectable = true;
-        FabricObject.customProperties = ['name', 'selectable']
+        // FabricObject.ownDefaults.selectable = true;
+        FabricObject.customProperties = ['name']
 
         const fabricCanvas = new Canvas(canvasRef.current, {
             width: util.parseUnit('680mm'),
@@ -40,6 +40,14 @@ export const CanvasProvider = ({ children }) => {
             stopContextMenu: true,
             centeredRotation: true
         })
+
+        // const rect = new Rect({
+        //     width: 100,
+        //     height: 100
+        // });
+        // rect.clone()
+
+        fabricCanvas.renderAll()
 
         setCanvas(fabricCanvas);
         return () => fabricCanvas.dispose();
@@ -88,9 +96,9 @@ export const CanvasProvider = ({ children }) => {
         if (isUndoRedo) return;
         redoStack = [];
         const currentState = JSON.stringify(canvas);
-        console.log('Current State ', JSON.parse(currentState))
+        // console.log('Current State ', JSON.parse(currentState))
         undoStack.push(currentState);
-        if (undoStack.length > 15) undoStack.shift()
+        if (undoStack.length > 25) undoStack.shift()
     }
 
     const undo = () => {
@@ -99,8 +107,13 @@ export const CanvasProvider = ({ children }) => {
             redoStack.push(currentState)
             isUndoRedo = true
 
-            console.log('Undo State : ', undoStack[undoStack.length - 1])
             canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
+                const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
+                if (object) {
+                    object.set({
+                        selectable: false
+                    })
+                }
                 canvas.renderAll();
                 isUndoRedo = false;
             })
@@ -114,6 +127,12 @@ export const CanvasProvider = ({ children }) => {
             isUndoRedo = true
             
             canvas.loadFromJSON(stateToRedo).then(() => {
+                const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
+                if (object) {
+                    object.set({
+                        selectable: false
+                    })
+                }
                 canvas.renderAll();
                 isUndoRedo = false;
             })
