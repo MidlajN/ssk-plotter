@@ -13,19 +13,21 @@ export const handleFile = (file, canvas) => {
     if (file && file.type !== 'image/svg+xml') return;
   
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
         const svg = e.target.result;
-    
-        loadSVGFromString(svg, (objects, options) => {
-            const obj = util.groupSVGElements(objects, options);
-            console.log("Svg from file -->> \n",objects, options, obj)
 
-            // Set styles after object is loaded
-            obj.set({ selectable: true, hasControls: true, strokeWidth: 2, stroke: '#fff', fill: '#fff' });
-
-            canvas.add(obj);
-            canvas.renderAll();
-        });
+        const loadedSvg = await loadSVGFromString(svg)
+        console.log(loadedSvg)
+        loadedSvg.objects.forEach(obj => {
+            obj.set({
+                stroke: 'black',
+                strokeWidth: 2,
+                fill: 'transparent'
+            })
+        })
+        const svgObj = util.groupSVGElements(loadedSvg.objects, loadedSvg.options);
+        canvas.add(svgObj);
+        canvas.renderAll();
     };
     reader.readAsText(file);
 };
@@ -62,7 +64,7 @@ export const split = (canvas, saveState) => {
             stroke: 'black',
             strokeWidth: 2,
         });
-        // fabricPath.setCoords()
+        fabricPath.setCoords()
         fabricPaths.push(fabricPath);
     }
     
@@ -111,6 +113,8 @@ export const split = (canvas, saveState) => {
                 console.log('Single M', paths)
                 let lastX = 0;
                 let lastY = 0;
+                let mainMX = 0;
+                let mainMY = 0;
                 for (let i = 0; i < paths.length; i++) {
                     const command = paths[i][0];
                     let newLine = null;
@@ -119,7 +123,11 @@ export const split = (canvas, saveState) => {
                         // Move command (start new contour)
                         lastX = paths[i][1];
                         lastY = paths[i][2];
-                        // newLine = `M ${lastX} ${lastY}`;
+                        mainMX = paths[i][1];
+                        mainMY = paths[i][2];
+
+                    } else if (command === 'Z') {
+                        newLine = `M ${lastX} ${lastY} L ${mainMX} ${mainMY}`
                     } else {
                         newLine = `M ${lastX} ${lastY} ${paths[i].join(' ')}`;
                         lastX = paths[i][paths[i].length - 2];
@@ -175,6 +183,13 @@ export const split = (canvas, saveState) => {
         if (fabricPaths.length > 0) {
             canvas.off('object:added', saveState);
 
+            // fabricPaths.forEach(obj => {
+            //     console.log(
+            //         'Object : ', obj
+            //     )
+            // })
+            // fabricPaths = fabricPaths.filter(obj => (obj.width !== 0 || obj.height !== 0))
+
             const group = new Group(fabricPaths);
             group.set({
                 left: activeObject.left,
@@ -183,9 +198,18 @@ export const split = (canvas, saveState) => {
                 scaleY: activeObject.scaleY,
                 angle: activeObject.angle,
             })
+            group.setCoords()
 
-            // canvas.add(...group.removeAll())
-            canvas.add(group)
+            
+
+            const objects = [...group.removeAll()];
+            console.log(
+                'Group : ', group,
+                '\nObjects : ', objects
+
+            )
+            canvas.add(...objects)
+            // canvas.add(...fabricPaths)
             canvas.remove(activeObject);
             canvas.on('object:added', saveState);
         }
