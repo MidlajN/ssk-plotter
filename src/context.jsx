@@ -2,7 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
-import { FabricObject, Canvas, util, Path, Rect } from "fabric";
+import { FabricObject, Canvas, util, Path } from "fabric";
 import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "./components/editor/functions";
 // import 'fabric-history';
 
@@ -17,7 +17,6 @@ export const CanvasProvider = ({ children }) => {
     const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
-    // const [ tool, setTool ] = useState('Select');
     const toolRef = useRef('Select')
     
     let undoStack = [];
@@ -33,16 +32,15 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.noScaleCache = true;
         FabricObject.ownDefaults.strokeUniform = true;
         FabricObject.customProperties = ['name'];
-        
+         
         const fabricCanvas = new Canvas(canvasRef.current, {
-            width: util.parseUnit('680mm'),
-            height: util.parseUnit('450mm'),
+            width: util.parseUnit('300mm'),
+            height: util.parseUnit('300mm'),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
-            centeredRotation: true
-        })
-
+            centeredRotation: true,
+        });
         fabricCanvas.renderAll()
 
         setCanvas(fabricCanvas);
@@ -66,7 +64,6 @@ export const CanvasProvider = ({ children }) => {
         }
 
         canvas.on('object:modified', updateObjectVals);
-
         return () => canvas.off('object:modified', updateObjectVals);
     }, [canvas]);
 
@@ -91,7 +88,6 @@ export const CanvasProvider = ({ children }) => {
         if (isUndoRedo) return;
         redoStack = [];
         const currentState = JSON.stringify(canvas);
-        // console.log('Current State ', JSON.parse(currentState))
         undoStack.push(currentState);
         if (undoStack.length > 25) undoStack.shift()
     }
@@ -378,7 +374,6 @@ export const CommunicationProvider = ({ children }) => {
     useEffect(() => {
         if (response.pageId === '') return;
 
-        console.log('Page ID ', response.pageId)
         sendToMachine('$Report/interval=50');
 
         // The Current Undo/Redo Changes the behaviour of this dotRef, ToDO : Rework this method to a different approach

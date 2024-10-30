@@ -152,7 +152,7 @@ export function Import() {
             loadedSvg.objects.forEach(obj => {
                 obj.set({
                     stroke: 'black',
-                    strokeWidth: 1,
+                    strokeWidth: 2,
                     fill: 'transparent'
                 })
             })

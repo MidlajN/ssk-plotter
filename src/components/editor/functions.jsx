@@ -21,7 +21,7 @@ export const handleFile = (file, canvas) => {
             console.log("Svg from file -->> \n",objects, options, obj)
 
             // Set styles after object is loaded
-            obj.set({ selectable: true, hasControls: true, strokeWidth: 1, stroke: '#fff', fill: '#fff' });
+            obj.set({ selectable: true, hasControls: true, strokeWidth: 2, stroke: '#fff', fill: '#fff' });
 
             canvas.add(obj);
             canvas.renderAll();
@@ -49,20 +49,20 @@ export const split = (canvas, saveState) => {
             hasControls: true,
             fill: 'transparent',
             stroke: 'black',
-            strokeWidth: 1,
+            strokeWidth: 2,
         });
         fabricPaths.push(line)
     }
 
     const createPath = (path) => {
-        const fabricPath = new Path(path);
-        fabricPath.set({
+        const fabricPath = new Path(path, {
             selectable: true,
             hasControls: true,
             fill: 'transparent',
             stroke: 'black',
-            strokeWidth: 1,
+            strokeWidth: 2,
         });
+        // fabricPath.setCoords()
         fabricPaths.push(fabricPath);
     }
     
@@ -90,11 +90,12 @@ export const split = (canvas, saveState) => {
             }
 
             if (multipleMFound()) {
+                console.log('Multiple M found')
                 let array = [];
                 for (let i = 0; i <= paths.length; i++) {
                     const line = paths[i] ? paths[i].join(' ') : null;
                     const command = paths[i] ? paths[i][0] : null;
-    
+
                     if (command === 'M' || i === paths.length) {
                         if (array.length) mainArray.push(array.join(' '));
                         array = []
@@ -107,24 +108,25 @@ export const split = (canvas, saveState) => {
                     }
                 }
             } else {
+                console.log('Single M', paths)
                 let lastX = 0;
                 let lastY = 0;
                 for (let i = 0; i < paths.length; i++) {
                     const command = paths[i][0];
-                    let newLine = '';
-            
+                    let newLine = null;
+
                     if (command === 'M') {
                         // Move command (start new contour)
                         lastX = paths[i][1];
                         lastY = paths[i][2];
-                        newLine = `M ${lastX} ${lastY}`;
+                        // newLine = `M ${lastX} ${lastY}`;
                     } else {
                         newLine = `M ${lastX} ${lastY} ${paths[i].join(' ')}`;
                         lastX = paths[i][paths[i].length - 2];
                         lastY = paths[i][paths[i].length - 1];
                     }
 
-                    createPath(newLine);
+                    if (newLine) createPath(newLine);
                 }
             }
         } else if (activeObject.type === 'rect') {
@@ -173,19 +175,17 @@ export const split = (canvas, saveState) => {
         if (fabricPaths.length > 0) {
             canvas.off('object:added', saveState);
 
-            const group = new Group(fabricPaths, {
-                // absolutePositioned: true
-            });
-            // console.log(group, ...fabricPaths)
-            // group.set({
-            //     top: activeObject.top,
-            //     left: activeObject.left,
-            //     scaleX: activeObject.scaleX,
-            //     scaleY: activeObject.scaleY,
-            //     angle: activeObject.angle
-            // });
+            const group = new Group(fabricPaths);
+            group.set({
+                left: activeObject.left,
+                top: activeObject.top,
+                scaleX: activeObject.scaleX,
+                scaleY: activeObject.scaleY,
+                angle: activeObject.angle,
+            })
 
-            canvas.add(...group.removeAll())
+            // canvas.add(...group.removeAll())
+            canvas.add(group)
             canvas.remove(activeObject);
             canvas.on('object:added', saveState);
         }
@@ -208,7 +208,7 @@ export const group = (canvas, saveState) => {
     const group = new Group(objects, {
         subTargetCheck: true,
         // interactive: true
-    })
+    });
     canvas.add(group);
     canvas.setActiveObject(group);
     canvas.on('object:removed', saveState);
@@ -223,7 +223,6 @@ export const group = (canvas, saveState) => {
  * @param {Function} setCopiedObject - A function to set the copied object.
  */
 export const copyObject = (setCopiedObject, canvas) => {
-    console.log('Canvas from the copyObject : ', canvas)
     if (canvas) {
         const activeObject = canvas.getActiveObject();
         if (activeObject) {
