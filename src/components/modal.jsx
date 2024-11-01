@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 /* eslint-disable react/prop-types */
 import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
-// import { useEffect } from "react";
 import { X } from "lucide-react";
-import { useCom } from "../context";
+import useCom from "../context/ComContext";
 import { PlotSvg } from "./icons";
 ReactModal.setAppElement('#root');
 

@@ -3,7 +3,8 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
 import { CloudUpload, Square, Circle, Triangle, } from "lucide-react";
-import useCanvas, { useCom } from "../../context";
+import useCanvas from "../../context/CanvasContext";
+import useCom from "../../context/ComContext";
 import { loadSVGFromString, util } from "fabric";
 import './editor.css';
 

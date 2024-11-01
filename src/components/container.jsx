@@ -2,9 +2,9 @@
 // import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { handleFile } from "./editor/functions";
-import './style.css';
-import  useCanvas  from "../context";
+import useCanvas from "../context/CanvasContext";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import './style.css';
 
 export default function Container({ children, expanded, setExpanded, hideSideBar }) {
     const { 
@@ -23,7 +23,6 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                     minScale={.5} 
                     limitToBounds={ false }
                     panning={{ excluded: ['fabricCanvas'] }}
-                    // onPanningStart={handlePanStart}
                 >
                     <TransformComponent
                         contentStyle={{ margin: '3rem 4rem'}} 
@@ -32,12 +31,10 @@ export default function Container({ children, expanded, setExpanded, hideSideBar
                             height: '90vh', 
                             overflow:'visible', 
                             display:'flex', 
-                            // left:'6vw', 
-                            // top:'2rem' 
                         }}
                     >
                         <div 
-                        // className="machine-outer"
+                        className=""
                         >
                             <div 
                                 // className="machine-inner relative"

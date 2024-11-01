@@ -57,14 +57,21 @@ export const split = (canvas, saveState) => {
     }
 
     const createPath = (path) => {
+
         const fabricPath = new Path(path, {
             selectable: true,
             hasControls: true,
             fill: 'transparent',
             stroke: 'black',
             strokeWidth: 2,
+            // strokeLineCap: 'round'
         });
-        fabricPath.setCoords()
+
+        // console.log(
+        //     'Path : ', path,
+        //     '\nPathObject : ', fabricPath
+        // )
+        // // fabricPath.setCoords()
         fabricPaths.push(fabricPath);
     }
     
@@ -127,6 +134,7 @@ export const split = (canvas, saveState) => {
                         mainMY = paths[i][2];
 
                     } else if (command === 'Z') {
+                        if (mainMX === lastX && mainMY === lastY) continue
                         newLine = `M ${lastX} ${lastY} L ${mainMX} ${mainMY}`
                     } else {
                         newLine = `M ${lastX} ${lastY} ${paths[i].join(' ')}`;
@@ -198,7 +206,7 @@ export const split = (canvas, saveState) => {
                 scaleY: activeObject.scaleY,
                 angle: activeObject.angle,
             })
-            group.setCoords()
+            // group.setCoords()
 
             
 
@@ -206,10 +214,9 @@ export const split = (canvas, saveState) => {
             console.log(
                 'Group : ', group,
                 '\nObjects : ', objects
-
             )
-            canvas.add(...objects)
-            // canvas.add(...fabricPaths)
+            // canvas.add(...objects)
+            canvas.add(...fabricPaths)
             canvas.remove(activeObject);
             canvas.on('object:added', saveState);
         }

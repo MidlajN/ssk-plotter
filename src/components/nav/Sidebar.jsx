@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-import useCanvas from "../context";
+import useCanvas from "../../context/CanvasContext";
 import { Boxes, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
-import { split, group } from "../components/editor/functions";
-import { SplitSvg } from "./icons";
+import { split, group } from "../editor/functions";
+import { SplitSvg } from "../icons";
 
 export const SideNav = ({ tool, setTool, setExpanded }) => {
   const { canvas, saveState } = useCanvas();

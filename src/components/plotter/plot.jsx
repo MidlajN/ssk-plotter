@@ -17,8 +17,9 @@ import {
     Info,
     CheckCheck
 } from "lucide-react";
-import useCanvas, { useCom } from "../context";
-import { SetupModal } from "./modal";
+import useCanvas from "../../context/CanvasContext";
+import useCom from "../../context/ComContext";
+import { SetupModal } from "../modal";
 import { returnGroupedObjects, returnSvgElements, sortSvgElements, convertToGcode } from "./convert";
 import { motion } from "framer-motion";
 
@@ -224,7 +225,7 @@ export const Plot = () => {
 
                 <div className="flex w-full min-w-80 items-end justify-between gap-1 pt-2 lg:pt-12">
                     { !job.connected ? (
-                        <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
+                        <ActionButton label={'Ready'} Icon={Plug} onclick={ plot } bgColor={'#0e505c'}/>
                     ) : (
                         <>
                             { job.started ? (
