@@ -1,3 +1,5 @@
+import './nav.css'
+
 // eslint-disable-next-line react/prop-types
 export const NavBar = ({ tool, setTool, setExpanded, setHideSideBar }) => {
     return (

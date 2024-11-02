@@ -1,0 +1,46 @@
+/* ------------------------- navbar ------------------------- */
+.navbar .navDiv {
+    border-bottom: 2px solid #1c7f969c;
+    background-color: #FCFCFF;
+}
+.navbar .navDiv h3 {
+    font-family: "Merriweather Sans", sans-serif;
+    /* font-size: 2vw; */
+    line-height: 36px;
+    letter-spacing: .2em;
+    text-align: left;
+}
+.navbar .navDiv h3 span {
+    font-family: "Julee", cursive;;
+    color: #1c8096;
+    /* font-size: 2.5vw; */
+    line-height: 36px;
+    letter-spacing: 0em;
+    text-align: left;
+}
+.navbar .navDiv .buttonGroup {
+    box-shadow: inset -1px 2px 2px 0px #00000025;
+    background-color: #DFDFDF;
+    border: 1px solid #EDEDED;
+    border-radius: 5rem;
+}
+.navbar .navDiv .buttonGroup button {
+    font-family: "Merriweather Sans", sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: normal;
+    letter-spacing: 0em;
+    text-align: center;
+    font-size: 0.6rem;
+    color: #1C274C;
+    height: fit-content;
+    min-width: 3.5rem;
+}
+.navbar .navDiv .buttonGroup button.active {
+    background-color: #1c8096;
+    color: white;
+    padding: 0.3rem 1rem;
+    margin-block: .3rem;
+    border-radius: 5rem;
+    box-shadow: 2px 2px 3px 0px #00000025;
+}

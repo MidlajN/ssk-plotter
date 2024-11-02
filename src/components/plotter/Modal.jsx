@@ -3,8 +3,8 @@
 import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
 import { X } from "lucide-react";
-import useCom from "../context/ComContext";
-import { PlotSvg } from "./icons";
+import useCom from "../../context/ComContext";
+import { PlotSvg } from "../Icons";
 ReactModal.setAppElement('#root');
 
 export const SetupModal = () => {

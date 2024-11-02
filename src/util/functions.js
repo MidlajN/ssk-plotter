@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-import ReactDOMServer from 'react-dom/server'
 import { loadSVGFromString, util, Path, Line, ActiveSelection, Group } from 'fabric';
 // import { object } from 'framer-motion/client';
 
@@ -365,17 +364,4 @@ export const info = (canvas) => {
     const activeObject = canvas.getActiveObject();
     console.log('SVG ::: ', activeObject.toSVG())
     canvas.renderAll();
-}
-
-export const componentToUrl = (Component, rotationAngle = 0) => {
-    let svgString = ReactDOMServer.renderToStaticMarkup(<Component size={20} strokeWidth={1.5} color={'#4b5563'}  />)
-    svgString = svgString.replace(
-        '<svg ',
-        `<svg transform="rotate(${rotationAngle})" `
-      );
-
-    const blob = new Blob([svgString], { type: 'image/svg+xml'});
-    const url = URL.createObjectURL(blob);
-
-    return url
 }

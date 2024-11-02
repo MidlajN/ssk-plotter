@@ -1,0 +1,91 @@
+ .canvas-section {
+    background-color: #ebebeb;
+    overflow: hidden;
+    position: relative;
+    max-width: 100vw;
+    max-height: 100vh;
+}
+.canvas-section .canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: 0.5s all;
+    /* background: radial-gradient(#878787 0%, transparent 0%) 0% 0% / 0em 0em, repeating-linear-gradient(0deg, transparent 0%, #F9F9FF 7%, #F9F9FF 9%, transparent 10%) 0% 0% / 3em 3em, linear-gradient(45deg, transparent 49%, #ffffff 49%, #878787 51%, transparent 51%) 0% 0% / 3em 3em, linear-gradient(-45deg, transparent 49%, #ffffff 49%, #919191 51%, transparent 51%) 0% 0% / 3em 3em #ffffff; */
+}
+.canvas-section .canvas .toggle {
+    position: absolute;
+    inset-inline: auto;
+    right: 0;
+    /* background-color: #F5762E; */
+    color: white;
+    /* padding: 0.3rem 1rem; */
+    margin-block: .3rem;
+}
+
+@media (max-width: 1024px) {
+    .canvas-section .canvas .toggle {
+        bottom: 0;
+        left: 50%;
+        translate: -50%;
+        right: auto;
+        rotate: 90deg;
+        background-color: rgb(203, 213, 225);
+        padding: 10px;
+        border-radius: 100%;
+        transition: all 0.5s ease;
+    }
+    .canvas-section .canvas button:hover {
+        background-color: rgb(176, 191, 209);
+    }
+}
+
+.canvas-section .canvas .machine-outer {
+    padding: 5rem 5rem 0px 5rem;
+    background-color: #ffffff69;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    /* box-shadow: 0px 0px 3px #a3a3a3; */
+    box-shadow: 4px 4px 14px 4px #a3a3a3;
+}
+.canvas-section .canvas .machine-inner {
+    background-color: #DFDFDF;
+    border-top: 1px solid #ededed;
+    border-left: 1px solid #ededed;
+    border-right: 1px solid #ededed;
+    padding: 4rem 4rem 2rem 8rem;
+    /* padding: 8rem 8rem 5rem 15rem; */
+}
+.canvas-section .canvas .machine-inner::before {
+    content: "";
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    width: 8rem;
+    height: 11rem;
+    z-index: 1;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="81" viewBox="0 0 60 81" fill="none"><rect width="60" height="81" fill="%238E98BC" fill-opacity="0.15"/><rect x="23" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="61" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="37" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="37" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="9" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="39" y="22" width="13" height="10" rx="3" fill="%239BA7D0" fill-opacity="0.48"/><circle cx="16" cy="16" r="10" fill="%238E0000" fill-opacity="0.16"/><path d="M52 12.5C52 16.0899 49.0899 19 45.5 19C41.9101 19 39 16.0899 39 12.5C39 8.91015 41.9101 6 45.5 6C49.0899 6 52 8.91015 52 12.5Z" fill="%239BA7D0" fill-opacity="0.48"/></svg>');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.canvas-section .footer {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    font-size: 13px;
+}
+@media (max-width: 768px) {
+    .canvas-section .footer {
+        justify-content: space-between;
+    }
+}
+.canvas-section .footer div {
+    min-width: 6rem;
+}

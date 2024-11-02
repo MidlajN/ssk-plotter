@@ -3,7 +3,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { FabricObject, Canvas, util } from "fabric";
-import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "../components/editor/functions";
+import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "../util/functions";
 
 const CanvasContext = createContext(null);
 
