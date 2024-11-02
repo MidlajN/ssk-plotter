@@ -1,8 +1,11 @@
 /* eslint-disable react/prop-types */
 import useCanvas from "../../context/CanvasContext";
-import { Boxes, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
+import { Boxes, CloudUpload, Download, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
 import { split, group } from "../../util/functions";
 import { SplitSvg } from "../Icons";
+import { handleFile } from "../../util/functions";
+import './nav.css';
+import { useState } from "react";
 
 export const SideNav = ({ tool, setTool, setExpanded }) => {
   const { canvas, saveState } = useCanvas();
@@ -60,6 +63,33 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
         setExpanded={setExpanded}
       />
     </Sidebar>
+  )
+}
+
+export const TopBar = ({ tool, setTool, setExpanded }) => {
+  const { canvas, saveState } = useCanvas();
+  const [ canvasSize, setCanvasSize ] = useState('A3');
+
+  const handleSelect = (e) => {
+    setCanvasSize(e.target.value)
+  }
+
+  return (
+    <>
+      <div className="topBar">
+        <div className="svgImport">
+          <Download size={20} strokeWidth={3} color={'#a7a7a7'}/>
+          <p>Import</p>
+          <input type="file" onChange={ e => handleFile(e.target.files[0]) } />
+        </div>
+
+        <select value={canvasSize} onChange={handleSelect}>
+          <option value="A3">A3</option>
+          <option value="A4">A4</option>
+          <option value="Custom">Custom</option>
+        </select>
+      </div>
+    </>
   )
 }
 
@@ -140,13 +170,13 @@ export default function Sidebar({ children }) {
 return (
     <aside 
       className="
-        h-full px- min-w-14 max-[900px]:h-fit max-[900px]:absolute max-[900px]:z-50 
+        h-full min-w-14 max-[900px]:h-fit max-[900px]:absolute max-[900px]:z-50 
         top-[50%] max-[900px]:transform max-[900px]:-translate-y-[50%] max-[900px]:left-1 
         transition-all duration-500
       "> 
-    <nav className="h-full flex flex-col bg-white border-r shadow-sm">
-        <ul className="flex-1 py-2">{children}</ul>
-    </nav>
+      <nav className="h-full flex flex-col rounded-lg border border-[#1c809681] bg-white border-r shadow-sm">
+          <ul className="flex-1 py-2">{children}</ul>
+      </nav>
     </aside>
 )
 }
