@@ -56,14 +56,14 @@
     border-radius: 0.5rem;
     border-color: #1c809681;
     background-color: white;
-    padding: 0.25rem 0.5rem;
+    padding: 0.3rem 0.7rem;
 }
 .topBar .svgImport {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 1px 1px;
+    padding: 1px 5px;
     height: fit-content;
     /* border: 1px dashed #dfdfdf; */
     border-radius: 0.5rem;
@@ -82,6 +82,7 @@
 .topBar .svgImport p{
     padding: 0rem 0.5rem;
 }
+
 .topBar select {
     background: white;
     border: 1px dashed #c4c4c4;
@@ -101,4 +102,34 @@
 }
 .topBar select:focus {
     outline: none;
+}
+
+
+.topBar .input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    color: rgb(87, 87, 87);
+}
+.topBar .input input {
+    max-width: 4rem;
+    border: 1px dashed rgba(0, 0, 0, 0.164);
+    /* border-radius: 0.4rem; */
+    padding-inline: 5px;
+    transition: 0.5s all;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    color: #141d3b;
+}
+.topBar .input input::-webkit-inner-spin-button, 
+.topBar .input input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: none;
+}
+.topBar .input input:focus {
+    outline: none;
+    border: 1px solid #1c809681;
 }

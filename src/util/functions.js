@@ -19,7 +19,7 @@ export const handleFile = (file, canvas) => {
         console.log(loadedSvg)
         loadedSvg.objects.forEach(obj => {
             obj.set({
-                stroke: 'black',
+                stroke: '#5e5e5e',
                 strokeWidth: 2,
                 fill: 'transparent'
             })

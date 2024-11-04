@@ -16,6 +16,13 @@ export const CanvasProvider = ({ children }) => {
     const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
+    const [ canvasConfig, setCanvasConfig ] = useState({
+        width: 300,
+        height: 300,
+        orientation: 'vertical',
+        maxWidth: 300,
+        maxHeight: 430
+    })
     const toolRef = useRef('Select')
     
     let undoStack = [];
@@ -33,8 +40,8 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.customProperties = ['name'];
          
         const fabricCanvas = new Canvas(canvasRef.current, {
-            width: util.parseUnit('300mm'),
-            height: util.parseUnit('300mm'),
+            width: util.parseUnit(`${ canvasConfig.width }mm`),
+            height: util.parseUnit(`${ canvasConfig.height }mm`),
             backgroundColor: "white",
             fireRightClick: true,
             stopContextMenu: true,
@@ -196,7 +203,9 @@ export const CanvasProvider = ({ children }) => {
         <CanvasContext.Provider 
             value={{ 
                 canvas, 
-                canvasRef, 
+                canvasRef,
+                canvasConfig, 
+                setCanvasConfig,
                 objectValues, 
                 setObjectValues, 
                 saveState,
