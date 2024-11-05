@@ -1,39 +1,48 @@
 import useCanvas from "../../context/CanvasContext";
 import { useEffect, useState } from "react";
 import { Download, RectangleHorizontal, RectangleVertical, Shrink } from "lucide-react";
+import { util } from "fabric";
 import { handleFile } from "../../util/functions";
 
 export const TopBar = () => {
     const { canvas, canvasConfig, setCanvasConfig } = useCanvas();
-    const [ canvasSize, setCanvasSize ] = useState(null);
+    const [ canvasSize, setCanvasSize ] = useState('Custom');
+
+    const setDimension = (width, height) => {
+        if (!canvas) return;
+        canvas.setWidth(util.parseUnit(`${width}mm`));
+        canvas.setHeight(util.parseUnit(`${height}mm`));
+    }
 
     const handleSelect = (e) => {
         const selected = e.target.value;
         if (selected === 'A4') {
             setCanvasConfig(prev => ({
                 ...prev,
-                width: 210,
-                height: 297,
+                height: 210,
+                width: 297,
             }));
         } else if (selected === 'A3') {
             setCanvasConfig(prev => ({
                 ...prev,
-                width: 297,
-                height: 420,
+                height: 297,
+                width: 420,
             }));
         }
         setCanvasSize(e.target.value)
     }
 
     useEffect(() => {
-        if (canvasConfig.width === 210 && canvasConfig.height === 297) {
+        if (canvasConfig.height === 210 && canvasConfig.width === 297) {
             setCanvasSize('A4');
-        } else if (canvasConfig.width === 297 && canvasConfig.height === 420) {
+        } else if (canvasConfig.height === 297 && canvasConfig.width === 420) {
             setCanvasSize('A3');
         } else {
             setCanvasSize('Custom')
         }
-    }, [canvasConfig, ])
+        setDimension(canvasConfig.width, canvasConfig.height);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [canvasConfig])
 
     return (
         <>
@@ -65,7 +74,7 @@ export const TopBar = () => {
                             }
                         }}
                     />
-                    <p>mm</p>
+                    <p className="text-sm">mm</p>
                 </div>
 
                 <div className="input">
@@ -83,10 +92,10 @@ export const TopBar = () => {
                             }
                         }}
                     />
-                    <p>mm</p>
+                    <p className="text-sm">mm</p>
                 </div>
 
-                <div className="flex gap-1">
+                {/* <div className="flex gap-1">
                     <div 
                         className={
                             `w-7 h-6 flex items-center justify-center cursor-pointer
@@ -106,11 +115,11 @@ export const TopBar = () => {
                         >
                         <RectangleVertical size={18} strokeWidth={1} color={'#000'}/>
                     </div>
-                </div>
+                </div> */}
 
-                <div className="pr-1">
+                {/* <div className="pr-1">
                     <Shrink size={18} strokeWidth={1.6} color={'#000'}/>
-                </div>
+                </div> */}
             </div>
         </>
     )

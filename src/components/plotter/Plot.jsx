@@ -24,7 +24,6 @@ import { returnGroupedObjects, returnSvgElements, sortSvgElements, convertToGcod
 import { motion } from "framer-motion";
 import './plotter.css'
 
-
 export const Plot = () => {
     const { canvas } = useCanvas();
     const {

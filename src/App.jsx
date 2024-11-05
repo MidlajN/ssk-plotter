@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Default, Import } from "./components/editor/Editor.jsx";
 import { Plot } from "./components/plotter/Plot.jsx";
 import useCanvas from "./context/CanvasContext.jsx";
@@ -8,13 +8,16 @@ import { BottomNav, SideNav } from "./components/nav/Sidebar.jsx";
 import { TopBar } from "./components/nav/Topbar.jsx";
 import { useEditorSetup } from "./components/editor/useEditorSetup.jsx";
 import { NavBar } from "./components/nav/Navbar.jsx";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
+import { Canvas, FabricObject, util } from "fabric";
 
 export default function Home() {
-  const { canvas, saveState, toolRef, canvasRef, objectValues } = useCanvas();
+  const { canvas, saveState, toolRef, canvasRef, objectValues, plotterRef } = useCanvas();
+
+  const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
   const [ hideSideBar, setHideSideBar ] = useState(false);
@@ -27,6 +30,54 @@ export default function Home() {
   //   setResponse({ ...response, pageId: 0 })
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
+
+  useEffect(() => {
+    if (tool === 'Plot') {
+      if (transformRef.current) transformRef.current.resetTransform();
+      
+      FabricObject.ownDefaults.hasControls = false;
+      FabricObject.ownDefaults.borderDashArray = [15];
+
+      const plotterCanvas = new Canvas(plotterRef.current, {
+        width: util.parseUnit(`430mm`),
+        height: util.parseUnit(`310mm`),
+        backgroundColor: "white",
+        fireRightClick: true,
+        stopContextMenu: true,
+        centeredRotation: true,
+        selectionDashArray: [10],
+        selectionBorderColor: '#095262',
+        selectionColor: '',
+        controlsAboveOverlay: false
+      });
+
+      const objects = canvas.getObjects();
+      objects.forEach((obj) => {
+        obj.clone().then(clonedObj => {
+          clonedObj.set({
+            lockRotation: true,
+            lockScalingX: true,
+            lockScalingY: true,
+            borderDashArray: [13],
+            cornerSize: 0,
+            hasControls: false
+          })
+          plotterCanvas.add(clonedObj)
+        })
+      })
+
+      plotterCanvas.renderAll()
+
+      return () => {
+        plotterCanvas.dispose();
+        FabricObject.ownDefaults.hasControls = true;
+        FabricObject.ownDefaults.borderDashArray = [0]
+      }
+    } else if (canvas){
+      canvas.renderAll()
+    }
+
+  }, [tool])
 
   useEditorSetup(canvas, tool, strokeColor, element, saveState, toolRef);
 
@@ -48,28 +99,39 @@ export default function Home() {
           <div className="canvas-section flex flex-col lg:flex-row">
             <div className={`canvas ${ expanded ? 'lg:w-[80%] h-full' : 'w-[100%]' }`}>
               <TransformWrapper
-                initialScale={0.65} 
-                maxScale={1}
+                initialScale={0.6} 
+                maxScale={3}
                 minScale={.5} 
-                limitToBounds={ false }
+                limitToBounds={ true }
                 panning={{ excluded: ['fabricCanvas'] }}
+                // centerZoomedOut
+                centerOnInit
+                ref={transformRef}
               >
-                  <TransformComponent
-                    contentStyle={{ margin: '3rem 4rem'}} 
-                    wrapperStyle={{  
-                      width: '96vw', 
-                      height: '90vh', 
-                      overflow:'visible', 
-                      display:'flex', 
-                    }}
+                <TransformComponent
+                  wrapperStyle={{  
+                    width: '96vw', 
+                    height: '90vh', 
+                    overflow:'visible', 
+                    // display:'flex', 
+                  }}
+                  contentStyle={{ 
+                    margin: '',
+                  }} 
+                  
+                  
+                >
+                  <div style={{ display: tool === 'Plot' ? 'block' : 'none'}}>
+                    <canvas ref={ plotterRef } className="fabricCanvas"></canvas>
+                  </div>
+                  <div 
+                    onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0], canvas) } } 
+                    onDragOver={ e => { e.preventDefault(); } }
+                    style={{ display: tool !== 'Plot' ? 'block' : 'none'}}
                   >
-                    <div 
-                      onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0], canvas) } } 
-                      onDragOver={ e => { e.preventDefault(); } }
-                    >
-                      <canvas ref={ canvasRef } className="fabricCanvas"></canvas>
-                    </div>
-                  </TransformComponent>
+                    <canvas ref={ canvasRef } className="fabricCanvas"></canvas>
+                  </div>
+                </TransformComponent>
               </TransformWrapper>
 
               <button className="toggle" onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>

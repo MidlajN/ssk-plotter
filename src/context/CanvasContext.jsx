@@ -13,6 +13,7 @@ export default function useCanvas() {
 
 export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
+    const plotterRef = useRef(null)
     const [ canvas, setCanvas ] = useState(null);
     const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
@@ -20,8 +21,8 @@ export const CanvasProvider = ({ children }) => {
         width: 300,
         height: 300,
         orientation: 'vertical',
-        maxWidth: 300,
-        maxHeight: 430
+        maxWidth: 430,
+        maxHeight: 330
     })
     const toolRef = useRef('Select')
     
@@ -38,6 +39,7 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.noScaleCache = true;
         FabricObject.ownDefaults.strokeUniform = true;
         FabricObject.customProperties = ['name'];
+
          
         const fabricCanvas = new Canvas(canvasRef.current, {
             width: util.parseUnit(`${ canvasConfig.width }mm`),
@@ -209,7 +211,8 @@ export const CanvasProvider = ({ children }) => {
                 objectValues, 
                 setObjectValues, 
                 saveState,
-                toolRef
+                toolRef,
+                plotterRef
             }}
         >
             { children }
