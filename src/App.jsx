@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import { Default, Import } from "./components/editor/Editor.jsx";
+import { Editor, Import } from "./components/editor/Editor.jsx";
 import { Plot } from "./components/plotter/Plot.jsx";
 import useCanvas from "./context/CanvasContext.jsx";
 import { BottomNav, SideNav } from "./components/nav/Sidebar.jsx";
 import { TopBar } from "./components/nav/Topbar.jsx";
 import { useEditorSetup } from "./components/editor/useEditorSetup.jsx";
 import { NavBar } from "./components/nav/Navbar.jsx";
-import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
@@ -92,17 +92,23 @@ export default function Home() {
         />
 
         <div className="h-[91%] bg-[#ebebeb] relative"> 
-          <div className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' } absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}>
+          <div 
+            // className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' } absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}
+            className={`block lg:block absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}
+          >
             <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
           </div>
 
-          <div className="canvas-section flex flex-col lg:flex-row">
-            <div className={`canvas ${ expanded ? 'lg:w-[80%] h-full' : 'w-[100%]' }`}>
+          <div 
+            // className="canvas-section flex flex-col lg:flex-row"
+            className="canvas-section flex flex-row"
+          >
+            <div className={`canvas ${ expanded ? 'lg:w-[83%]' : 'w-[100%]' }`}>
               <TransformWrapper
                 initialScale={0.6} 
                 maxScale={3}
                 minScale={.5} 
-                limitToBounds={ true }
+                limitToBounds={ false }
                 panning={{ excluded: ['fabricCanvas'] }}
                 // centerZoomedOut
                 centerOnInit
@@ -110,19 +116,24 @@ export default function Home() {
               >
                 <TransformComponent
                   wrapperStyle={{  
-                    width: '96vw', 
-                    height: '90vh', 
+                    width: '100%', 
+                    height: '100%', 
                     overflow:'visible', 
                     // display:'flex', 
                   }}
                   contentStyle={{ 
                     margin: '',
-                  }} 
-                  
-                  
+                  }}  
                 >
-                  <div style={{ display: tool === 'Plot' ? 'block' : 'none'}}>
-                    <canvas ref={ plotterRef } className="fabricCanvas"></canvas>
+                  <div 
+                    className="machine-outer"
+                    style={{ display: tool === 'Plot' ? 'block' : 'none'}}
+                  >
+                    <div className="machine-inner">
+                      <div className="machine-bed">
+                        <canvas ref={ plotterRef } className="fabricCanvas"></canvas>
+                      </div>
+                    </div>
                   </div>
                   <div 
                     onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0], canvas) } } 
@@ -134,17 +145,18 @@ export default function Home() {
                 </TransformComponent>
               </TransformWrapper>
 
-              <button className="toggle" onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>
+              <button className="toggle lg:hidden" onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>
               <div className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' } absolute top-3 left-1/2 -translate-x-1/2 z-10 h-fit w-fit`}>
                 <TopBar tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
               </div>
             </div>
 
-            <div className={`${ expanded ? '  min-[1300px]:w-[20%] lg:w-[45%]' : 'lg:w-[0]' } bg-white transition-all duration-500 lg:overflow-hidden`}>
-              <BottomNav tool={tool} setExpanded={setExpanded} setTool={setTool} />
+            <div 
+              className={`${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500 lg:overflow-hidden lg:border-l-2 border-[#1c7f969c]`}
+            >
 
               <div className={ `h-full transition-all duration-[2s] overflow-hidden ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
-                { (tool !== 'Import' && tool !== 'Plot') &&  <Default strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement} />}
+                { (tool !== 'Import' && tool !== 'Plot') &&  <Editor strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement} />}
                 { tool === 'Import' && <Import /> }
                 { tool === 'Plot' && <Plot /> }
               </div>

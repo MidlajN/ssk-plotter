@@ -433,3 +433,20 @@ export const SplitSvg = () => (
       </g>
     </svg>
   );
+export const JogButton = (props) => (
+  <svg
+    width={18}
+    height={16}
+    viewBox="0 0 18 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M1.07647 10.3333H7.5002H9.8752V15L17.0002 8L9.8752 1V5.66667H7.5002H1.07666"
+      stroke="black"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);

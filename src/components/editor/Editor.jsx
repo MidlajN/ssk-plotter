@@ -10,7 +10,7 @@ import './editor.css';
 
 
 
-export function Default({ strokeColor, setStrokeColor, tool, element, setElement }) {
+export function Editor({ strokeColor, setStrokeColor, tool, element, setElement }) {
     const { canvas } = useCanvas();
     const { colors } = useCom()
     const [ renderElements, setRenderElements ] = useState(false);
@@ -67,7 +67,7 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                     <h1>Settings</h1>
                 </div>
 
-                <div className="py-4 flex gap-4 items-center justify-between">
+                {/* <div className="py-4 flex gap-4 items-center justify-between">
                     <p className="text-lg font-medium text-gray-600">Pen Color</p>
                     <div 
                         className="flex gap-3 items-center justify-center border pr-3 rounded-full shadow-[inset_0px_1px_2px_1px_#00000025] overflow-hidden bg-[#f0f0f0]" 
@@ -81,17 +81,21 @@ export function Default({ strokeColor, setStrokeColor, tool, element, setElement
                             { colors.filter(color => color.color === strokeColor).map(color => color.name)[0] }
                         </p>
                     </div>
-                </div>
+                </div> */}
 
-                <div className="grid lg:grid-cols-5 grid-cols-8 max-[500px]:grid-cols-4 mt-8">
+                <div 
+                    // className="grid lg:grid-cols-5 grid-cols-8 max-[500px]:grid-cols-4 mt-8"
+                    className="flex flex-wrap gap-4 justify-center items-center"
+                >
                     { colors.map((color, index) => (
                         <div 
                             key={ index }
-                            className="rounded-md border-4 cursor-pointer" 
+                            className="rounded-md mx-auto w-fit border-4 cursor-pointer" 
                             style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
                             onClick={ () => { setStrokeColor(color.color)}}
                         >
-                            <div className="p-5 border-2 border-white rounded-md" style={{ backgroundColor: color.color }}></div>
+                            <div className="p-6 border-2 border-white rounded-md" style={{ backgroundColor: color.color }}></div>
+                            <p className={`text-center text-sm text-gray-500 ${ color.color === strokeColor ? 'text-black bg-[#dbdbdb87] font-medium' : ''  }`}>{ color.name }</p>
                         </div>
                     ))}
                 </div>

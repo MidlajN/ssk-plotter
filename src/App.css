@@ -3,14 +3,14 @@
     overflow: hidden;
     position: relative;
     max-width: 100vw;
-    max-height: 100vh;
+    max-height: 100%;
 }
 .canvas-section .canvas {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    height: 100%;
+    /* height: 100%; */
     position: relative;
     overflow: hidden;
     transition: 0.5s all;
@@ -20,6 +20,8 @@
     position: absolute;
     inset-inline: auto;
     right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     /* background-color: #F5762E; */
     color: white;
     /* padding: 0.3rem 1rem; */
@@ -27,7 +29,7 @@
 }
 
 @media (max-width: 1024px) {
-    .canvas-section .canvas .toggle {
+    /* .canvas-section .canvas .toggle {
         bottom: 0;
         left: 50%;
         translate: -50%;
@@ -37,42 +39,101 @@
         padding: 10px;
         border-radius: 100%;
         transition: all 0.5s ease;
-    }
-    .canvas-section .canvas button:hover {
+    } */
+    /* .canvas-section .canvas button:hover {
         background-color: rgb(176, 191, 209);
-    }
+    } */
 }
 
 .canvas-section .canvas .machine-outer {
-    padding: 5rem 5rem 0px 5rem;
+    /* padding: 5rem 5rem 0px 5rem; */
+    padding: 0.5rem .5rem 0px .5rem;
     background-color: #ffffff69;
     border-top: 1px solid #ffffff;
     border-left: 1px solid #ffffff;
     border-right: 1px solid #ffffff;
     /* box-shadow: 0px 0px 3px #a3a3a3; */
-    box-shadow: 4px 4px 14px 4px #a3a3a3;
+    /* box-shadow: 4px 4px 14px 4px #a3a3a3; */
 }
 .canvas-section .canvas .machine-inner {
     background-color: #DFDFDF;
     border-top: 1px solid #ededed;
     border-left: 1px solid #ededed;
     border-right: 1px solid #ededed;
-    padding: 4rem 4rem 2rem 8rem;
-    /* padding: 8rem 8rem 5rem 15rem; */
+    /* padding: 4rem 4rem 2rem 8rem; */
+    padding: 5rem 5rem 0rem 5rem;
 }
 .canvas-section .canvas .machine-inner::before {
     content: "";
     position: absolute;
-    bottom: 2rem;
-    left: 0;
-    width: 8rem;
-    height: 11rem;
+    bottom: 0;
+    right: 10px;
+    width: 5rem;
+    height: 7rem;
     z-index: 1;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="81" viewBox="0 0 60 81" fill="none"><rect width="60" height="81" fill="%238E98BC" fill-opacity="0.15"/><rect x="23" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="61" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="23" y="37" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="37" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="9" y="49" width="12" height="10" rx="3" fill="%2369749A" fill-opacity="0.48"/><rect x="39" y="22" width="13" height="10" rx="3" fill="%239BA7D0" fill-opacity="0.48"/><circle cx="16" cy="16" r="10" fill="%238E0000" fill-opacity="0.16"/><path d="M52 12.5C52 16.0899 49.0899 19 45.5 19C41.9101 19 39 16.0899 39 12.5C39 8.91015 41.9101 6 45.5 6C49.0899 6 52 8.91015 52 12.5Z" fill="%239BA7D0" fill-opacity="0.48"/></svg>');
+    background-image: url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2284%22%20viewBox%3D%220%200%2060%2084%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M0%200.428558H60V84H0V0.428558Z%22%20fill%3D%22%23ADADAD%22%20fill-opacity%3D%220.15%22%2F%3E%0A%3Cpath%20d%3D%22M34.1532%2031.6438H38.2649H39.785V34.6308L44.3456%2030.1503L39.785%2025.6697V28.6568H38.2649H34.1533%22%20stroke%3D%22%23969696%22%20stroke-width%3D%220.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3Cpath%20d%3D%22M25.1925%2031.6438H21.0808H19.5607V34.6308L15.0001%2030.1503L19.5607%2025.6697V28.6568H21.0808H25.1924%22%20stroke%3D%22%23969696%22%20stroke-width%3D%220.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3Cpath%20d%3D%22M28.1793%2025.6209V21.5092V19.9891H25.1923L29.6728%2015.4285L34.1533%2019.9891H31.1663V21.5092V25.6208%22%20stroke%3D%22%23969696%22%20stroke-width%3D%220.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3Cpath%20d%3D%22M31.1664%2034.6307V38.7423V40.2625H34.1534L29.6729%2044.823L25.1924%2040.2625H28.1794V38.7423V34.6308%22%20stroke%3D%22%23969696%22%20stroke-width%3D%220.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3Cpath%20d%3D%22M33.2142%2066.8571V60.4286C33.2142%2058.6533%2031.7751%2057.2143%2029.9999%2057.2143V57.2143C28.2247%2057.2143%2026.7856%2058.6534%2026.7856%2060.4286V66.8571%22%20stroke%3D%22%23969696%22%20stroke-width%3D%220.7%22%20stroke-linecap%3D%22round%22%2F%3E%0A%3C%2Fsvg%3E%0A');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
 }
+.canvas-section .canvas .machine-inner::after {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: left;
+    content: "";
+    position: absolute;
+    top: 53.3%;
+    left: 2rem;
+    width: 5rem;
+    height: 32rem;
+    z-index: 1;
+    background-color: #ededed;
+    border-radius: 1.5rem 0rem 0rem 1.5rem;
+    transform: translateY(-50%);
+    /* box-shadow: inset 0px 2px 3px 0px #0000003d; */
+    z-index: 3;
+}
+
+
+.canvas-section .canvas .machine-inner .machine-bed {
+    position: relative;
+    padding: 3rem 3rem 5rem 3rem;
+    background-color: #ebebeb;
+    box-shadow: inset 0px 1px 3px 1px #0000003d;
+    border-top-left-radius: 3rem;
+    border-top-right-radius: 3rem
+}
+.canvas-section .canvas .machine-inner .machine-bed::before {
+    background-image: url('data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%22196%22%20viewBox%3D%220%200%2024%20196%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20clip-path%3D%22url%28%23clip0_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M0%207C0%203.134%203.13401%200%207%200H24V196H7C3.13401%20196%200%20192.866%200%20189V7Z%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3Cg%20filter%3D%22url%28%23filter0_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%2010C4%206.68629%206.68629%204%2010%204H22C23.1046%204%2024%204.89543%2024%206V22C24%2023.1046%2023.1046%2024%2022%2024H10C6.68629%2024%204%2021.3137%204%2018V10Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter1_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%2034C4%2030.6863%206.68629%2028%2010%2028H22C23.1046%2028%2024%2028.8954%2024%2030V46C24%2047.1046%2023.1046%2048%2022%2048H10C6.68629%2048%204%2045.3137%204%2042V34Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%2238%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter2_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%2058C4%2054.6863%206.68629%2052%2010%2052H22C23.1046%2052%2024%2052.8954%2024%2054V70C24%2071.1046%2023.1046%2072%2022%2072H10C6.68629%2072%204%2069.3137%204%2066V58Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%2262%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter3_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%2082C4%2078.6863%206.68629%2076%2010%2076H22C23.1046%2076%2024%2076.8954%2024%2078V94C24%2095.1046%2023.1046%2096%2022%2096H10C6.68629%2096%204%2093.3137%204%2090V82Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%2286%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter4_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%20106C4%20102.686%206.68629%20100%2010%20100H22C23.1046%20100%2024%20100.895%2024%20102V118C24%20119.105%2023.1046%20120%2022%20120H10C6.68629%20120%204%20117.314%204%20114V106Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%22110%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter5_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%20130C4%20126.686%206.68629%20124%2010%20124H22C23.1046%20124%2024%20124.895%2024%20126V142C24%20143.105%2023.1046%20144%2022%20144H10C6.68629%20144%204%20141.314%204%20138V130Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%22134%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter6_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%20154C4%20150.686%206.68629%20148%2010%20148H22C23.1046%20148%2024%20148.895%2024%20150V166C24%20167.105%2023.1046%20168%2022%20168H10C6.68629%20168%204%20165.314%204%20162V154Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%22158%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20filter%3D%22url%28%23filter7_d_1868_180%29%22%3E%0A%3Cpath%20d%3D%22M4%20178C4%20174.686%206.68629%20172%2010%20172H22C23.1046%20172%2024%20172.895%2024%20174V190C24%20191.105%2023.1046%20192%2022%20192H10C6.68629%20192%204%20189.314%204%20186V178Z%22%20fill%3D%22white%22%2F%3E%0A%3Ccircle%20cx%3D%2214%22%20cy%3D%22182%22%20r%3D%225%22%20fill%3D%22%23EDEDED%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fg%3E%0A%3Cdefs%3E%0A%3Cfilter%20id%3D%22filter0_d_1868_180%22%20x%3D%223%22%20y%3D%224%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter1_d_1868_180%22%20x%3D%223%22%20y%3D%2228%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter2_d_1868_180%22%20x%3D%223%22%20y%3D%2252%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter3_d_1868_180%22%20x%3D%223%22%20y%3D%2276%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter4_d_1868_180%22%20x%3D%223%22%20y%3D%22100%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter5_d_1868_180%22%20x%3D%223%22%20y%3D%22124%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter6_d_1868_180%22%20x%3D%223%22%20y%3D%22148%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3Cfilter%20id%3D%22filter7_d_1868_180%22%20x%3D%223%22%20y%3D%22172%22%20width%3D%2222%22%20height%3D%2222%22%20filterUnits%3D%22userSpaceOnUse%22%20color-interpolation-filters%3D%22sRGB%22%3E%0A%3CfeFlood%20flood-opacity%3D%220%22%20result%3D%22BackgroundImageFix%22%2F%3E%0A%3CfeColorMatrix%20in%3D%22SourceAlpha%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200%22%20result%3D%22hardAlpha%22%2F%3E%0A%3CfeOffset%20dy%3D%221%22%2F%3E%0A%3CfeGaussianBlur%20stdDeviation%3D%220.5%22%2F%3E%0A%3CfeComposite%20in2%3D%22hardAlpha%22%20operator%3D%22out%22%2F%3E%0A%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.25%200%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in2%3D%22BackgroundImageFix%22%20result%3D%22effect1_dropShadow_1868_180%22%2F%3E%0A%3CfeBlend%20mode%3D%22normal%22%20in%3D%22SourceGraphic%22%20in2%3D%22effect1_dropShadow_1868_180%22%20result%3D%22shape%22%2F%3E%0A%3C%2Ffilter%3E%0A%3CclipPath%20id%3D%22clip0_1868_180%22%3E%0A%3Cpath%20d%3D%22M0%207C0%203.134%203.13401%200%207%200H24V196H7C3.13401%20196%200%20192.866%200%20189V7Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2FclipPath%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E%0A');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: left;
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -4.2rem;
+    width: 4.2rem;
+    height: 32rem;
+    z-index: 4;
+    background-color: #ededed;
+    border-radius: 1.5rem 0rem 0rem 1.5rem;
+    transform: translateY(-50%);
+    box-shadow: inset 2px 1px 3px 0px #0000003d;
+}
+.canvas-section .canvas .machine-inner .machine-bed::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 98%;
+    height: 2rem;
+    z-index: 1;
+    background-color: #ededed;
+    border-radius: 2rem 2rem 0rem 0rem;
+    transform: translateX(-50%);
+    box-shadow: inset 0px 2px 3px 0px #0000003d;
+}
+
 
 .canvas-section .footer {
     background-color: white;
