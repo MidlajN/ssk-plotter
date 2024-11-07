@@ -1,13 +1,11 @@
 /* eslint-disable react/prop-types */
 import useCanvas from "../../context/CanvasContext";
-import { Boxes, CloudUpload, Group, MousePointer2Icon, PenLine, PenTool } from "lucide-react";
 import { split, group } from "../../util/functions";
 import { SplitSvg } from "../Icons";
-// import { handleFile } from "../../util/functions";
 import './nav.css';
-// import { useState } from "react";
+import { Circle, Group, Minus, MousePointer2Icon, PenTool, Square, Triangle } from "lucide-react";
 
-export const SideNav = ({ tool, setTool, setExpanded }) => {
+export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) => {
   const { canvas, saveState } = useCanvas();
   return (
     <Sidebar>
@@ -17,24 +15,48 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
         setTool={setTool} 
         setExpanded={setExpanded}
       />
-      <SidebarItem 
+      {/* <SidebarItem 
         icon={ <PenLine size={22} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
         text={'Lines'} 
         setTool={setTool} 
         setExpanded={setExpanded}
-      />
+      /> */}
       <SidebarItem 
-        icon={ <PenTool size={22} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
+        icon={ <PenTool size={22} strokeWidth={1.5} style={{ rotate: '-90deg'}} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
         text={'Pen'} 
         setTool={setTool}
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <Boxes size={22} strokeWidth={1.5} color={ tool === 'Elements' ? '#1c8096' : '#4b5563' }  /> } 
-        text={'Elements'} 
+        icon={ <Minus size={22} strokeWidth={1.5} style={{ rotate: '-45deg'}} color={ tool === 'Lines' ? '#1c8096' : '#4b5563' } /> } 
+        text={'Lines'} 
         setTool={setTool}
         setExpanded={setExpanded}
-        // canvasFunction={ () => info(canvas) }
+        // canvasFunction={ () => setElement('Line') }
+      />
+      <SidebarItem 
+        icon={ <Square size={22} strokeWidth={1.5} color={ ( tool === 'Elements' && element === 'rectangle' ) ? '#1c8096' : '#4b5563' } /> } 
+        text={'Elements'} 
+        hoverText={'Rectangle'}
+        setTool={setTool}
+        setExpanded={setExpanded}
+        canvasFunction={ () => setElement('rectangle') }
+      />
+       <SidebarItem 
+        icon={ <Circle size={22} strokeWidth={1.5} color={ (tool === 'Elements' && element === 'circle') ? '#1c8096' : '#4b5563' } /> } 
+        text={'Elements'} 
+        hoverText={'Circle'}
+        setTool={setTool}
+        setExpanded={setExpanded}
+        canvasFunction={ () => setElement('circle') }
+      />
+      <SidebarItem 
+        icon={ <Triangle size={22} strokeWidth={1.5} color={ (tool === 'Elements' && element === 'triangle') ? '#1c8096' : '#4b5563' }  /> } 
+        text={'Elements'} 
+        hoverText={'Triangle'}
+        setTool={setTool}
+        setExpanded={setExpanded}
+        canvasFunction={ () => setElement('triangle') }
       />
       <SidebarItem 
         icon={ <Group size={22} strokeWidth={1.5} color={ tool === 'Group' ? '#1c8096' : '#4b5563' } /> } 
@@ -56,87 +78,15 @@ export const SideNav = ({ tool, setTool, setExpanded }) => {
         setTool={setTool}
         setExpanded={setExpanded}
       /> */}
-      <SidebarItem 
+      {/* <SidebarItem 
         icon={ <CloudUpload size={22} strokeWidth={1.5} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
         text={'Import'} 
         setTool={setTool} 
         setExpanded={setExpanded}
-      />
+      /> */}
     </Sidebar>
   )
 }
-
-export const BottomNav = ({  tool, setTool, setExpanded }) => {
-  const { canvas, saveState } = useCanvas()
-  
-  return (
-    <>
-      <div className={`p-5 overflow-x-scroll no-scrollbar flex gap-[1px] items-center lg:hidden ${ tool !== 'Plot' ? '' : 'hidden' }`}>
-        <div className="bg-slate-300 rounded-s-md">
-          <SidebarItem 
-            icon={ <MousePointer2Icon size={25} strokeWidth={2.3} color={ tool === 'Select' ? '#1c8096' : '#4b5563'} /> } 
-            text={'Select'} 
-            setTool={setTool} 
-            setExpanded={setExpanded}
-          />
-        </div>
-        <div className="bg-slate-200">
-          <SidebarItem 
-            icon={ <PenLine size={25} strokeWidth={2.3} color={ tool === 'Lines' ? '#1c8096' : '#4b5563'} /> } 
-            text={'Lines'} 
-            setTool={setTool} 
-            setExpanded={setExpanded}
-          />
-        </div>
-        <div className="bg-slate-200">
-          <SidebarItem 
-            icon={ <PenTool size={25} strokeWidth={2} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
-            text={'Pen'} 
-            setTool={setTool}
-            setExpanded={setExpanded}
-          />
-        </div>
-        <div className="bg-slate-200">
-          <SidebarItem 
-            icon={ <Boxes size={25} strokeWidth={1.8} color={ tool === 'Elements' ? '#1c8096' : '#4b5563'}  /> } 
-            text={'Elements'} 
-            setTool={setTool}
-            setExpanded={setExpanded}
-            // canvasFunction={ () => info(canvas) }
-          />
-        </div>
-        <div className="bg-slate-200">
-          <SidebarItem 
-            icon={ <Group size={25} strokeWidth={2.2} color={ tool === 'Group' ? '#1c8096' : '#4b5563'} /> } 
-            text={'Group'} 
-            setTool={setTool}
-            setExpanded={setExpanded}
-            canvasFunction={ () => group(canvas, saveState) }
-          />
-        </div>
-        <div className="bg-slate-200">
-          <SidebarItem 
-            icon={ <SplitSvg /> } 
-            text={'Split'} 
-            setTool={setTool} 
-            setExpanded={setExpanded}
-            canvasFunction={ () => split(canvas, saveState) }
-          />
-        </div>
-        
-        <div className="bg-slate-200 rounded-e-md">
-          <SidebarItem 
-            icon={ <CloudUpload size={25} strokeWidth={2} color={ tool === 'Import' ? '#1c8096' : '#4b5563'} /> } 
-            text={'Import'} 
-            setTool={setTool} 
-            setExpanded={setExpanded}
-          />
-        </div>
-      </div>
-    </>
-  )
-}
-
 
 
 export default function Sidebar({ children }) {
@@ -154,7 +104,7 @@ return (
 )
 }
 
-export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction }) {
+export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction, hoverText = null }) {
     
     return (
         <li
@@ -189,7 +139,7 @@ export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction }
                     group-hover:visible group-hover:opacity-100 lg:group-hover:translate-x-0 lg:group-hover:translate-y-0
                 `}
             >
-                {text}
+                { hoverText ? hoverText : text }
             </div>
 
         </li>

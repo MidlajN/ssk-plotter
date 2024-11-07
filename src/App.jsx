@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import { Editor, Import } from "./components/editor/Editor.jsx";
+import { Editor } from "./components/editor/Editor.jsx";
 import { Plot } from "./components/plotter/Plot.jsx";
 import useCanvas from "./context/CanvasContext.jsx";
-import { BottomNav, SideNav } from "./components/nav/Sidebar.jsx";
+import { SideNav } from "./components/nav/Sidebar.jsx";
 import { TopBar } from "./components/nav/Topbar.jsx";
 import { useEditorSetup } from "./components/editor/useEditorSetup.jsx";
 import { NavBar } from "./components/nav/Navbar.jsx";
@@ -15,8 +15,14 @@ import './App.css'
 import { Canvas, FabricObject, util } from "fabric";
 
 export default function Home() {
-  const { canvas, saveState, toolRef, canvasRef, objectValues, plotterRef } = useCanvas();
-
+  const { 
+    canvas, 
+    saveState, 
+    toolRef, 
+    canvasRef, 
+    // objectValues, 
+    plotterRef 
+  } = useCanvas();
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
@@ -93,19 +99,19 @@ export default function Home() {
 
         <div className="h-[91%] bg-[#ebebeb] relative"> 
           <div 
-            // className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' } absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}
-            className={`block lg:block absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}
+            className={` ${ hideSideBar ? 'hidden' : '' } absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}
           >
-            <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
+            <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } element={element} setElement={ setElement } />
           </div>
 
           <div 
-            // className="canvas-section flex flex-col lg:flex-row"
             className="canvas-section flex flex-row"
           >
             <div className={`canvas ${ expanded ? 'lg:w-[83%]' : 'w-[100%]' }`}>
               <TransformWrapper
-                initialScale={0.6} 
+                initialScale={ tool === 'Plot' ? 0.5 : 0.6 } 
+                initialPositionX={ tool === 'Plot' ? 200 : null }
+                initialPositionY={ tool === 'Plot' ? 100 : null }
                 maxScale={3}
                 minScale={.5} 
                 limitToBounds={ false }
@@ -149,15 +155,18 @@ export default function Home() {
               <div className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' } absolute top-3 left-1/2 -translate-x-1/2 z-10 h-fit w-fit`}>
                 <TopBar tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
               </div>
+              {/* <button className=" absolute bottom-3 left-1/2 -translate-x-1/2 z-10 h-fit w-fit border-2">Reset</button> */}
             </div>
 
             <div 
-              className={`${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500 lg:overflow-hidden lg:border-l-2 border-[#1c7f969c]`}
+              className={`
+                ${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500 
+                lg:overflow-hidden lg:border-l-2 ${ tool === 'Plot' ? 'border-[#9c3c6e7c]' : 'border-[#1c7f969c]' }
+              `}
             >
-
               <div className={ `h-full transition-all duration-[2s] overflow-hidden ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
                 { (tool !== 'Import' && tool !== 'Plot') &&  <Editor strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement} />}
-                { tool === 'Import' && <Import /> }
+                {/* { tool === 'Import' && <Import /> } */}
                 { tool === 'Plot' && <Plot /> }
               </div>
             </div>

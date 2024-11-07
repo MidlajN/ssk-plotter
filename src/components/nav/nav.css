@@ -1,7 +1,14 @@
 /* ------------------------- navbar ------------------------- */
 .navbar .navDiv {
-    border-bottom: 2px solid #1c7f969c;
+    /* border-bottom: 2px solid #1c7f969c; */
     background-color: #FCFCFF;
+    padding-inline: 2rem;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    transition: 0.5s all ease;
 }
 .navbar .navDiv h3 {
     font-family: "Merriweather Sans", sans-serif;
@@ -19,7 +26,7 @@
     text-align: left;
 }
 .navbar .navDiv .buttonGroup {
-    box-shadow: inset -1px 2px 2px 0px #00000025;
+    /* box-shadow: inset -1px 2px 2px 0px #00000025; */
     background-color: #DFDFDF;
     border: 1px solid #EDEDED;
     border-radius: 5rem;
@@ -37,7 +44,7 @@
     min-width: 3.5rem;
 }
 .navbar .navDiv .buttonGroup button.active {
-    background-color: #1c8096;
+    /* background-color: #1c8096; */
     color: white;
     padding: 0.3rem 1rem;
     margin-block: .3rem;

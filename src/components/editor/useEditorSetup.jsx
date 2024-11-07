@@ -26,7 +26,7 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
     canvas.mode = tool;
     toolRef.current = tool;
 
-    const resetCanvas = () => {
+    const resetCanvas = (downFunction, moveFunction, upFunction) => {
       canvas.selection = true;
       canvas.hoverCursor = 'all-scroll';
       canvas.defaultCursor = 'auto';
@@ -39,9 +39,9 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
         }
       });
 
-      canvas.off('mouse:down');
-      canvas.off('mouse:move');
-      canvas.off('mouse:up');
+      canvas.off('mouse:down', downFunction);
+      canvas.off('mouse:move', moveFunction);
+      canvas.off('mouse:up', upFunction);
     }
 
     const commonSetup = (cursor = 'auto') => {
@@ -77,7 +77,7 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
       let line;
       let mouseDown = false;
 
-      canvas.on('mouse:down', (event) => {
+      const setPointer = (event) => {
         canvas.off('object:added', saveState)
         const pointer = canvas.getPointer(event.e);
 
@@ -92,9 +92,9 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
           canvas.add(line);
           canvas.requestRenderAll();
         }
-      });
+      }
 
-      canvas.on('mouse:move', (event) => {
+      const drawLine = (event) => {
         const isCtrlPressed = event.e.ctrlKey;
 
         if (mouseDown) {
@@ -106,16 +106,20 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
           line.set({ x2: pointer.x , y2: pointer.y });
           canvas.requestRenderAll();
         }
-      });
+      }
 
-      canvas.on('mouse:up', () => {
+      const finishLine = () => {
         line.setCoords();
         mouseDown = false;
         canvas.on('object:added', saveState)
         canvas.fire('object:modified', { target: line });
-      });
+      }
 
-      return resetCanvas;
+      canvas.on('mouse:down', setPointer);  
+      canvas.on('mouse:move', drawLine);
+      canvas.on('mouse:up', finishLine);
+
+      return () => resetCanvas(setPointer, drawLine, finishLine);
     }
 
     if (tool === 'Elements') {
@@ -124,7 +128,7 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
       let mouseDown = false;
       let startPointer;
 
-      canvas.on('mouse:down', (event) => {
+      const setUpElement = (event) => {
         canvas.off('object:added', saveState)
         mouseDown = true;
         startPointer = canvas.getPointer(event.e);
@@ -138,9 +142,9 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
         });
 
         canvas.add(object);
-      })
+      }
 
-      canvas.on('mouse:move', (event) => {
+      const drawElement = (event) => {
         if (mouseDown && object) {
           const pointer = canvas.getPointer(event.e);
           const width = Math.abs(pointer.x - startPointer.x);
@@ -157,16 +161,21 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
           }
           canvas.requestRenderAll();
         }
-      });
+      }
 
-      canvas.on('mouse:up', () => {
+      const finishElement = () => {
         canvas.on('object:added', saveState)
         object.setCoords();
         mouseDown = false;
         canvas.fire('object:modified', { target: object });
-      });
+      }
 
-      return resetCanvas;
+      canvas.on('mouse:down', setUpElement);
+      canvas.on('mouse:move', drawElement);
+      canvas.on('mouse:up', finishElement)
+
+
+      return () => resetCanvas(setUpElement, drawElement, finishElement);
     }
   }, [canvas, element, saveState, strokeColor, tool])
 }

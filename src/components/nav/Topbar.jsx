@@ -1,8 +1,13 @@
 import useCanvas from "../../context/CanvasContext";
 import { useEffect, useState } from "react";
-import { Download, RectangleHorizontal, RectangleVertical, Shrink } from "lucide-react";
 import { util } from "fabric";
 import { handleFile } from "../../util/functions";
+import { 
+    Download, 
+    // RectangleHorizontal, 
+    // RectangleVertical, 
+    // Shrink 
+} from "lucide-react";
 
 export const TopBar = () => {
     const { canvas, canvasConfig, setCanvasConfig } = useCanvas();
@@ -115,9 +120,9 @@ export const TopBar = () => {
                         >
                         <RectangleVertical size={18} strokeWidth={1} color={'#000'}/>
                     </div>
-                </div> */}
+                </div>
 
-                {/* <div className="pr-1">
+                <div className="pr-1">
                     <Shrink size={18} strokeWidth={1.6} color={'#000'}/>
                 </div> */}
             </div>
