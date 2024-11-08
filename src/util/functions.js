@@ -42,6 +42,7 @@ export const handleFile = (file, canvas) => {
 export const split = (canvas, saveState) => {
     const activeObject = canvas.getActiveObject();
     if (!activeObject || activeObject.get('type') === 'activeSelection') return;
+    if (activeObject.isFreeDraw) return;
     let fabricPaths = [];
 
     const createLine = (x,y, x1, y1) => {
@@ -205,7 +206,7 @@ export const split = (canvas, saveState) => {
                 scaleY: activeObject.scaleY,
                 angle: activeObject.angle,
             })
-            // group.setCoords()
+            group.setCoords()
 
             
 
@@ -214,8 +215,8 @@ export const split = (canvas, saveState) => {
                 'Group : ', group,
                 '\nObjects : ', objects
             )
-            // canvas.add(...objects)
-            canvas.add(...fabricPaths)
+            canvas.add(...objects)
+            // canvas.add(...fabricPaths)
             canvas.remove(activeObject);
             canvas.on('object:added', saveState);
         }

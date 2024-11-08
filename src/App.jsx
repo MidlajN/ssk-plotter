@@ -29,6 +29,7 @@ export default function Home() {
   const [ hideSideBar, setHideSideBar ] = useState(false);
   const [ strokeColor, setStrokeColor ] = useState('#5e5e5e');
   const [ element, setElement ] = useState('rectangle');
+  const [ canvasObjs, setCanvasObjs ] = useState(null)
 
   // ---- For Debug Purposes ----
   // const { setResponse, response } = useCom();
@@ -164,9 +165,8 @@ export default function Home() {
                 lg:overflow-hidden lg:border-l-2 ${ tool === 'Plot' ? 'border-[#9c3c6e7c]' : 'border-[#1c7f969c]' }
               `}
             >
-              <div className={ `h-full transition-all duration-[2s] overflow-hidden ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
-                { (tool !== 'Import' && tool !== 'Plot') &&  <Editor strokeColor={strokeColor} setStrokeColor={setStrokeColor} tool={tool} element={element} setElement={setElement} />}
-                {/* { tool === 'Import' && <Import /> } */}
+              <div className={ `h-full transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
+                { tool !== 'Plot' &&  <Editor strokeColor={strokeColor} setStrokeColor={setStrokeColor} canvasObjs={canvasObjs} setCanvasObjs={setCanvasObjs} />}
                 { tool === 'Plot' && <Plot /> }
               </div>
             </div>

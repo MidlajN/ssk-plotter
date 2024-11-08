@@ -64,8 +64,13 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
       const customCursor = componentToUrl(PenTool, 0);
       canvas.freeDrawingCursor = `url(${ customCursor }), auto`;
 
+      canvas.on('path:created', (e) => {
+        e.path.isFreeDraw = true;
+      })
+
       return () => { 
         canvas.isDrawingMode = false; 
+        canvas.off('path:created');
       };
     }
 
