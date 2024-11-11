@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 export const PlotSvg = () => (
   <svg xmlSpace="preserve" viewBox="0 0 1350 900">
     <path fill="#fff" d="M0 0H1350V900H0z" />
@@ -447,6 +448,65 @@ export const JogButton = (props) => (
       stroke="black"
       strokeLinecap="round"
       strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const PenIcon = (props) => (
+  <svg
+    width={ props.width }
+    height={ props.height }
+    viewBox="0 0 46.646271 25.247044"
+    fill="none"
+    id="svg5"
+    className={ props.className }
+    // {...props}
+  >
+    <defs id="defs5" />
+    <path
+      d="M 0.60000002,0.60000002 20.938592,0.64704364 c 0,0 10.862493,7.22118366 19.919893,9.41736436 l -0.137529,5.285003 c -9.0574,2.1962 -19.782364,9.297633 -19.782364,9.297633 H 0.62305602"
+      stroke={ props.stroke }
+      strokeWidth={2}
+      strokeMiterlimit={10}
+      id="path1"
+      style={{
+        strokeWidth: 1.2,
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeDasharray: "none",
+      }}
+    />
+    <path
+      d="m 35.689792,8.6996636 c 0,0 4.7224,0.58852 10.0047,3.4305804 0.4594,0.2441 0.4737,0.8326 0.0144,1.0766 -5.2967,2.8278 -10.0191,3.4019 -10.0191,3.4019 V 8.6853136 Z"
+      fill={ props.stroke }
+      stroke={ props.stroke }
+      strokeWidth={2}
+      strokeMiterlimit={10}
+      id="path2"
+      style={{
+        strokeWidth: 1.2,
+        strokeDasharray: "none",
+      }}
+    />
+    <path
+      d="M 20.863192,0.64704364 V 24.647044 Z"
+      fill="#ffffff"
+      id="path3"
+      style={{
+        strokeWidth: 1.2,
+        strokeDasharray: "none",
+      }}
+    />
+    <path
+      d="m 20.863192,0.64704364 c 4.524151,6.84678496 6.87918,14.24648436 0,24.00000036"
+      stroke={ props.stroke }
+      strokeWidth={2}
+      strokeMiterlimit={10}
+      id="path4"
+      style={{
+        strokeWidth: 1.2,
+        strokeDasharray: "none",
+      }}
     />
   </svg>
 );

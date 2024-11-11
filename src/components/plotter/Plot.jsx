@@ -23,8 +23,10 @@ import { SetupModal } from "./Modal";
 import { returnGroupedObjects, returnSvgElements, sortSvgElements, convertToGcode } from "../../util/convert";
 import { motion } from "framer-motion";
 import './plotter.css'
+import { RotateLeft, RotateRight } from "./Icons";
+import { Group } from "fabric";
 
-export const Plot = () => {
+export const Plot = ({ plotCanvas }) => {
     const { canvas } = useCanvas();
     const {
         response, config, setConfig, setupModal, job, setJob, colors,
@@ -126,6 +128,15 @@ export const Plot = () => {
         )
     }
 
+    const handleRotation = (angle) => {
+        const activeObjects = plotCanvas.getActiveObjects()
+        const group = new Group(activeObjects)
+        plotCanvas.remove(...activeObjects)
+        group.rotate(angle)
+        plotCanvas.add(...group.removeAll());
+        plotCanvas.renderAll();
+    }
+
     const ActionButton = ({ label, Icon, onclick, bgColor }) => {
         return (
 
@@ -145,7 +156,7 @@ export const Plot = () => {
         <>
         <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
             <div className="cut w-full">
-                <div 
+                {/* <div 
                     className="w-full flex items-end lg:justify-end gap-3 pb-4" 
                     onClick={ () => { setConfig({ ...config, open: !config.open })}}
                 >
@@ -159,9 +170,39 @@ export const Plot = () => {
                         </div>
                         <p className="text-[12px] pr-2 text-white font-medium">Settings</p>
                     </div>
+                </div> */}
+
+                <div className="p-5">
+                    <div className="flex gap-6 pb-2">
+                        <p className="min-w-14">Width</p>
+                        <p>445 <span className="text-xs text-gray-500">mm</span></p>
+                    </div>
+                    <div className="flex gap-6 pb-2">
+                        <p className="min-w-14">Height</p>
+                        <p>435 <span className="text-xs text-gray-500">mm</span></p>
+                    </div>
+                    <div className="flex gap-6">
+                        <p className="min-w-14">Angle</p>
+                        <p>0 <span className="text-xs text-gray-500">deg</span></p>
+                    </div>
                 </div>
 
-                <div className="px-3 py-4 border-b border-white bg-[#2a334e] flex items-center gap-2">
+                <div className="px-5 flex gap-4">
+                    <div 
+                        className="hover:bg-gray-100 active:bg-gray-200 p-2 rounded-md cursor-pointer transition-all duration-300"
+                        onClick={() => handleRotation(90)}
+                    >
+                        <RotateRight width={30} height={30} />
+                    </div>
+                    <div 
+                        className="hover:bg-gray-100 active:bg-gray-200 p-2 rounded-md cursor-pointer transition-all duration-300"
+                        onClick={() => handleRotation(-90)}
+                    >
+                        <RotateLeft width={30} height={30} />
+                    </div>
+                </div>
+
+                {/* <div className="px-3 py-4 border-b border-white bg-[#2a334e] flex items-center gap-2">
                     <Info size={14} strokeWidth={2} color={'#ffff'} />
                     { !job.started && !job.percentage ? (
                         <p className="text-sm text-white">Currently No Job Is Running...</p>
@@ -181,9 +222,9 @@ export const Plot = () => {
                             { job.percentage === 100 && <CheckCheck size={17} strokeWidth={2.5} color={'#ffffff'} /> }
                         </>  
                     )}
-                </div>
+                </div> */}
 
-                <div className="text-sm responses lg:h-[25rem] min-h-44 relative">
+                {/* <div className="text-sm responses lg:h-[25rem] min-h-44 relative">
                     <textarea 
                         ref={textareaRef} 
                         value={ response.message } 
@@ -205,10 +246,10 @@ export const Plot = () => {
                             }}
                         />
                     </div>
-                </div>
+                </div> */}
             </div>
             <div className="flex flex-col items-center justify-center gap-5 px-6 lg:px-1 min-w-fit">
-                <div className="flex gap-4 w-full justify-around items-center">
+                {/* <div className="flex gap-4 w-full justify-around items-center">
                     <div className="grid grid-cols-3 gap-3">
                         <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />  
                         <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />  
@@ -221,7 +262,7 @@ export const Plot = () => {
                         <button className="p-2 bg-[#1C274C] rounded"><p className="text-white text-[10px]">Z-Axis</p></button>
                         <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
                     </div>
-                </div>
+                </div> */}
 
                 <div className="flex w-full min-w-80 items-end justify-between gap-1 pt-2 lg:pt-12">
                     { !job.connected ? (

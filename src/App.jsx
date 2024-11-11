@@ -30,6 +30,7 @@ export default function Home() {
   const [ strokeColor, setStrokeColor ] = useState('#5e5e5e');
   const [ element, setElement ] = useState('rectangle');
   const [ canvasObjs, setCanvasObjs ] = useState(null)
+  const [ plotterCanvas, setPlotterCanvas ] = useState(null)
 
   // ---- For Debug Purposes ----
   // const { setResponse, response } = useCom();
@@ -45,7 +46,7 @@ export default function Home() {
       FabricObject.ownDefaults.hasControls = false;
       FabricObject.ownDefaults.borderDashArray = [15];
 
-      const plotterCanvas = new Canvas(plotterRef.current, {
+      const plotCanvas = new Canvas(plotterRef.current, {
         width: util.parseUnit(`430mm`),
         height: util.parseUnit(`310mm`),
         backgroundColor: "white",
@@ -58,6 +59,7 @@ export default function Home() {
         controlsAboveOverlay: false
       });
 
+      setPlotterCanvas(plotCanvas)
       const objects = canvas.getObjects();
       objects.forEach((obj) => {
         obj.clone().then(clonedObj => {
@@ -69,14 +71,14 @@ export default function Home() {
             cornerSize: 0,
             hasControls: false
           })
-          plotterCanvas.add(clonedObj)
+          plotCanvas.add(clonedObj)
         })
       })
 
-      plotterCanvas.renderAll()
+      plotCanvas.renderAll()
 
       return () => {
-        plotterCanvas.dispose();
+        plotCanvas.dispose();
         FabricObject.ownDefaults.hasControls = true;
         FabricObject.ownDefaults.borderDashArray = [0]
       }
@@ -166,8 +168,8 @@ export default function Home() {
               `}
             >
               <div className={ `h-full transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
-                { tool !== 'Plot' &&  <Editor strokeColor={strokeColor} setStrokeColor={setStrokeColor} canvasObjs={canvasObjs} setCanvasObjs={setCanvasObjs} />}
-                { tool === 'Plot' && <Plot /> }
+                { tool !== 'Plot' &&  <Editor setTool={setTool} strokeColor={strokeColor} setStrokeColor={setStrokeColor} canvasObjs={canvasObjs} setCanvasObjs={setCanvasObjs} />}
+                { tool === 'Plot' && <Plot plotCanvas={plotterCanvas} /> }
               </div>
             </div>
             {/* <div className={`absolute bottom-0 ${ expanded ? 'md:w-[80%]' : 'w-full' } w-full py-2 px-4 footer transition-all duration-500 overflow-scroll no-scrollbar`}>

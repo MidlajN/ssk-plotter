@@ -45,6 +45,7 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
     }
 
     const commonSetup = (cursor = 'auto') => {
+      canvas.discardActiveObject();
       canvas.selection = false;
       canvas.hoverCursor = cursor;
       canvas.getObjects().forEach(obj => {

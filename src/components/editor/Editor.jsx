@@ -5,16 +5,18 @@ import { useEffect, useState } from "react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
 import './editor.css';
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2, X } from "lucide-react";
 import { deleteObject } from "../../util/functions";
+import { motion, AnimatePresence } from "framer-motion";
+import { PenIcon } from "../Icons";
 
 
-
-export function Editor({ strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs }) {
+export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs }) {
     const { canvas } = useCanvas();
     const { colors } = useCom()
     const [ dimension, setDimensions ] = useState({ width: 0, height: 0, angle: 0, active: false })
     const [ activeObjects, setActiveObjects ] = useState(null);
+    const [ isOpen, setIsOpen ] = useState(false);
 
     useEffect(() => {
         if (canvas) {
@@ -97,6 +99,8 @@ export function Editor({ strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs
         <>
             <div className="p-5 pb-10">
 
+                {/* <PopupExample /> */}
+
                 <div className={`object ${ dimension.active ? " pointer-events-auto opacity-100" : "pointer-events-none opacity-40" }`}>
                     <div className="input">
                         <p>Width</p>
@@ -116,20 +120,21 @@ export function Editor({ strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs
                 </div>
 
 
-                <div className="flex flex-wrap gap-4 justify-center items-center">
+                <div className="flex flex-wrap gap-x-1 gap-y-1 justify-center items-center">
                     { colors.map((color, index) => (
                         <div 
                             key={ index }
-                            className="rounded-md mx-auto w-fit border-4 cursor-pointer" 
-                            style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
+                            className="rounded-md mx-auto cursor-pointer w-[28%] h-[6.2rem] text-ellipsis overflow-hidden p-1" 
+                            // style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
                             onClick={ () => { setStrokeColor(color.color)}}
                         >
-                            <div className="p-6 border-2 border-white rounded-md" style={{ backgroundColor: color.color }}></div>
-                            <p className={`text-center text-sm  ${ color.color === strokeColor ? 'text-black bg-[#dbdbdb87] font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
+                            <div className="p-6 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
+                            <p className={`text-center text-sm pt-1 break-words ${ color.color === strokeColor ? 'text-black  font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
                         </div>
                     ))}
-                    <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]">Manage Colors..</button>
+                    <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
                 </div>
+                <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} />
 
                 <div className="p-4 mt-6 bg-gray-100 rounded-xl">
                     <h1 className="border-b border-[#1c7f969c] mb-4 pb-1 font-medium">Objects</h1>
@@ -140,6 +145,7 @@ export function Editor({ strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs
                                 className="flex items-center gap-4 py-2 px-2 border-b cursor-pointer"
                                 onClick={() => {
                                     canvas.setActiveObject(object);
+                                    setTool('Select');
                                     canvas.renderAll();
                                 }}
                                 style={{ background: activeObjects?.includes(object) ? '#e5e7eb' : '' }}
@@ -151,12 +157,83 @@ export function Editor({ strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs
                         ))}
                     </div>
 
-                    <div className="flex justify-end items-center gap-4 pt-3" >
-                        <Trash2 size={18} strokeWidth={1.5} style={{ color: 'gray' }} onClick={ () => deleteObject(canvas)} />
+                    <div className="flex justify-end items-center gap-4 pt-3" style={{ pointerEvents: activeObjects ? '' : 'none' }} >
+                        <Trash2 
+                            size={18} 
+                            strokeWidth={1.5} 
+                            style={{ color: activeObjects ? 'black' : 'gray' }} 
+                            onClick={ () => deleteObject(canvas)} 
+                            className="cursor-pointer active:text-red-700"
+                            />
                     </div>
                 </div>
 
             </div>
+        </>
+    )
+}
+
+
+
+const ManageColors = ({ isOpen, setIsOpen }) => {
+    const { colors, setColors } = useCom();
+    const updateColor = (index, newName) => {
+        const updatedColors = colors.map((color, i) => (
+            i === index ? { ...color, name: newName } : color
+        ));
+        setColors(updatedColors)
+
+    }
+    const togglePopup = () => {
+        setIsOpen(!isOpen);
+    }
+
+    return (
+        <>
+            <AnimatePresence>
+                { isOpen && (
+                    <motion.div
+                        className="fixed inset-0 flex items-center justify-center bg-opacity-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={ togglePopup }
+                    >
+                        <motion.div
+                            className="absolute right-[18%] w-fit bg-white rounded-xl shadow-lg overflow-hidden border border-[#1c7f969c]"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            onClick={(e) => e.stopPropagation()} // Prevent closing on popup click
+                        >
+                            <div className="flex justify-end items-center border-b "> 
+                                {/* <p className="pl-6">Color Manager</p> */}
+                                <button className="p-3 hover:bg-gray-100 transition-all duration-300 active:bg-gray-300" onClick={togglePopup}> 
+                                    <X size={18} strokeWidth={1.5} />
+                                </button>
+                            </div>
+                            <div className="colorManager">
+                                { colors.map((color, index) => (
+                                    <div key={index} className="item" >
+                                        <PenIcon stroke={ color.color } width={35} height={20} />
+                                        <p className="text-sm">{ index + 1 }</p>
+                                        <input 
+                                            type="text" 
+                                            value={ color.name } 
+                                            onChange={(e) => updateColor(index, e.target.value)}
+                                        />
+                                        <div className="w-7 h-7 rounded-lg" style={{ background: color.color }}></div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* <h2 className="mb-4 text-lg font-semibold">Popup Content</h2> */}
+                            {/* <p>This is your popup content! You can add any component here.</p> */}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     )
 }

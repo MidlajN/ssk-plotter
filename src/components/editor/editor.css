@@ -35,3 +35,39 @@
     outline: none;
     border: 1px solid #1c809681;
 }
+
+
+.colorManager {
+    padding: 1rem 1.1rem 1rem 1.1rem;
+
+}
+.colorManager .item {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 0.8rem 0.5rem;
+}
+.colorManager .item:not(:last-child) {
+    border-bottom: 1px solid #00000024;
+}
+.colorManager .item p {
+    position: absolute;
+    padding-left: 4px;
+}
+.colorManager .item input {
+    max-width: 12rem;
+    border: 1px solid rgba(0, 0, 0, 0.164);
+    /* border-radius: 0.4rem; */
+    padding: 3px 5px;
+    transition: 0.5s all;
+    font-size: 14px;
+    font-weight: 500;
+    /* text-align: center; */
+    color: #141d3b;
+}
+.colorManager .item input:focus {
+    outline: none;
+    border: 1px dashed rgba(0, 0, 0, 0.164);
+    border-bottom: 1px solid #1c809681;
+    /* border-radius: 0.4rem; */
+}
