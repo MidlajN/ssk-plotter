@@ -103,7 +103,7 @@ export default function Home() {
           setHideSideBar={ setHideSideBar } 
         />
 
-        <div className="h-[91%] bg-[#ebebeb] relative"> 
+        <div className="h-[91%] bg-[#ebebeb]"> 
           <AnimatePresence>
             { !hideSideBar &&
               <motion.div
@@ -191,11 +191,11 @@ export default function Home() {
 
             <div 
               className={`
-                ${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500 
-                lg:overflow-hidden lg:border-l-2 ${ tool === 'Plot' ? 'border-[#9c3c6e7c]' : 'border-[#1c7f969c]' }
+                ${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500
+                lg:border-l-2 ${ tool === 'Plot' ? 'border-[#9c3c6e7c]' : 'border-[#1c7f969c]' }
               `}
             >
-              <div className={ `h-full transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
+              <div className={ `h-full relative transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
                 { tool !== 'Plot' &&  <Editor setTool={setTool} strokeColor={strokeColor} setStrokeColor={setStrokeColor} canvasObjs={canvasObjs} setCanvasObjs={setCanvasObjs} />}
                 { tool === 'Plot' && <Plot plotCanvas={plotterCanvas} /> }
               </div>

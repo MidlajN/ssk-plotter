@@ -51,9 +51,18 @@ export const Plot = ({ plotCanvas }) => {
         };
     }, [canvas]);
 
+    const handleRotation = (angle) => {
+        const activeObjects = plotCanvas.getActiveObjects()
+        const group = new Group(activeObjects)
+        plotCanvas.remove(...activeObjects)
+        group.rotate(angle)
+        plotCanvas.add(...group.removeAll());
+        plotCanvas.renderAll();
+    }
+
     return (
         <>
-            <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
+            <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] bg-white h-full pb-10">
                 <div>
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
@@ -69,8 +78,30 @@ export const Plot = ({ plotCanvas }) => {
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <SettingsComponent openConfig={openConfig} setOpenConfig={setOpenConfig} plotCanvas={plotCanvas} />
+                        <div className="mx-3 px-1 py-1 flex bg-gray-100 rounded-xl items-center">
+                            <div 
+                                className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
+                                onClick={() => handleRotation(90)}
+                            >
+                                <RotateRight width={25} height={25} />
+                            </div>
+                            <div 
+                                className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
+                                onClick={() => handleRotation(-90)}
+                            >
+                                <RotateLeft width={25} height={25} />
+                            </div>
+                            <div 
+                                className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300 ml-auto" 
+                                onClick={ () => setOpenConfig(true) }
+                            >
+                                <Settings size={22} strokeWidth={1.5} />
+                            </div>
+                        </div>
                     </motion.div>
+
+                    <SettingsComponent openConfig={openConfig} setOpenConfig={setOpenConfig} plotCanvas={plotCanvas} />
+
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
@@ -95,6 +126,7 @@ export const Plot = ({ plotCanvas }) => {
                     exit={{ scale: 0.8, opacity: 0 }}
                     transition={{ duration: 0.5 }}
                 >
+
                     <ActionButtonsComponent />
                 </motion.div>
 
@@ -126,7 +158,7 @@ const DimensionComponent = () => {
     )
 }
 
-const SettingsComponent = ({ openConfig, setOpenConfig, plotCanvas }) => {
+const SettingsComponent = ({ openConfig, setOpenConfig }) => {
     const { config, setConfig, sendToMachine, response } = useCom();
     const gcodeRef = useRef(null)
     const textareaRef = useRef(null)
@@ -173,14 +205,11 @@ const SettingsComponent = ({ openConfig, setOpenConfig, plotCanvas }) => {
         gcodeRef.current.value = '';
     }
 
-    const handleRotation = (angle) => {
-        const activeObjects = plotCanvas.getActiveObjects()
-        const group = new Group(activeObjects)
-        plotCanvas.remove(...activeObjects)
-        group.rotate(angle)
-        plotCanvas.add(...group.removeAll());
-        plotCanvas.renderAll();
+    const handlePopUp = () => {
+        setOpenConfig(false)
     }
+
+    
 
     useEffect(() => {
         if ( textareaRef.current ) {
@@ -190,34 +219,15 @@ const SettingsComponent = ({ openConfig, setOpenConfig, plotCanvas }) => {
 
     return (
         <>
-            <div className="mx-3 px-1 py-1 flex bg-gray-100 rounded-xl items-center">
-                <div 
-                    className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
-                    onClick={() => handleRotation(90)}
-                >
-                    <RotateRight width={25} height={25} />
-                </div>
-                <div 
-                    className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
-                    onClick={() => handleRotation(-90)}
-                >
-                    <RotateLeft width={25} height={25} />
-                </div>
-                <div 
-                    className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300 ml-auto" 
-                    onClick={ () => setOpenConfig(true) }
-                >
-                    <Settings size={22} strokeWidth={1.5} />
-                </div>
-            </div>
 
             <AnimatePresence>
                 { openConfig &&
                     <motion.div
-                        className="fixed inset-0 flex items-center justify-center bg-opacity-50"
+                        className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        onClick={ handlePopUp }
                     >
                         <motion.div
                             className="absolute right-[18%] w-fit bg-white rounded-xl overflow-hidden shadow-lg border border-[#cfcfcf7c]"
@@ -254,7 +264,7 @@ const SettingsComponent = ({ openConfig, setOpenConfig, plotCanvas }) => {
                                 </div>
                             </div>
 
-                            <div className="text-sm responses mt-5 min-h-44 relative">
+                            <div className="text-sm responses mt-5 min-h-44">
                                 <textarea 
                                     ref={textareaRef} 
                                     value={ response.message } 

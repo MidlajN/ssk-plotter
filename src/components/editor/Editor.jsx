@@ -126,6 +126,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     </motion.div>
 
                     <motion.div
+                        className="h-full w-full"
                         initial={{ scale: 0.8, opacity: 0, translateY: 20 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
@@ -145,8 +146,9 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                             ))}
                             <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
                         </div>
-                        <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
                     </motion.div>
+                    
+                    <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
 
                     <motion.div
                         initial={{ opacity: 0, translateY: 20 }}
