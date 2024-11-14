@@ -14,6 +14,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
 import { Canvas, FabricObject, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
   const { 
@@ -103,11 +104,21 @@ export default function Home() {
         />
 
         <div className="h-[91%] bg-[#ebebeb] relative"> 
-          <div 
-            className={` ${ hideSideBar ? 'hidden' : '' } absolute left-3 top-1/2 -translate-y-1/2 z-10 h-fit w-fit`}
-          >
-            <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } element={element} setElement={ setElement } />
-          </div>
+          <AnimatePresence>
+            { !hideSideBar &&
+              <motion.div
+                className={`absolute left-3 top-1/2 -translate-y-1/2 z-10`}
+                initial={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                exit={{ opacity: 0, translateX: -20}}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                  <SideNav tool={ tool } setTool={ setTool } setExpanded={ setExpanded } element={element} setElement={ setElement } />
+                </div>
+              </motion.div>
+            } 
+          </AnimatePresence>
 
           <div 
             className="canvas-section flex flex-row"
@@ -130,15 +141,11 @@ export default function Home() {
                     width: '100%', 
                     height: '100%', 
                     overflow:'visible', 
-                    // display:'flex', 
                   }}
-                  contentStyle={{ 
-                    margin: '',
-                  }}  
                 >
                   <div 
                     className="machine-outer"
-                    style={{ display: tool === 'Plot' ? 'block' : 'none'}}
+                    style={{ display: tool === 'Plot' ? 'block' : 'none' }}
                   >
                     <div className="machine-inner">
                       <div className="machine-bed">
@@ -146,6 +153,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
+
                   <div 
                     onDrop={ e => { e.preventDefault(); handleFile(e.dataTransfer.files[0], canvas) } } 
                     onDragOver={ e => { e.preventDefault(); } }
@@ -153,14 +161,32 @@ export default function Home() {
                   >
                     <canvas ref={ canvasRef } className="fabricCanvas"></canvas>
                   </div>
+                  
                 </TransformComponent>
               </TransformWrapper>
 
-              <button className="toggle lg:hidden" onClick={() => setExpanded(!expanded)}>{ expanded ? <ChevronRight size={30} color="#1c8096" /> : <ChevronLeft size={30} color="#1c8096" /> }</button>
-              <div className={`hidden lg:block ${ hideSideBar ? 'lg:hidden' : '' } absolute top-3 left-1/2 -translate-x-1/2 z-10 h-fit w-fit`}>
-                <TopBar tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
-              </div>
-              {/* <button className=" absolute bottom-3 left-1/2 -translate-x-1/2 z-10 h-fit w-fit border-2">Reset</button> */}
+              <button className="toggle lg:hidden" onClick={() => setExpanded(!expanded)}>
+                { expanded ? 
+                  <ChevronRight size={30} color="#1c8096" /> : 
+                  <ChevronLeft size={30} color="#1c8096" /> 
+                }
+              </button>
+
+              <AnimatePresence>
+                { !hideSideBar &&
+                  <motion.div
+                    className={`absolute top-0 left-1/2 -translate-x-1/2 z-10 h-fit w-fit`}
+                    initial={{ opacity: 0, translateY: -40 }}
+                    animate={{ opacity: 1, translateY: 0 }}
+                    exit={{ opacity: 0, translateY: -40}}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className={`absolute top-3 left-1/2 -translate-x-1/2 z-10 h-fit w-fit`}>
+                      <TopBar tool={ tool } setTool={ setTool } setExpanded={ setExpanded } />
+                    </div>
+                  </motion.div>
+                }
+              </AnimatePresence>
             </div>
 
             <div 

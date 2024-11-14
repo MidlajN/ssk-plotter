@@ -53,11 +53,10 @@ export const Plot = ({ plotCanvas }) => {
 
     return (
         <>
-        <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
-            <div>
-                <AnimatePresence>
+            <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] relative bg-white h-full pb-10">
+                <div>
                     <motion.div
-                        initial={{ scale: 0.8, opacity: 0, translateY: 200 }}
+                        initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.2 }}
@@ -65,7 +64,7 @@ export const Plot = ({ plotCanvas }) => {
                         <DimensionComponent />
                     </motion.div>
                     <motion.div
-                        initial={{ scale: 0.8, opacity: 0, translateY: 200 }}
+                        initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.3 }}
@@ -73,7 +72,7 @@ export const Plot = ({ plotCanvas }) => {
                         <SettingsComponent openConfig={openConfig} setOpenConfig={setOpenConfig} plotCanvas={plotCanvas} />
                     </motion.div>
                     <motion.div
-                        initial={{ scale: 0.8, opacity: 0, translateY: 200 }}
+                        initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.4 }}
@@ -81,28 +80,27 @@ export const Plot = ({ plotCanvas }) => {
                         <StatusComponent />
                     </motion.div>
                     <motion.div
-                        initial={{ scale: 0.8, opacity: 0, translateY: 200 }}
+                        initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.5 }}
                     >
                         <ColorSortComponent />
                     </motion.div>
-                </AnimatePresence>
+                </div>
+
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
+                    animate={{ scale: 1, opacity: 1, translateY: 0 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <ActionButtonsComponent />
+                </motion.div>
+
+                { setupModal && <SetupModal /> }
+
             </div>
-
-            <motion.div
-                initial={{ scale: 0.8, opacity: 0, translateY: 200 }}
-                animate={{ scale: 1, opacity: 1, translateY: 0 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <ActionButtonsComponent />
-            </motion.div>
-
-            { setupModal && <SetupModal /> }
-
-        </div>
         </>
     )
 }
@@ -292,7 +290,7 @@ const StatusComponent = () => {
 
     return (
         <>
-            <div className="mx-3 my-3 px-1 py-1 border-b border-white  flex items-center gap-2">
+            <div className="mx-3 my-3 px-1 py-1 pb-3 border-b border-white  flex items-center gap-2">
                 <Info size={14} strokeWidth={2} color={'gray'} />
                 { !job.started && !job.percentage ? (
                     <p className="text-sm text-gray">Currently No Job Is Running...</p>

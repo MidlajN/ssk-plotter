@@ -99,76 +99,94 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
     return (
         <>
             <div className="p-5 pb-10">
-
-                {/* <PopupExample /> */}
-
-                <div className={`object ${ dimension.active ? " pointer-events-auto opacity-100" : "pointer-events-none opacity-40" }`}>
-                    <div className="input">
-                        <p>Width</p>
-                        <input type="number" value={dimension.width}/>
-                        <p className="text-sm pl-2">mm</p>
-                    </div>
-                    <div className="input">
-                        <p>Height</p>
-                        <input type="number" value={dimension.height}/>
-                        <p className="text-sm pl-2">mm</p>
-                    </div>
-                    <div className="input">
-                        <p>Angle</p>
-                        <input type="number" value={dimension.angle}/>
-                        <p className="text-sm pl-2">deg</p>
-                    </div>
-                </div>
-
-
-                <div className="flex flex-wrap gap-x-1 gap-y-1 justify-center items-center">
-                    { colors.map((color, index) => (
-                        <div 
-                            key={ index }
-                            className="rounded-md mx-auto cursor-pointer w-[28%] h-[6.2rem] text-ellipsis overflow-hidden p-1" 
-                            // style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
-                            onClick={ () => { setStrokeColor(color.color)}}
-                        >
-                            <div className="p-6 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
-                            <p className={`text-center text-sm pt-1 break-words ${ color.color === strokeColor ? 'text-black  font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
-                        </div>
-                    ))}
-                    <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
-                </div>
-                <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
-
-                <div className="p-4 mt-6 bg-gray-100 rounded-xl">
-                    <h1 className="border-b border-[#1c7f969c] mb-4 pb-1 font-medium">Objects</h1>
-                    <div className="h-48 overflow-scroll scrollbar-hide">
-                        { canvasObjs?.map((object, index) => (
-                            <div 
-                                key={ index } 
-                                className="flex items-center gap-4 py-2 px-2 border-b cursor-pointer"
-                                onClick={() => {
-                                    canvas.setActiveObject(object);
-                                    setTool('Select');
-                                    canvas.renderAll();
-                                }}
-                                style={{ background: activeObjects?.includes(object) ? '#e5e7eb' : '' }}
-                            >
-                                <Eye size={18} strokeWidth={1.5} style={{ color: 'gray' }} />
-                                <p className="text-sm">{index + 1} - <span className="capitalize">{ object.get('type') }</span></p>
-                                <div className="w-4 h-4 rounded-md ml-auto" style={{ background: object.get('stroke')}} ></div>
+                <AnimatePresence>
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0, translateY: 20 }}
+                        animate={{ scale: 1, opacity: 1, translateY: 0 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <div className={`object ${ dimension.active ? " pointer-events-auto opacity-100" : "pointer-events-none opacity-40" }`}>
+                            <div className="input">
+                                <p>Width</p>
+                                <input type="number" value={dimension.width}/>
+                                <p className="text-sm pl-2">mm</p>
                             </div>
-                        ))}
-                    </div>
+                            <div className="input">
+                                <p>Height</p>
+                                <input type="number" value={dimension.height}/>
+                                <p className="text-sm pl-2">mm</p>
+                            </div>
+                            <div className="input">
+                                <p>Angle</p>
+                                <input type="number" value={dimension.angle}/>
+                                <p className="text-sm pl-2">deg</p>
+                            </div>
+                        </div>
+                    </motion.div>
 
-                    <div className="flex justify-end items-center gap-4 pt-3" style={{ pointerEvents: activeObjects ? '' : 'none' }} >
-                        <Trash2 
-                            size={18} 
-                            strokeWidth={1.5} 
-                            style={{ color: activeObjects ? 'black' : 'gray' }} 
-                            onClick={ () => deleteObject(canvas)} 
-                            className="cursor-pointer active:text-red-700"
-                            />
-                    </div>
-                </div>
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0, translateY: 20 }}
+                        animate={{ scale: 1, opacity: 1, translateY: 0 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="flex flex-wrap gap-x-1 gap-y-1 justify-center items-center">
+                            { colors.map((color, index) => (
+                                <div 
+                                    key={ index }
+                                    className="rounded-md mx-auto cursor-pointer w-[28%] h-[6.2rem] text-ellipsis overflow-hidden p-1" 
+                                    // style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
+                                    onClick={ () => { setStrokeColor(color.color)}}
+                                >
+                                    <div className="p-6 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
+                                    <p className={`text-center text-sm pt-1 break-words ${ color.color === strokeColor ? 'text-black  font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
+                                </div>
+                            ))}
+                            <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
+                        </div>
+                        <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
+                    </motion.div>
 
+                    <motion.div
+                        initial={{ opacity: 0, translateY: 20 }}
+                        animate={{ opacity: 1, translateY: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="p-4 mt-6 bg-gray-100 rounded-xl">
+                            <h1 className="border-b border-[#1c7f969c] mb-4 pb-1 font-medium">Objects</h1>
+                            <div className="h-48 overflow-scroll scrollbar-hide">
+                                { canvasObjs?.map((object, index) => (
+                                    <div 
+                                        key={ index } 
+                                        className="flex items-center gap-4 py-2 px-2 border-b cursor-pointer"
+                                        onClick={() => {
+                                            canvas.setActiveObject(object);
+                                            setTool('Select');
+                                            canvas.renderAll();
+                                        }}
+                                        style={{ background: activeObjects?.includes(object) ? '#e5e7eb' : '' }}
+                                    >
+                                        <Eye size={18} strokeWidth={1.5} style={{ color: 'gray' }} />
+                                        <p className="text-sm">{index + 1} - <span className="capitalize">{ object.get('type') }</span></p>
+                                        <div className="w-4 h-4 rounded-md ml-auto" style={{ background: object.get('stroke')}} ></div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex justify-end items-center gap-4 pt-3" style={{ pointerEvents: activeObjects ? '' : 'none' }} >
+                                <Trash2 
+                                    size={18} 
+                                    strokeWidth={1.5} 
+                                    style={{ color: activeObjects ? 'black' : 'gray' }} 
+                                    onClick={ () => deleteObject(canvas)} 
+                                    className="cursor-pointer active:text-red-700"
+                                />
+                            </div>
+                        </div>
+                    </motion.div> 
+                </AnimatePresence>
             </div>
         </>
     )
@@ -258,9 +276,6 @@ const ManageColors = ({ isOpen, setIsOpen, strokeColor, setStrokeColor }) => {
                                     </div>
                                 ))}
                             </div>
-                            
-                            {/* <h2 className="mb-4 text-lg font-semibold">Popup Content</h2> */}
-                            {/* <p>This is your popup content! You can add any component here.</p> */}
                         </motion.div>
                     </motion.div>
                 )}

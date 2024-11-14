@@ -41,13 +41,13 @@
     font-size: 0.6rem;
     color: #1C274C;
     height: fit-content;
-    min-width: 3.5rem;
+    min-width: 4rem;
+    padding: 0.3rem 1rem;
+    margin-block: .3rem;
 }
 .navbar .navDiv .buttonGroup button.active {
     /* background-color: #1c8096; */
     color: white;
-    padding: 0.3rem 1rem;
-    margin-block: .3rem;
     border-radius: 5rem;
     box-shadow: 2px 2px 3px 0px #00000025;
 }
