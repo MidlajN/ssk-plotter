@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { 
     ChevronLeft,
     ChevronRight,
@@ -15,7 +15,9 @@ import {
     // Pause,
     Play,
     Info,
-    CheckCheck
+    CheckCheck,
+    Settings,
+    ArrowUp
 } from "lucide-react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
@@ -25,6 +27,7 @@ import { motion } from "framer-motion";
 import './plotter.css'
 import { RotateLeft, RotateRight } from "./Icons";
 import { Group } from "fabric";
+import { AnimatePresence } from "framer-motion";
 
 export const Plot = ({ plotCanvas }) => {
     const { canvas } = useCanvas();
@@ -32,7 +35,7 @@ export const Plot = ({ plotCanvas }) => {
         response, config, setConfig, setupModal, job, setJob, colors,
         setSetupModal, setProgress,  openSocket, closeSocket, sendToMachine
     } = useCom();
-
+    const [ openConfig, setOpenConfig ] = useState(false)
     const textareaRef = useRef(null)
     const gcodeRef = useRef(null)
 
@@ -110,11 +113,11 @@ export const Plot = ({ plotCanvas }) => {
     }, [canvas]);
 
     // Scroll the textarea to the bottom when it overflows
-    useEffect(() => {
-        if ( textareaRef.current ) {
-            textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
-        }
-    }, [response.message]);
+    // useEffect(() => {
+    //     if ( textareaRef.current ) {
+    //         textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+    //     }
+    // }, [response.message]);
 
     const JogButton = ({gcode, Icon, className}) => {
         return (
@@ -187,20 +190,27 @@ export const Plot = ({ plotCanvas }) => {
                     </div>
                 </div>
 
-                <div className="px-5 flex gap-4">
+                <div className="mx-3 px-1 py-1 flex bg-gray-100 rounded-xl items-center">
                     <div 
-                        className="hover:bg-gray-100 active:bg-gray-200 p-2 rounded-md cursor-pointer transition-all duration-300"
+                        className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
                         onClick={() => handleRotation(90)}
                     >
-                        <RotateRight width={30} height={30} />
+                        <RotateRight width={25} height={25} />
                     </div>
                     <div 
-                        className="hover:bg-gray-100 active:bg-gray-200 p-2 rounded-md cursor-pointer transition-all duration-300"
+                        className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
                         onClick={() => handleRotation(-90)}
                     >
-                        <RotateLeft width={30} height={30} />
+                        <RotateLeft width={25} height={25} />
+                    </div>
+                    <div 
+                        className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300 ml-auto" 
+                        onClick={ () => setOpenConfig(true) }
+                    >
+                        <Settings size={22} strokeWidth={1.5} />
                     </div>
                 </div>
+                <ConfigModal openConfig={openConfig} setOpenConfig={setOpenConfig} />
 
                 {/* <div className="px-3 py-4 border-b border-white bg-[#2a334e] flex items-center gap-2">
                     <Info size={14} strokeWidth={2} color={'#ffff'} />
@@ -224,45 +234,8 @@ export const Plot = ({ plotCanvas }) => {
                     )}
                 </div> */}
 
-                {/* <div className="text-sm responses lg:h-[25rem] min-h-44 relative">
-                    <textarea 
-                        ref={textareaRef} 
-                        value={ response.message } 
-                        className="cursor-default min-h-22 lg:pb-8" 
-                        readOnly
-                    />
-                    
-                    <div className="absolute w-full bottom-0 left-0 p-3">
-                        <input 
-                            ref={ gcodeRef }
-                            className="w-full bg-[#1e263f] p-2 border border-[#ffffff69] outline-none text-sm" 
-                            placeholder="Enter You G-Code here" 
-                            onKeyDown={ (e) => {
-                                if (e.key === 'Enter') {
-                                    const value = gcodeRef.current.value;
-                                    sendToMachine(value)
-                                    gcodeRef.current.value = '';
-                                }
-                            }}
-                        />
-                    </div>
-                </div> */}
             </div>
             <div className="flex flex-col items-center justify-center gap-5 px-6 lg:px-1 min-w-fit">
-                {/* <div className="flex gap-4 w-full justify-around items-center">
-                    <div className="grid grid-cols-3 gap-3">
-                        <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />  
-                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />  
-                        <JogButton className='col-start-2' gcode={`$H`} Icon={Home} />  
-                        <JogButton className='col-start-3' gcode={`$J=G91 G21 F${ config.jogSpeed } X10`} Icon={ChevronRight} /> 
-                        <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
-                    </div>
-                    <div className="grid grid-cols-1 gap-3 h-fit">
-                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z1`} Icon={ChevronUp} />  
-                        <button className="p-2 bg-[#1C274C] rounded"><p className="text-white text-[10px]">Z-Axis</p></button>
-                        <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
-                    </div>
-                </div> */}
 
                 <div className="flex w-full min-w-80 items-end justify-between gap-1 pt-2 lg:pt-12">
                     { !job.connected ? (
@@ -420,6 +393,136 @@ function ConfigComponent() {
                 ))}
             </div>
             <p className="text-[12px] `max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
+        </>
+    )
+}
+
+
+const ConfigModal = ({ openConfig, setOpenConfig }) => {
+    const { config, setConfig, sendToMachine, response } = useCom();
+    const gcodeRef = useRef(null)
+    const textareaRef = useRef(null)
+
+    const InputComponent = useCallback(({ inputKey, config, setConfig, label, limit=null }) => {
+        const handleChange = (e) => {
+            let value = e.target.value;
+            if (limit) {
+                value = parseInt(value < limit ? value : limit)
+                value = isNaN(value) ? 0 : value
+            }
+            setConfig({ ...config, [inputKey]: value })
+        }
+        return (
+            <div className="flex items-center justify-between relative py-1">
+                <div className="flex gap-5 items-center justify-between rounded-[7px] p-1 bg-white z-10 w-full">
+                    <p className="text-[#575757] text-sm font-normal">{label}</p>
+                    <input 
+                        type="text" 
+                        className="text-end pr-2 max-w-[11rem] transition-all duration-500 outline-none border-b focus:border-[#1c7f969c] text-sm font-normal" 
+                        value={config[inputKey]} 
+                        onChange={ handleChange }
+                    />
+                </div>
+            </div>
+        )
+    }, [])
+
+    const JogButton = ({gcode, Icon, className}) => {
+        return (
+            <motion.button
+                className={`${className} p-3 bg-[#1C274C] rounded flex justify-center items-center`}
+                onClick={ () => sendToMachine(gcode) }
+                whileTap={{ scale: 0.95 }}
+            >
+                <Icon size={20} strokeWidth={gcode === '$H' ? 2 : 4} color={gcode === '$H' ? '#ffffff' : '#F5762E'} />
+            </motion.button>
+        )
+    }
+
+    const sendGcode = () => {
+        const value = gcodeRef.current.value;
+        sendToMachine(value)
+        gcodeRef.current.value = '';
+    }
+
+    useEffect(() => {
+        if ( textareaRef.current ) {
+            textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+        }
+    }, [response.message]);
+
+    return (
+        <>
+            <AnimatePresence>
+                { openConfig &&
+                    <motion.div
+                        className="fixed inset-0 flex items-center justify-center bg-opacity-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="absolute right-[18%] w-fit bg-white rounded-xl overflow-hidden shadow-lg border border-[#cfcfcf7c]"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            onClick={(e) => e.stopPropagation()} // Prevent closing on popup click
+                        >
+                            <div className="flex justify-between items-center "> 
+                                <p className="pl-6 pt-3 font-medium text-[#1e263f]">Control Settings</p>
+                                <button className="p-3 rounded-tr-xl bg-gray-100 rounded-bl-2xl transition-all duration-300 active:bg-gray-300" onClick={ () => setOpenConfig(false) }> 
+                                    <X size={18} strokeWidth={1.5} />
+                                </button>
+                            </div>
+                            <div className="p-6">
+                                <InputComponent inputKey={`url`} config={config} setConfig={setConfig} label={'Machine URL'}/>
+                                <InputComponent inputKey={`feedRate`} config={config} setConfig={setConfig} label={'Feed Rate'} limit={12000}/>
+                                <InputComponent inputKey={`jogSpeed`} config={config} setConfig={setConfig} label={'Jog Speed'} limit={15000}/>
+                            </div>
+
+                            <div className="p-5 flex gap-4 w-full justify-around items-center">
+                                <div className="grid grid-cols-3 gap-3">
+                                    <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y10`} Icon={ChevronUp} />  
+                                    <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } X-10`} Icon={ChevronLeft} />  
+                                    <JogButton className='col-start-2' gcode={`$H`} Icon={Home} />  
+                                    <JogButton className='col-start-3' gcode={`$J=G91 G21 F${ config.jogSpeed } X10`} Icon={ChevronRight} /> 
+                                    <JogButton className='col-start-2' gcode={`$J=G91 G21 F${ config.jogSpeed } Y-10`} Icon={ChevronDown} />  
+                                </div>
+                                <div className="grid grid-cols-1 gap-3 h-fit">
+                                    <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z1`} Icon={ChevronUp} />  
+                                    <button className="p-2 bg-[#1C274C] rounded"><p className="text-white text-[10px]">Z-Axis</p></button>
+                                    <JogButton className='col-start-1' gcode={`$J=G91 G21 F${ config.jogSpeed } Z-1`} Icon={ChevronDown} />  
+                                </div>
+                            </div>
+
+                            <div className="text-sm responses mt-5 min-h-44 relative">
+                                <textarea 
+                                    ref={textareaRef} 
+                                    value={ response.message } 
+                                    className="cursor-default pb-1" 
+                                    readOnly
+                                />
+                                
+                                <div className="relative w-full">
+                                    <input 
+                                        ref={ gcodeRef }
+                                        className="w-full bg-[#1e263f] p-2 rounded-md border border-[#ffffff69] outline-none text-sm" 
+                                        placeholder="Enter You G-Code here" 
+                                        onKeyDown={ (e) => { if (e.key === 'Enter') sendGcode() }}
+                                    />
+                                    <button 
+                                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#2651d4] hover:bg-[#2d58da] active:bg-[#2651d4ce] transition-all duration-200 rounded p-1"
+                                        onClick={ sendGcode }
+                                    >
+                                        <ArrowUp size={20} />
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                }
+            </AnimatePresence>
         </>
     )
 }

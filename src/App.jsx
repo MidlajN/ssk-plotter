@@ -34,15 +34,12 @@ export default function Home() {
   const [ canvasObjs, setCanvasObjs ] = useState(null)
   const [ plotterCanvas, setPlotterCanvas ] = useState(null)
 
-  // ---- For Debug Purposes ----
+  // // ---- For Debug Purposes ----
   // const { setResponse, response } = useCom();
   // useEffect(() => {
   //   setResponse({ ...response, pageId: 0 })
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
-  useEffect(() => {
-
-  })
 
   useEffect(() => {
     if (tool === 'Plot') {
