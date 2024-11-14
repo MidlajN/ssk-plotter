@@ -9,6 +9,7 @@ import { Eye, Trash2, X } from "lucide-react";
 import { deleteObject } from "../../util/functions";
 import { motion, AnimatePresence } from "framer-motion";
 import { PenIcon } from "../Icons";
+import { ChromePicker } from "react-color";
 
 
 export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs }) {
@@ -134,7 +135,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     ))}
                     <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
                 </div>
-                <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} />
+                <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
 
                 <div className="p-4 mt-6 bg-gray-100 rounded-xl">
                     <h1 className="border-b border-[#1c7f969c] mb-4 pb-1 font-medium">Objects</h1>
@@ -174,18 +175,40 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
 }
 
 
-
-const ManageColors = ({ isOpen, setIsOpen }) => {
+const ManageColors = ({ isOpen, setIsOpen, strokeColor, setStrokeColor }) => {
     const { colors, setColors } = useCom();
-    const updateColor = (index, newName) => {
+    const { canvas } = useCanvas();
+    const [ displayPalette, setDisplayPalettte ] = useState({ open: false, index: null });
+
+    const updateName = (index, newName) => {
         const updatedColors = colors.map((color, i) => (
             i === index ? { ...color, name: newName } : color
         ));
         setColors(updatedColors)
 
     }
+
+    const updateColor = (index, newColor, oldColor) => {
+        const updatedColors = colors.map((color, i) => (
+            i === index ? { ...color, color: newColor.hex } : color
+        ));
+        setColors(updatedColors);
+        canvas.getObjects().forEach(obj => {
+            if (obj.get('stroke') === oldColor) {
+                obj.set({
+                    stroke: newColor.hex
+                });
+            }
+        })
+        canvas.renderAll()
+        if( strokeColor === oldColor) {
+            setStrokeColor(newColor.hex)
+        }
+    }
+
     const togglePopup = () => {
         setIsOpen(!isOpen);
+        setDisplayPalettte({ open: false, index: null })
     }
 
     return (
@@ -200,7 +223,7 @@ const ManageColors = ({ isOpen, setIsOpen }) => {
                         onClick={ togglePopup }
                     >
                         <motion.div
-                            className="absolute right-[18%] w-fit bg-white rounded-xl shadow-lg overflow-hidden border border-[#1c7f969c]"
+                            className="absolute right-[18%] w-fit bg-white rounded-xl shadow-lg border border-[#1c7f969c]"
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.8, opacity: 0 }}
@@ -209,7 +232,7 @@ const ManageColors = ({ isOpen, setIsOpen }) => {
                         >
                             <div className="flex justify-end items-center border-b "> 
                                 {/* <p className="pl-6">Color Manager</p> */}
-                                <button className="p-3 hover:bg-gray-100 transition-all duration-300 active:bg-gray-300" onClick={togglePopup}> 
+                                <button className="p-3 rounded-tr-xl hover:bg-gray-100 transition-all duration-300 active:bg-gray-300" onClick={togglePopup}> 
                                     <X size={18} strokeWidth={1.5} />
                                 </button>
                             </div>
@@ -221,9 +244,17 @@ const ManageColors = ({ isOpen, setIsOpen }) => {
                                         <input 
                                             type="text" 
                                             value={ color.name } 
-                                            onChange={(e) => updateColor(index, e.target.value)}
+                                            onChange={(e) => updateName(index, e.target.value)}
                                         />
-                                        <div className="w-7 h-7 rounded-lg" style={{ background: color.color }}></div>
+                                        <div className="w-7 h-7 rounded-lg" style={{ background: color.color }} onClick={() => setDisplayPalettte({ open: true, index: index })}></div>
+                                        { displayPalette.open && index === displayPalette.index &&
+                                            <>
+                                                <div className="absolute z-[2]">
+                                                    <div className="fixed top-0 right-0 left-0 bottom-0" onClick={() => setDisplayPalettte({ open: false, index: null })} />
+                                                    <ChromePicker  color={ color.color } onChange={ (clr) => updateColor( index, clr, color.color )} />
+                                                </div>
+                                            </>
+                                        }
                                     </div>
                                 ))}
                             </div>

@@ -21,6 +21,13 @@ export const CommunicationProvider = ({ children }) => {
     const [ ws, setWs ] = useState(null);
     const [colors, setColors] = useState([
         { 
+            color: '#5e5e5e', 
+            name: 'Gray', 
+            zValue: -33.4, 
+            penPick: [ 'G53 Y60', 'G53 X724.8Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
+            penDrop: [ 'G53 Y60', 'G53 X724.8Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ]
+        },
+        { 
             color: '#ffff00', 
             name: 'Yellow', 
             zValue: -33.4, 
@@ -33,13 +40,6 @@ export const CommunicationProvider = ({ children }) => {
             zValue: -33.4, 
             penPick: [ 'G53 Y60', 'G53 X763.3Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
             penDrop: [ 'G53 Y60', 'G53 X763.3Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ]
-        },
-        { 
-            color: '#5e5e5e', 
-            name: 'Gray', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X724.8Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X724.8Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ]
         },
         { 
             color: '#227fe3', 

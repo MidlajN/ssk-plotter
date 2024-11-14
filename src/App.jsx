@@ -13,6 +13,7 @@ import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
 import { Canvas, FabricObject, util } from "fabric";
+import useCom from "./context/ComContext.jsx";
 
 export default function Home() {
   const { 
@@ -23,11 +24,12 @@ export default function Home() {
     // objectValues, 
     plotterRef 
   } = useCanvas();
+  const { colors } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
   const [ hideSideBar, setHideSideBar ] = useState(false);
-  const [ strokeColor, setStrokeColor ] = useState('#5e5e5e');
+  const [ strokeColor, setStrokeColor ] = useState(colors[0].color);
   const [ element, setElement ] = useState('rectangle');
   const [ canvasObjs, setCanvasObjs ] = useState(null)
   const [ plotterCanvas, setPlotterCanvas ] = useState(null)
@@ -38,6 +40,9 @@ export default function Home() {
   //   setResponse({ ...response, pageId: 0 })
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
+  useEffect(() => {
+
+  })
 
   useEffect(() => {
     if (tool === 'Plot') {
