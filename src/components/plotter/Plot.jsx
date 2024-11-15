@@ -17,7 +17,8 @@ import {
     Info,
     CheckCheck,
     Settings,
-    ArrowUp
+    ArrowUp,
+    MoreVertical
 } from "lucide-react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
@@ -65,6 +66,7 @@ export const Plot = ({ plotCanvas }) => {
             <div className="flex justify-between gap-4 max-[750px]:flex-col lg:flex-col p-5 z-[2] bg-white h-full pb-10">
                 <div>
                     <motion.div
+                        key={1}
                         initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
@@ -73,6 +75,7 @@ export const Plot = ({ plotCanvas }) => {
                         <DimensionComponent />
                     </motion.div>
                     <motion.div
+                        key={2}
                         initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
@@ -103,6 +106,7 @@ export const Plot = ({ plotCanvas }) => {
                     <SettingsComponent openConfig={openConfig} setOpenConfig={setOpenConfig} plotCanvas={plotCanvas} />
 
                     <motion.div
+                        key={3}
                         initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
@@ -110,7 +114,9 @@ export const Plot = ({ plotCanvas }) => {
                     >
                         <StatusComponent />
                     </motion.div>
+
                     <motion.div
+                        key={4}
                         initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
@@ -121,6 +127,7 @@ export const Plot = ({ plotCanvas }) => {
                 </div>
 
                 <motion.div
+                    key={5}
                     initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
                     animate={{ scale: 1, opacity: 1, translateY: 0 }}
                     exit={{ scale: 0.8, opacity: 0 }}
@@ -327,20 +334,88 @@ const StatusComponent = () => {
 
 const ColorSortComponent = () => {
     const { colors, setColors } = useCom();
+    const { canvas } = useCanvas();
     const dragDiv = useRef(0);
-    const dragOverDiv = useRef(0)
+    const dragOverDiv = useRef(0);
+    const [ drawnColors, setDrawnColors ] = useState([])
+    const [ showMore, setShowMore ] = useState(null)
 
+    // const handleSort = () => {
+    //     const cloneColors = [...colors];
+    //     const temp = cloneColors[dragDiv.current]
+    //     cloneColors[dragDiv.current] = cloneColors[dragOverDiv.current];
+    //     cloneColors[dragOverDiv.current] = temp
+    //     setColors(cloneColors)
+    // }
     const handleSort = () => {
-        const cloneColors = [...colors];
+        const cloneColors = [...drawnColors];
         const temp = cloneColors[dragDiv.current]
         cloneColors[dragDiv.current] = cloneColors[dragOverDiv.current];
         cloneColors[dragOverDiv.current] = temp
-        setColors(cloneColors)
+        setDrawnColors(cloneColors)
     }
+
+    useEffect(() => {
+        const uniqueColors = [];
+        canvas.getObjects().forEach((obj) => {
+            const color = obj.get('stroke');
+            if ( color && !uniqueColors.some(clr => clr.color === color )) {
+                const name = colors.reduce((clrName, currentColor) => {
+                    if (currentColor.color === color) {
+                        clrName = currentColor.name;
+                    }
+                    return clrName
+                }, null)
+
+                console.log(name)
+                uniqueColors.push({ color: color, name: name });
+            }
+        });
+        setDrawnColors(uniqueColors);
+    }, [canvas, colors])
 
     return (
         <>
             <div className="flex flex-col gap-2 m-2 p-4 rounded-md bg-[#f7f7f7] border border-[#eeeeee]">
+                { drawnColors.map((color, index) => (
+                    <div 
+                        key={index} 
+                        className="flex gap-4 justify-between items-center py-2 border-b-2 bg-white px-1 rounded-md w-full" 
+                        draggable
+                        onDragStart={ () =>  ( dragDiv.current = index )}
+                        onDragEnter={ () => { dragOverDiv.current = index }}
+                        onDragEnd={ handleSort }
+                        onDragOver={ (e) => { e.preventDefault() }}
+                    >
+                        <div className="flex gap-1 items-center pl-[2px] w-full">
+                            <GripHorizontal size={17} strokeWidth={2} color="gray" />
+                            <PenIcon stroke={ color.color } width={35} height={15} />
+                            <p className=" font-normal text-[#035264] text-sm pl-2">{color.name}</p>
+                            <MoreVertical size={17} strokeWidth={2} color="gray" className="ml-auto cursor-pointer" onClick={() => setShowMore(index)} />
+                            { showMore === index && (
+                                <>
+                                    <motion.div
+                                        className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        // onClick={ handlePopUp }
+                                    >
+                                        <div className="flex flex-col absolute bg-white shadow-md right-4 top-4 border rounded-lg">
+                                            <button className="pl-4 pr-10 text-start py-2 hover:bg-gray-50 active:bg-gray-100">Skip</button>
+                                            <button className="pl-4 pr-10 text-start py-2 hover:bg-gray-50 active:bg-gray-100">Replace</button>
+                                        </div>
+
+                                    </motion.div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <p className="text-[12px] `max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
+
+            {/* <div className="flex flex-col gap-2 m-2 p-4 rounded-md bg-[#f7f7f7] border border-[#eeeeee]">
                 { colors.map((color, index) => (
                     <div 
                         key={index} 
@@ -359,7 +434,7 @@ const ColorSortComponent = () => {
                     </div>
                 ))}
             </div>
-            <p className="text-[12px] `max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
+            <p className="text-[12px] `max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p> */}
         </>
     )
 }

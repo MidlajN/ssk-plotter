@@ -95,12 +95,21 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
         }
     }, [canvas])
 
+    const handleDimension = (name, value) => {
+        setDimensions(prev => ({
+            ...prev,
+            [name]: value
+        }))
+        console.log('name : ', name, 'value : ', value)
+    }
+
 
     return (
         <>
             <div className="p-5 pb-10">
                 <AnimatePresence>
                     <motion.div
+                        key={1}
                         initial={{ scale: 0.8, opacity: 0, translateY: 20 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
@@ -109,23 +118,24 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                         <div className={`object ${ dimension.active ? " pointer-events-auto opacity-100" : "pointer-events-none opacity-40" }`}>
                             <div className="input">
                                 <p>Width</p>
-                                <input type="number" value={dimension.width}/>
+                                <input type="number" value={dimension.width} onInput={ (e) => handleDimension('width', e.target.value)}/>
                                 <p className="text-sm pl-2">mm</p>
                             </div>
                             <div className="input">
                                 <p>Height</p>
-                                <input type="number" value={dimension.height}/>
+                                <input type="number" value={dimension.height} onInput={ (e) => handleDimension('height', e.target.value )}/>
                                 <p className="text-sm pl-2">mm</p>
                             </div>
                             <div className="input">
                                 <p>Angle</p>
-                                <input type="number" value={dimension.angle}/>
+                                <input type="number" value={dimension.angle} onInput={ (e) => handleDimension('angle', e.target.value )}/>
                                 <p className="text-sm pl-2">deg</p>
                             </div>
                         </div>
                     </motion.div>
 
                     <motion.div
+                        key={2}
                         className="h-full w-full"
                         initial={{ scale: 0.8, opacity: 0, translateY: 20 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
@@ -151,6 +161,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
 
                     <motion.div
+                        key={3}
                         initial={{ opacity: 0, translateY: 20 }}
                         animate={{ opacity: 1, translateY: 0 }}
                         exit={{ opacity: 0 }}

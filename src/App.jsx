@@ -195,7 +195,7 @@ export default function Home() {
                 lg:border-l-2 ${ tool === 'Plot' ? 'border-[#9c3c6e7c]' : 'border-[#1c7f969c]' }
               `}
             >
-              <div className={ `h-full relative transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
+              <div className={ `h-full transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
                 { tool !== 'Plot' &&  <Editor setTool={setTool} strokeColor={strokeColor} setStrokeColor={setStrokeColor} canvasObjs={canvasObjs} setCanvasObjs={setCanvasObjs} />}
                 { tool === 'Plot' && <Plot plotCanvas={plotterCanvas} /> }
               </div>
