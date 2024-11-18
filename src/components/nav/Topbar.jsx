@@ -1,12 +1,12 @@
 import useCanvas from "../../context/CanvasContext";
 import { useEffect, useState } from "react";
-import { util } from "fabric";
+import { ActiveSelection, util } from "fabric";
 import { handleFile } from "../../util/functions";
 import { 
-    Download, 
+    Download,
+    Shrink, 
     // RectangleHorizontal, 
     // RectangleVertical, 
-    // Shrink 
 } from "lucide-react";
 
 export const TopBar = () => {
@@ -36,6 +36,37 @@ export const TopBar = () => {
         }
         setCanvasSize(e.target.value)
     }
+
+    const shrinkCanvasToSelection = (canvas) => {
+        const objects = canvas.getObjects();
+
+        if (objects.length === 0) return;
+      
+        // Create an active selection
+        const selection = new ActiveSelection(objects, { canvas });
+        canvas.setActiveObject(selection);
+        canvas.renderAll(); // Ensure the selection is visible on the canvas
+      
+        // Get the bounding box of the selection
+        const boundingRect = selection.getBoundingRect(true); // Use true for absolute coordinates
+        const newWidth = boundingRect.width;
+        const newHeight = boundingRect.height;
+      
+        // Adjust all objects' positions relative to the new canvas size
+        objects.forEach((obj) => {
+          obj.left -= boundingRect.left;
+          obj.top -= boundingRect.top;
+          obj.setCoords(); // Update the object's coordinates
+        });
+      
+        // Resize the canvas to fit the bounding box
+        canvas.setWidth(newWidth);
+        canvas.setHeight(newHeight);
+      
+        // Clear the selection
+        canvas.discardActiveObject();
+        canvas.renderAll();
+    };      
 
     useEffect(() => {
         if (canvasConfig.height === 210 && canvasConfig.width === 297) {
@@ -120,11 +151,11 @@ export const TopBar = () => {
                         >
                         <RectangleVertical size={18} strokeWidth={1} color={'#000'}/>
                     </div>
-                </div>
-
-                <div className="pr-1">
-                    <Shrink size={18} strokeWidth={1.6} color={'#000'}/>
                 </div> */}
+
+                <div className="pr-1" onClick={() => shrinkCanvasToSelection(canvas)}>
+                    <Shrink size={18} strokeWidth={1.6} color={'#000'}/>
+                </div>
             </div>
         </>
     )

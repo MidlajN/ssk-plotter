@@ -10,6 +10,7 @@ import { deleteObject } from "../../util/functions";
 import { motion, AnimatePresence } from "framer-motion";
 import { PenIcon } from "../Icons";
 import { ChromePicker } from "react-color";
+import { util } from "fabric";
 
 
 export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs }) {
@@ -38,7 +39,9 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     const scaledHeight = pixelHeight * scaleY;
                     const mmHeight = parseFloat(scaledHeight * 25.4 / 96).toFixed(2);
 
-                    const angle = parseFloat((activeObject[0].get('angle') * 25.4) / 96).toFixed(2);
+                    console.log(activeObject[0].get('angle'))
+                    // const angle = parseFloat((activeObject[0].get('angle') * 25.4) / 96).toFixed(2);
+                    const angle = activeObject[0].get('angle');
                     setDimensions({ width: mmWidth, height: mmHeight, angle: angle, active: true });
                 } else {
                     setDimensions({ ...dimension, active: false })
@@ -46,6 +49,8 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
             }
 
             canvas.on('mouse:down', handleObject);
+            canvas.on('object:modified', handleObject);
+            canvas.on('selection:created', handleObject);
 
             const setUpColor = (objects) => {
                 console.log(objects)
@@ -65,10 +70,15 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                 canvas.renderAll();
             }
 
-            return () => canvas.off('mouse:down', handleObject);
+            return () => {
+                canvas.off('mouse:down', handleObject);
+                canvas.off('object:modified', handleObject);
+                canvas.off('selection:created', handleObject);
+            }
         }
 
     }, [canvas, strokeColor])
+    
 
     useEffect(() => {
         if (!canvas) return;
@@ -78,6 +88,10 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
         };
         const handleAddedObject = () => {
             setCanvasObjs([...canvas.getObjects()])
+            const object = canvas.getActiveObject()
+            if (!object) {
+                setDimensions({ width: 0, height: 0, angle: 0, active: false })
+            }
         }
 
         canvas.on('selection:created', handleSelection);
@@ -99,8 +113,20 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
         setDimensions(prev => ({
             ...prev,
             [name]: value
-        }))
-        console.log('name : ', name, 'value : ', value)
+        }));
+        const object = canvas.getActiveObject();
+        if (name === 'angle') {
+            object.set({
+                [name]: value
+            })
+        } else {
+            object.set({
+                [name]: util.parseUnit(`${value}mm`)
+            })
+        }
+        canvas.discardActiveObject();
+        canvas.setActiveObject(object);
+        canvas.renderAll()
     }
 
 

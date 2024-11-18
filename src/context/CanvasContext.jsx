@@ -39,6 +39,7 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.noScaleCache = true;
         FabricObject.ownDefaults.strokeUniform = true;
         FabricObject.customProperties = ['name'];
+        // FabricObject.ownDefaults.centeredRotation = true;
 
          
         const fabricCanvas = new Canvas(canvasRef.current, {

@@ -50,7 +50,7 @@ export const split = (canvas, saveState) => {
             selectable: true,
             hasControls: true,
             fill: 'transparent',
-            stroke: 'black',
+            stroke: '#5e5e5e',
             strokeWidth: 2,
         });
         fabricPaths.push(line)
@@ -62,7 +62,7 @@ export const split = (canvas, saveState) => {
             selectable: true,
             hasControls: true,
             fill: 'transparent',
-            stroke: 'black',
+            stroke: '#5e5e5e',
             strokeWidth: 2,
             // strokeLineCap: 'round'
         });

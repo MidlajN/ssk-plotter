@@ -72,7 +72,7 @@ export const Plot = ({ plotCanvas }) => {
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                     >
-                        <DimensionComponent />
+                        <DimensionComponent plotCanvas={plotCanvas} />
                     </motion.div>
                     <motion.div
                         key={2}
@@ -117,10 +117,10 @@ export const Plot = ({ plotCanvas }) => {
 
                     <motion.div
                         key={4}
-                        initial={{ scale: 0.8, opacity: 0, translateY: 40 }}
-                        animate={{ scale: 1, opacity: 1, translateY: 0 }}
-                        exit={{ scale: 0.8, opacity: 0 }}
-                        transition={{ duration: 0.5 }}
+                        initial={{ opacity: 0,  }}
+                        animate={{ opacity: 1,  }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.7 }}
                     >
                         <ColorSortComponent />
                     </motion.div>
@@ -144,22 +144,57 @@ export const Plot = ({ plotCanvas }) => {
     )
 }
 
-const DimensionComponent = () => {
+const DimensionComponent = ({ plotCanvas }) => {
+    const [ dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    useEffect(() => {
+        if (!plotCanvas) return;
+
+        const getSelectionDimensions = () => {
+            const activeObject = plotCanvas.getActiveObject();
+            let width = null;
+            let height = null;
+            // let angle = null;
+            if (activeObject && activeObject.type === 'activeSelection') {
+                const boundingRect = activeObject.getBoundingRect(true); // true for absolute coordinates
+                width = parseFloat(boundingRect.width * 25.4 / 96).toFixed(2); 
+                height = parseFloat(boundingRect.height * 25.4 / 96).toFixed(2); 
+    
+            } else if (activeObject) {
+                width = parseFloat(activeObject.getScaledWidth() * 25.4 / 96).toFixed(2);
+                height = parseFloat(activeObject.getScaledHeight() * 25.4 / 96).toFixed(2);
+            }
+            setDimensions({ width: width ? width : 0, height: height ? height: 0 });
+        };
+          
+        plotCanvas.on('selection:created', getSelectionDimensions);
+        plotCanvas.on('selection:updated', getSelectionDimensions);
+        plotCanvas.on('selection:cleared', getSelectionDimensions);
+
+        return () => {
+            plotCanvas.off('selection:created', getSelectionDimensions);
+            plotCanvas.off('selection:updated', getSelectionDimensions);
+            plotCanvas.off('selection:cleared', getSelectionDimensions);
+        }
+          
+    }, [plotCanvas])
+
+
     return (
         <>
             <div className="p-5">
                 <div className="flex gap-6 pb-2">
                     <p className="min-w-14">Width</p>
-                    <p>445 <span className="text-xs text-gray-500">mm</span></p>
+                    <p>{ dimensions.width } <span className="text-xs text-gray-500">mm</span></p>
                 </div>
                 <div className="flex gap-6 pb-2">
                     <p className="min-w-14">Height</p>
-                    <p>435 <span className="text-xs text-gray-500">mm</span></p>
+                    <p>{ dimensions.height } <span className="text-xs text-gray-500">mm</span></p>
                 </div>
-                <div className="flex gap-6">
+                {/* <div className="flex gap-6">
                     <p className="min-w-14">Angle</p>
                     <p>0 <span className="text-xs text-gray-500">deg</span></p>
-                </div>
+                </div> */}
             </div>
         </>
     )
@@ -352,7 +387,23 @@ const ColorSortComponent = () => {
         const temp = cloneColors[dragDiv.current]
         cloneColors[dragDiv.current] = cloneColors[dragOverDiv.current];
         cloneColors[dragOverDiv.current] = temp
+
+        const sortedColor = colors.sort((a, b) => {
+            const indexA = cloneColors.findIndex(color => color.color === a.color)
+            const indexB = cloneColors.findIndex(color => color.color === b.color)
+            return indexA - indexB
+        })
+        setColors(sortedColor)
         setDrawnColors(cloneColors)
+    }
+
+    const handleColor = (color, value) => {
+        setColors(prevColors => 
+            prevColors.map(prevColor => (
+                prevColor.color === color ? { ...prevColor, skipped: value } : prevColor
+            ))
+        )
+        setShowMore(null)
     }
 
     useEffect(() => {
@@ -360,81 +411,96 @@ const ColorSortComponent = () => {
         canvas.getObjects().forEach((obj) => {
             const color = obj.get('stroke');
             if ( color && !uniqueColors.some(clr => clr.color === color )) {
-                const name = colors.reduce((clrName, currentColor) => {
+                const result = colors.reduce((accumulator, currentColor) => {
                     if (currentColor.color === color) {
-                        clrName = currentColor.name;
+                        accumulator = {
+                            name: currentColor.name,
+                            skipped: currentColor.skipped
+                        }
                     }
-                    return clrName
+                    return accumulator
                 }, null)
-
-                console.log(name)
-                uniqueColors.push({ color: color, name: name });
+                uniqueColors.push({ color: color, name: result.name, skipped: result.skipped });
             }
         });
-        setDrawnColors(uniqueColors);
+
+        const sortedColor = uniqueColors.sort((a, b) => {
+            const indexA = colors.findIndex(color => color.color === a.color)
+            const indexB = colors.findIndex(color => color.color === b.color)
+            return indexA - indexB
+        })
+        setDrawnColors(sortedColor);
     }, [canvas, colors])
 
     return (
         <>
-            <div className="flex flex-col gap-2 m-2 p-4 rounded-md bg-[#f7f7f7] border border-[#eeeeee]">
-                { drawnColors.map((color, index) => (
-                    <div 
-                        key={index} 
-                        className="flex gap-4 justify-between items-center py-2 border-b-2 bg-white px-1 rounded-md w-full" 
-                        draggable
-                        onDragStart={ () =>  ( dragDiv.current = index )}
-                        onDragEnter={ () => { dragOverDiv.current = index }}
-                        onDragEnd={ handleSort }
-                        onDragOver={ (e) => { e.preventDefault() }}
-                    >
-                        <div className="flex gap-1 items-center pl-[2px] w-full">
-                            <GripHorizontal size={17} strokeWidth={2} color="gray" />
-                            <PenIcon stroke={ color.color } width={35} height={15} />
-                            <p className=" font-normal text-[#035264] text-sm pl-2">{color.name}</p>
-                            <MoreVertical size={17} strokeWidth={2} color="gray" className="ml-auto cursor-pointer" onClick={() => setShowMore(index)} />
-                            { showMore === index && (
-                                <>
-                                    <motion.div
-                                        className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        // onClick={ handlePopUp }
-                                    >
-                                        <div className="flex flex-col absolute bg-white shadow-md right-4 top-4 border rounded-lg">
-                                            <button className="pl-4 pr-10 text-start py-2 hover:bg-gray-50 active:bg-gray-100">Skip</button>
-                                            <button className="pl-4 pr-10 text-start py-2 hover:bg-gray-50 active:bg-gray-100">Replace</button>
-                                        </div>
+            { drawnColors.length >= 1 ? (
+                <>
+                    <div className="flex flex-col gap-2 m-2 p-4 rounded-md bg-[#f7f7f7] border border-[#eeeeee]">
+                        { drawnColors.map((color, index) => (
+                            <div 
+                                key={index} 
+                                className="flex gap-4 justify-between items-center py-2 border-b-2 bg-white px-1 rounded-md w-full" 
+                                style={{ opacity: color.skipped ? 0.7 : 1}}
+                                draggable
+                                onDragStart={ () =>  ( dragDiv.current = index )}
+                                onDragEnter={ () => { dragOverDiv.current = index }}
+                                onDragEnd={ handleSort }
+                                onDragOver={ (e) => { e.preventDefault() }}
+                            >
+                                <div className="flex gap-1 items-center pl-[2px] w-full relative">
+                                    <GripHorizontal size={17} strokeWidth={2} color="gray" />
+                                    <PenIcon stroke={ color.color } width={35} height={15} />
 
-                                    </motion.div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <p className="text-[12px] `max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
+                                    <p className={`${ color.skipped ? 'text-gray-700' : 'text-[#035264]' } text-sm pl-2`}>
+                                        {color.name} 
+                                        { color.skipped && <span className="text-gray-500 text-[11px] italic"> &nbsp;&nbsp; skipped </span>}
+                                    </p>
 
-            {/* <div className="flex flex-col gap-2 m-2 p-4 rounded-md bg-[#f7f7f7] border border-[#eeeeee]">
-                { colors.map((color, index) => (
-                    <div 
-                        key={index} 
-                        className="flex gap-4 justify-between items-center py-1 border-b-2 bg-white px-1 rounded-md" 
-                        draggable
-                        onDragStart={ () =>  ( dragDiv.current = index )}
-                        onDragEnter={ () => { dragOverDiv.current = index }}
-                        onDragEnd={ handleSort }
-                        onDragOver={ (e) => { e.preventDefault() }}
-                    >
-                        <div className="flex gap-1 items-center pr-4 pl-[2px]">
-                            <GripHorizontal size={17} strokeWidth={2} color="gray" />
-                            <PenIcon stroke={ color.color } width={35} height={20} />
-                            <p className=" font-normal text-[#035264] text-sm pl-2">{color.name}</p>
-                        </div>
+                                    <MoreVertical size={17} strokeWidth={2} color="gray" className="ml-auto cursor-pointer drop-shadow-md drop" onClick={() => setShowMore(index)} />
+                                    
+                                    { showMore === index && (
+                                        <>
+                                            <motion.div
+                                                className="fixed inset-0 flex items-center justify-center bg-opacity-50"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                onClick={ () => setShowMore(false) }
+                                            />
+                                            <motion.div
+                                                className="absolute right-3 top-2 w-fit shadow-lg"
+                                                initial={{ scale: 0.8, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                exit={{ scale: 0.5, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                onClick={(e) => e.stopPropagation()} // Prevent closing on popup click
+                                            >
+                                                <div className="flex flex-col bg-white shadow-md border rounded-md overflow-hidden">
+                                                    { color.skipped ? (
+                                                        <button className="pl-4 pr-10 text-start py-1 hover:bg-gray-50 active:bg-gray-100" onClick={ () => handleColor(color.color, false) }>Include</button>
+                                                    ) : (
+                                                        <button className="pl-4 pr-10 text-start py-1 hover:bg-gray-50 active:bg-gray-100" onClick={ () => handleColor(color.color, true) }>Skip</button>
+                                                    )}
+                                                    {/* <button className="pl-4 pr-10 text-start py-2 hover:bg-gray-50 active:bg-gray-100">Replace</button> */}
+                                                </div>
+                                            </motion.div>
+                                        </>
+                                    )}
+
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-            <p className="text-[12px] `max-w-80 mt-2 px-2 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p> */}
+                    <p className="text-[12px] max-w-80 mt-2 px-3 text-[#525252]">You can rearrange the colors in the order you prefer, and the plotter will draw them in the sequence you&apos;ve specified.</p>
+                </>
+            ) : (
+                <>
+                    <div className="p-5">
+                        <p className="text-sm text-gray-700">No Objects to be drawn...</p>
+                    </div>
+                </>
+            )}
         </>
     )
 }
@@ -481,23 +547,29 @@ const ActionButtonsComponent = () => {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const plot =  async () => {
-        setProgress({ uploading: false, converting: true, progress: 10 });
-        setJob({ ...job, connected: true });
+        // setProgress({ uploading: false, converting: true, progress: 10 });
+        // setJob({ ...job, connected: true });
         setSetupModal(true);
         await delay(500);
 
-        const groupedObjects = returnGroupedObjects(canvas)
+        let groupedObjects = returnGroupedObjects(canvas);
+        const cleanedObjects = Object.fromEntries(
+            Object.entries(groupedObjects).filter(([color]) => {
+                // console.log('color ::: ', color)
+                return colors.some(item => item.color === color && !item.skipped)
+            })
+        )
 
-        const svgElements = returnSvgElements(groupedObjects, canvas.getWidth(), canvas.getHeight());
+        const svgElements = returnSvgElements(cleanedObjects, canvas.getWidth(), canvas.getHeight());
         sortSvgElements(svgElements, colors);
 
-        setProgress({ uploading: false, converting: true, progress: 40 });
+        // setProgress({ uploading: false, converting: true, progress: 40 });
         await delay(500);
 
         const gcodes = await convertToGcode(svgElements, colors, config);
         console.log('Gcode Generated : \n', gcodes.join('\n'))
 
-        setProgress({ uploading: false, converting: true, progress: 80 });
+        // setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
 
         uploadToMachine(gcodes);
@@ -523,7 +595,7 @@ const ActionButtonsComponent = () => {
         <>
             <div className={`flex items-end w-full  gap-1 justify-center`}>
                 { !job.connected ? (
-                    <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
+                    <ActionButton label={'Ready'} Icon={Plug} onclick={ plot } bgColor={'#0e505c'}/>
                 ) : (
                     <>
                         { job.started ? (
