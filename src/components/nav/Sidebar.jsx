@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import useCanvas from "../../context/CanvasContext";
 import { split, group } from "../../util/functions";
-import { SplitSvg } from "../Icons";
+import { FreeDrawIcon, SplitSvg } from "../Icons";
 import './nav.css';
-import { Circle, Group, Minus, MousePointer2Icon, PenTool, Square, Triangle } from "lucide-react";
+import { Circle, Group, Minus, MousePointer2Icon, Square, Triangle } from "lucide-react";
 
 export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) => {
   const { canvas, saveState } = useCanvas();
@@ -21,8 +21,14 @@ export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) =>
         setTool={setTool} 
         setExpanded={setExpanded}
       /> */}
-      <SidebarItem 
+      {/* <SidebarItem 
         icon={ <PenTool size={22} strokeWidth={1.5} style={{ rotate: '-90deg'}} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
+        text={'Pen'} 
+        setTool={setTool}
+        setExpanded={setExpanded}
+      /> */}
+      <SidebarItem 
+        icon={ <FreeDrawIcon size={22} strokeWidth={1.5} color={ tool === 'Pen' ? '#1c8096' : '#4b5563'} /> } 
         text={'Pen'} 
         setTool={setTool}
         setExpanded={setExpanded}

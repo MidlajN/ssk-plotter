@@ -510,3 +510,40 @@ export const PenIcon = (props) => (
     />
   </svg>
 );
+
+
+export const FreeDrawIcon = (props) => (
+  <svg
+    width={22}
+    height={21}
+    viewBox="0 0 22 21"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M6.82137 18.6102L1.45459 19.8694L2.7137 14.5034L15.9497 1.26574C16.261 0.954282 16.6834 0.779297 17.1237 0.779297C17.5641 0.779297 17.9864 0.954282 18.2978 1.26574L20.059 3.02617C20.3705 3.3375 20.5455 3.75983 20.5455 4.2002C20.5455 4.64058 20.3705 5.06291 20.059 5.37424L6.82137 18.6102Z"
+      stroke={props.color}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M19.4821 5.9627L15.3711 1.85254"
+      stroke={props.color}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18.2895 7.14732L14.1885 3.02637"
+      stroke={props.color}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7.03892 18.4024L2.93042 14.2939"
+      stroke={props.color}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);

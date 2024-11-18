@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { Line, PencilBrush } from "fabric";
-import { prebuiltComponents } from "./Components.jsx";
+import { Line, PencilBrush, Rect, Ellipse, Triangle } from "fabric";
 import { PenTool, Pencil } from "lucide-react";
 import ReactDOMServer from 'react-dom/server'
 
@@ -130,6 +129,30 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
 
     if (tool === 'Elements') {
       commonSetup();
+      const prebuiltComponents = {
+        rectangle: new Rect({
+          width: 0,
+          height: 0,
+          fill: 'transparent',
+          stroke: 'black',
+          strokeWidth: 3,
+        }),
+        circle: new Ellipse({
+          rx: 0,
+          ry: 0,
+          fill: 'transparent',
+          stroke: 'black',
+          strokeWidth:3,
+        }),
+        triangle: new Triangle({
+          width: 0,
+          height: 0,
+          fill: 'transparent',
+          stroke: 'black',
+          strokeWidth: 3,
+        }),
+      };
+      
       let object;
       let mouseDown = false;
       let startPointer;

@@ -4,14 +4,12 @@
 import { useEffect, useState } from "react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
-import './editor.css';
-import { Eye, Trash2, X } from "lucide-react";
 import { deleteObject } from "../../util/functions";
 import { motion, AnimatePresence } from "framer-motion";
-import { PenIcon } from "../Icons";
-import { ChromePicker } from "react-color";
+import { ManageColors, ObjectAlignComponent } from "./Components";
 import { util } from "fabric";
-
+import { Trash2, Eye } from "lucide-react";
+import './editor.css';
 
 export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs }) {
     const { canvas } = useCanvas();
@@ -39,7 +37,6 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     const scaledHeight = pixelHeight * scaleY;
                     const mmHeight = parseFloat(scaledHeight * 25.4 / 96).toFixed(2);
 
-                    console.log(activeObject[0].get('angle'))
                     // const angle = parseFloat((activeObject[0].get('angle') * 25.4) / 96).toFixed(2);
                     const angle = activeObject[0].get('angle');
                     setDimensions({ width: mmWidth, height: mmHeight, angle: angle, active: true });
@@ -78,7 +75,6 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
         }
 
     }, [canvas, strokeColor])
-    
 
     useEffect(() => {
         if (!canvas) return;
@@ -156,32 +152,37 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                                 <p>Angle</p>
                                 <input type="number" value={dimension.angle} onInput={ (e) => handleDimension('angle', e.target.value )}/>
                                 <p className="text-sm pl-2">deg</p>
-                            </div>
+                            </div> 
                         </div>
+                        
+                        <div className="pt-4">
+                            <ObjectAlignComponent />
+                        </div>
+
                     </motion.div>
 
                     <motion.div
                         key={2}
-                        className="h-full w-full"
+                        className="h-full w-full flex flex-col gap-4"
                         initial={{ scale: 0.8, opacity: 0, translateY: 20 }}
                         animate={{ scale: 1, opacity: 1, translateY: 0 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <div className="flex flex-wrap gap-x-1 gap-y-1 justify-center items-center">
+                        <div className="grid grid-cols-3 gap-x-4 gap-y-2 justify-center items-center">
                             { colors.map((color, index) => (
                                 <div 
                                     key={ index }
-                                    className="rounded-md mx-auto cursor-pointer w-[28%] h-[6.2rem] text-ellipsis overflow-hidden p-1" 
+                                    className="rounded-md mx-auto cursor-pointer w-full overflow-hidden p-1" 
                                     // style={{ borderColor: strokeColor === color.color ? '#1f7f9481' : 'white' }}
                                     onClick={ () => { setStrokeColor(color.color)}}
                                 >
-                                    <div className="p-6 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
-                                    <p className={`text-center text-sm pt-1 break-words ${ color.color === strokeColor ? 'text-black  font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
+                                    <div className="p-4 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
+                                    <p className={`text-center text-sm pt-1 truncate ${ color.color === strokeColor ? 'text-black  font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
                                 </div>
                             ))}
-                            <button className="text-sm bg-gray-100 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
                         </div>
+                        <button className="text-sm mx-auto bg-gray-100 active:bg-gray-50 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
                     </motion.div>
                     
                     <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
@@ -195,7 +196,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     >
                         <div className="p-4 mt-6 bg-gray-100 rounded-xl">
                             <h1 className="border-b border-[#1c7f969c] mb-4 pb-1 font-medium">Objects</h1>
-                            <div className="h-48 overflow-scroll scrollbar-hide">
+                            <div className=" h-40 overflow-scroll scrollbar-hide">
                                 { canvasObjs?.map((object, index) => (
                                     <div 
                                         key={ index } 
@@ -227,98 +228,6 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                     </motion.div> 
                 </AnimatePresence>
             </div>
-        </>
-    )
-}
-
-
-const ManageColors = ({ isOpen, setIsOpen, strokeColor, setStrokeColor }) => {
-    const { colors, setColors } = useCom();
-    const { canvas } = useCanvas();
-    const [ displayPalette, setDisplayPalettte ] = useState({ open: false, index: null });
-
-    const updateName = (index, newName) => {
-        const updatedColors = colors.map((color, i) => (
-            i === index ? { ...color, name: newName } : color
-        ));
-        setColors(updatedColors)
-
-    }
-
-    const updateColor = (index, newColor, oldColor) => {
-        const updatedColors = colors.map((color, i) => (
-            i === index ? { ...color, color: newColor.hex } : color
-        ));
-        setColors(updatedColors);
-        canvas.getObjects().forEach(obj => {
-            if (obj.get('stroke') === oldColor) {
-                obj.set({
-                    stroke: newColor.hex
-                });
-            }
-        })
-        canvas.renderAll()
-        if( strokeColor === oldColor) {
-            setStrokeColor(newColor.hex)
-        }
-    }
-
-    const togglePopup = () => {
-        setIsOpen(!isOpen);
-        setDisplayPalettte({ open: false, index: null })
-    }
-
-    return (
-        <>
-            <AnimatePresence>
-                { isOpen && (
-                    <motion.div
-                        className="fixed inset-0 flex items-center justify-center bg-opacity-50"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={ togglePopup }
-                    >
-                        <motion.div
-                            className="absolute right-[18%] w-fit bg-white rounded-xl shadow-lg border border-[#1c7f969c]"
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            onClick={(e) => e.stopPropagation()} // Prevent closing on popup click
-                        >
-                            <div className="flex justify-end items-center border-b "> 
-                                {/* <p className="pl-6">Color Manager</p> */}
-                                <button className="p-3 rounded-tr-xl hover:bg-gray-100 transition-all duration-300 active:bg-gray-300" onClick={togglePopup}> 
-                                    <X size={18} strokeWidth={1.5} />
-                                </button>
-                            </div>
-                            <div className="colorManager">
-                                { colors.map((color, index) => (
-                                    <div key={index} className="item" >
-                                        <PenIcon stroke={ color.color } width={35} height={20} />
-                                        <p className="text-sm">{ index + 1 }</p>
-                                        <input 
-                                            type="text" 
-                                            value={ color.name } 
-                                            onChange={(e) => updateName(index, e.target.value)}
-                                        />
-                                        <div className="w-7 h-7 rounded-lg" style={{ background: color.color }} onClick={() => setDisplayPalettte({ open: true, index: index })}></div>
-                                        { displayPalette.open && index === displayPalette.index &&
-                                            <>
-                                                <div className="absolute z-[2]">
-                                                    <div className="fixed top-0 right-0 left-0 bottom-0" onClick={() => setDisplayPalettte({ open: false, index: null })} />
-                                                    <ChromePicker  color={ color.color } onChange={ (clr) => updateColor( index, clr, color.color )} />
-                                                </div>
-                                            </>
-                                        }
-                                    </div>
-                                ))}
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </>
     )
 }

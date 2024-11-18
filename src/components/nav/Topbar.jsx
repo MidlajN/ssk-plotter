@@ -58,10 +58,15 @@ export const TopBar = () => {
           obj.top -= boundingRect.top;
           obj.setCoords(); // Update the object's coordinates
         });
-      
+
         // Resize the canvas to fit the bounding box
         canvas.setWidth(newWidth);
         canvas.setHeight(newHeight);
+        setCanvasConfig(prev => ({
+            ...prev,
+            width: newWidth * 25.5 / 96,
+            height: newHeight * 25.5 / 96
+        }));
       
         // Clear the selection
         canvas.discardActiveObject();
@@ -76,6 +81,7 @@ export const TopBar = () => {
         } else {
             setCanvasSize('Custom')
         }
+        
         setDimension(canvasConfig.width, canvasConfig.height);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasConfig])
