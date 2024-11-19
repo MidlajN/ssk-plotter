@@ -23,9 +23,9 @@ export const CommunicationProvider = ({ children }) => {
         { 
             color: '#5e5e5e', 
             name: 'Gray', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X724.8Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X724.8Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Gray' ],
+            penDrop: [ '; Gray Finished' ],
             skipped: false
         },
         { 
@@ -98,7 +98,7 @@ export const CommunicationProvider = ({ children }) => {
         // url: '192.168.0.1',
         feedRate: 10000,
         jogSpeed: 12000,
-        zOffset: 5,
+        zOffset: 24,
         open: false
     });
 

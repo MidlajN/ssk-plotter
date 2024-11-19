@@ -258,9 +258,9 @@ export const copyObject = (setCopiedObject, canvas) => {
         const activeObject = canvas.getActiveObject();
         if (activeObject) {
             activeObject.clone().then((clonedObject) => {
-                canvas.discardActiveObject();
+                // canvas.discardActiveObject();
                 setCopiedObject(clonedObject);
-                // console.log('Object copied', );
+                console.log('Object copied', );
             })
         } else {
             console.log('No object selected to copy');

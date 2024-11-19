@@ -2,8 +2,9 @@
 import useCanvas from "../../context/CanvasContext";
 import { split, group } from "../../util/functions";
 import { FreeDrawIcon, SplitSvg } from "../Icons";
+import { Line } from "./Icons";
 import './nav.css';
-import { Circle, Group, Minus, MousePointer2Icon, Square, Triangle } from "lucide-react";
+import { Circle, Group, MousePointer2Icon, Square, Triangle } from "lucide-react";
 
 export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) => {
   const { canvas, saveState } = useCanvas();
@@ -34,7 +35,8 @@ export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) =>
         setExpanded={setExpanded}
       />
       <SidebarItem 
-        icon={ <Minus size={22} strokeWidth={1.5} style={{ rotate: '-45deg'}} color={ tool === 'Lines' ? '#1c8096' : '#4b5563' } /> } 
+        // icon={ <Minus size={22} strokeWidth={1.5} style={{ rotate: '-45deg'}} color={ tool === 'Lines' ? '#1c8096' : '#4b5563' } /> } 
+        icon={ <Line size={22} strokeWidth={1.5} color={ tool === 'Lines' ? '#1c8096' : '#4b5563' } /> } 
         text={'Lines'} 
         setTool={setTool}
         setExpanded={setExpanded}
@@ -115,7 +117,7 @@ export function SidebarItem({ icon, text, setTool, setExpanded, canvasFunction, 
     return (
         <li
             className={`
-                relative flex items-center py-4 px-5 w-full my-1
+                relative flex items-center justify-center py-4 px-5 w-full my-1
                 font-medium cursor-pointer transition-colors group 
                 text-nowrap 
             `}

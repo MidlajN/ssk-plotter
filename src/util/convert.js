@@ -131,12 +131,12 @@ export const convertToGcode = async (svgElements, colors, config) => {
 
     return [
         // '$H', 
-        'G53 X0Y0',
+        // 'G53 X0Y0',
         // 'G0 X380Y380',
         // 'G10 L20 P0 X0 Y0 Z0', 
         `G0 F${config.jogSpeed}`,
         `G1 F${config.feedRate} `, 
         ...gcodes, 
-        'G53 X700Y450'
+        'G53 X-400Y300'
     ]
 }

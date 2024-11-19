@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PenIcon } from "../Icons";
 import { ChromePicker } from "react-color";
 import { X } from "lucide-react";
-import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignHorizontalJustifyStart, AlignStartHorizontal, Eye, FlipHorizontal, FlipVertical } from "lucide-react";
+import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignHorizontalJustifyStart, AlignStartHorizontal, FlipHorizontal, FlipVertical } from "lucide-react";
 
 
 export const ManageColors = ({ isOpen, setIsOpen, strokeColor, setStrokeColor }) => {
@@ -101,7 +101,7 @@ export const ManageColors = ({ isOpen, setIsOpen, strokeColor, setStrokeColor })
 }
 
 export const ObjectAlignComponent = () => {
-    const { canvas, canvasConfig } = useCanvas()
+    const { canvas } = useCanvas()
     const [ flip, setFlip ] = useState({ x: false, y: false })
 
     useEffect(() => {
@@ -120,45 +120,31 @@ export const ObjectAlignComponent = () => {
         const activeObjects = canvas.getActiveObject();
         if (!activeObjects) return;
 
-        console.log(activeObjects)
-        // let objects = []
-        // if (activeObjects.type === 'activeselection') {
-        //     objects = activeObjects.getObjects();
-        // } else {
-        //     objects = [activeObjects]
-        // }
-
         const canvasWidth = canvas.getWidth();
         const canvasHeight = canvas.getHeight();
-
-        // objects.forEach(obj => {
-        //     obj.setCoords();
-
-            switch (alignment) {
-                case 'left':
-                    activeObjects.left = 0;
-                    break;
-                case 'right':
-                    activeObjects.left = canvasWidth - activeObjects.width * activeObjects.scaleX;
-                    break;
-                case 'top':
-                    activeObjects.left = 0;
-                    break;
-                case 'centerH':
-                    activeObjects.left = 0;
-                    break;
-                case 'centerV':
-                    activeObjects.left = 0;
-                    break;
-                case 'bottom':
-                    activeObjects.left = 0;
-                    break;
-            
-                default:
-                    break;
-            }
-            activeObjects.setCoords()
-        // });
+        switch (alignment) {
+            case 'left':
+                activeObjects.left = 2;
+                break;
+            case 'right':
+                activeObjects.left = (canvasWidth - activeObjects.width * activeObjects.scaleX) - 5 ;
+                break;
+            case 'top':
+                activeObjects.top = 2;
+                break;
+            case 'centerH':
+                activeObjects.left = (canvasWidth - activeObjects.width * activeObjects.scaleX) / 2;
+                break;
+            case 'centerV':
+                activeObjects.top = (canvasHeight - activeObjects.height * activeObjects.scaleY) / 2;
+                break;
+            case 'bottom':
+                activeObjects.top = (canvasHeight - activeObjects.height * activeObjects.scaleY) - 5;
+                break;
+            default:
+                break;
+        }
+        activeObjects.setCoords()
         canvas.renderAll();
     }
 
@@ -177,14 +163,13 @@ export const ObjectAlignComponent = () => {
 
     return (
         <>
-            <div className="px-1 py-1 flex bg-gray-100 rounded-xl items-center justify-around mb-3">
+            <div className="py-1 flex bg-gray-100 rounded-xl items-center justify-around mb-3">
                 <AlignButton Icon={ AlignHorizontalJustifyStart } handleClick={() => alignObjectToCanvas('left')} />
-                <AlignButton Icon={ AlignCenterVertical } handleClick={() => alignObjectToCanvas('centerV')} />
+                <AlignButton Icon={ AlignCenterVertical } handleClick={() => alignObjectToCanvas('centerH')} />
                 <AlignButton Icon={ AlignEndVertical } handleClick={() => alignObjectToCanvas('right')} />
                 <AlignButton Icon={ AlignEndHorizontal } handleClick={() => alignObjectToCanvas('bottom')} />
-                <AlignButton Icon={ AlignCenterHorizontal } handleClick={() => alignObjectToCanvas('centerH')} />
+                <AlignButton Icon={ AlignCenterHorizontal } handleClick={() => alignObjectToCanvas('centerV')} />
                 <AlignButton Icon={ AlignStartHorizontal } handleClick={() => alignObjectToCanvas('top')} />
-                {/* <AlignButton Icon={ AlignEndVertical } handleClick={() => alignObjectToCanvas('true')} /> */}
             </div>
 
             <div className="flex">

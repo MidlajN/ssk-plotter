@@ -21,13 +21,15 @@ export const CanvasProvider = ({ children }) => {
         width: 300,
         height: 300,
         orientation: 'vertical',
-        maxWidth: 430,
-        maxHeight: 330
+        maxWidth: 330,
+        maxHeight: 430
     })
     const toolRef = useRef('Select')
+    const [ undoStack, setUndoStack ] = useState([])
+    const [ redoStack, setRedoStack ] = useState([])
     
-    let undoStack = [];
-    let redoStack = [];
+    // let undoStack = [];
+    // let redoStack = [];
     let isUndoRedo = false;
 
     useEffect(() => {
@@ -93,66 +95,143 @@ export const CanvasProvider = ({ children }) => {
 
     }, [canvas, objectValues]);
 
+    // const saveState = () => {
+    //     if (isUndoRedo) return;
+    //     // redoStack = [];
+    //     console.log('State Triggered :: ', undoStack)
+    //     const currentState = JSON.stringify(canvas);
+    //     undoStack.push(currentState);
+    //     if (undoStack.length > 25) undoStack.shift()
+    // }
     const saveState = () => {
         if (isUndoRedo) return;
-        redoStack = [];
-        const currentState = JSON.stringify(canvas);
-        undoStack.push(currentState);
-        if (undoStack.length > 25) undoStack.shift()
+        setRedoStack([]);
+
+        setUndoStack((prev) => {
+            const currentState = JSON.stringify(canvas);
+            const newStack = [ ...prev, currentState ];
+            if (newStack.length > 25) newStack.shift();
+            return newStack;
+        });
     }
 
+    useEffect(() => {
+        console.log('UndoStack :', undoStack)
+        console.log('RedoStack :', redoStack)
+    }, [ undoStack, redoStack ])
+
+    // const undo = () => {
+    //     if (undoStack.length > 1) {
+    //         const currentState = undoStack.pop();
+    //         redoStack.push(currentState)
+    //         isUndoRedo = true
+
+    //         canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
+    //             const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
+    //             if (object) {
+    //                 object.set({
+    //                     selectable: false
+    //                 })
+    //             }
+    //             if (toolRef.current === 'Lines') {
+    //                 canvas.getObjects().forEach(obj => {
+    //                     obj.set({
+    //                         selectable: false
+    //                     });
+    //                 });
+    //             }
+    //             canvas.renderAll();
+    //             isUndoRedo = false;
+    //         })
+    //     }
+    // }
     const undo = () => {
-        if (undoStack.length > 1) {
-            const currentState = undoStack.pop();
-            redoStack.push(currentState)
-            isUndoRedo = true
+        console.log('Undo RAN INITIAL');
+        setUndoStack((prevStack) => {
+            if (prevStack.length > 1) {
+                const currentState = prevStack.pop();
+                setRedoStack((prev) => [...prev, currentState]);
+                isUndoRedo = true;
+                console.log('Undo RAN')
 
-            canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
-                const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
-                if (object) {
-                    object.set({
-                        selectable: false
-                    })
-                }
-                if (toolRef.current === 'Lines') {
-                    canvas.getObjects().forEach(obj => {
-                        obj.set({
+                canvas.loadFromJSON(prevStack[prevStack.length - 1]).then(() => {
+                    const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
+                    if (object) {
+                        object.set({
                             selectable: false
+                        })
+                    }
+                    if (toolRef.current === 'Lines') {
+                        canvas.getObjects().forEach(obj => {
+                            obj.set({
+                                selectable: false
+                            });
                         });
-                    });
-                }
-                canvas.renderAll();
-                isUndoRedo = false;
-            })
-        }
+                    }
+                    canvas.renderAll();
+                    isUndoRedo = false;
+                });
+
+                return [...prevStack]
+            }
+            return prevStack;
+        })
     }
 
-    const redo = () => {
-        if (redoStack.length > 0) {
-            const stateToRedo = redoStack.pop();
-            undoStack.push(stateToRedo);
-            isUndoRedo = true
+    // const redo = () => {
+    //     if (redoStack.length > 0) {
+    //         const stateToRedo = redoStack.pop();
+    //         undoStack.push(stateToRedo);
+    //         isUndoRedo = true
             
-            canvas.loadFromJSON(stateToRedo).then(() => {
-                const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
-                if (object) {
-                    object.set({
-                        selectable: false
-                    })
-                }
-                if (toolRef.current === 'Lines') {
-                    canvas.getObjects().forEach(obj => {
-                        obj.set({
+    //         canvas.loadFromJSON(stateToRedo).then(() => {
+    //             const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
+    //             if (object) {
+    //                 object.set({
+    //                     selectable: false
+    //                 })
+    //             }
+    //             if (toolRef.current === 'Lines') {
+    //                 canvas.getObjects().forEach(obj => {
+    //                     obj.set({
+    //                         selectable: false
+    //                     });
+    //                 });
+    //             }
+    //             canvas.renderAll();
+    //             isUndoRedo = false;
+    //         })
+    //     }
+    // }
+    const redo = () => {
+        setRedoStack((prevStack) => {
+            if (prevStack.length > 0) {
+                const stateToRedo = prevStack.pop();
+                setUndoStack((prev) => [...prev, stateToRedo]);
+                isUndoRedo = true
+                
+                canvas.loadFromJSON(stateToRedo).then(() => {
+                    const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
+                    if (object) {
+                        object.set({
                             selectable: false
+                        })
+                    }
+                    if (toolRef.current === 'Lines') {
+                        canvas.getObjects().forEach(obj => {
+                            obj.set({
+                                selectable: false
+                            });
                         });
-                    });
-                }
-                canvas.renderAll();
-                isUndoRedo = false;
-            })
-        }
+                    }
+                    canvas.renderAll();
+                    isUndoRedo = false;
+                });
+                return [ ...prevStack ]
+            }
+            return prevStack;
+        });
     }
-
     
     useEffect(() => {
         if (!canvas) return ;
