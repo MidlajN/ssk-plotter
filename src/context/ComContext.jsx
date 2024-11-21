@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Path } from "fabric";
 
-import useCanvas from "./CanvasContext";
+// import useCanvas from "./CanvasContext";
 
 const ComContext = createContext(null);
 
@@ -13,12 +13,13 @@ export default function useCom() {
 }
 
 export const CommunicationProvider = ({ children }) => {
-    const { canvas } = useCanvas()
+    // const { canvas } = useCanvas()
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false, percentage: null });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
+    const [ plotterCanvas, setPlotterCanvas ] = useState(null)
     const [colors, setColors] = useState([
         { 
             color: '#5e5e5e', 
@@ -190,8 +191,6 @@ export const CommunicationProvider = ({ children }) => {
 
         // The Current Undo/Redo Changes the behaviour of this dotRef, ToDO : Rework this method to a different approach
         dotRef.current = new Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
-            // stroke: '#2a334e28', 
-            // strokeWidth: 8,
             fill: '#223265de',
             originX: 'center',
             originY: 'center',
@@ -200,10 +199,8 @@ export const CommunicationProvider = ({ children }) => {
             lockScalingX: true,
             lockScalingY: true,
             lockRotation: true,
-            top: 450 * 96 / 25.4,
-            left: 0,
-            // top: 900,
-            // left: 600,
+            top: 310 * 96 / 25.4,
+            left: 430 * 96 / 25.4,
             name: 'ToolHead',
             selectable: false,
             hoverCursor: 'auto'
@@ -211,7 +208,7 @@ export const CommunicationProvider = ({ children }) => {
 
         let snapped = false;
 
-        canvas.on('object:moving', (e) => {
+        plotterCanvas.on('object:moving', (e) => {
 
             const movingObject = e.target;
             const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = movingObject.getCoords();
@@ -266,10 +263,10 @@ export const CommunicationProvider = ({ children }) => {
         });
 
 
-        canvas.add(dotRef.current);
-        canvas.renderAll();
+        plotterCanvas.add(dotRef.current);
+        plotterCanvas.renderAll();
         return () => {
-            canvas.remove(dotRef.current);    
+            plotterCanvas.remove(dotRef.current);    
         }
     }, [response.pageId])
 
@@ -299,17 +296,18 @@ export const CommunicationProvider = ({ children }) => {
                 const [ x, y, z ] = coords.split(',').map(parseFloat);
  
                 // SD:100.00,/sd/job.gcode
-                console.log(
-                    'Data : ', data,
-                    '\nSplits : ', data.split('|'),
-                    '\nSD Percent : ', sdPercent, ' <-> ', percentage
-                );
+                // console.log(
+                //     'Data : ', data,
+                //     '\nSplits : ', data.split('|'),
+                //     '\nSD Percent : ', sdPercent, ' <-> ', percentage
+                // );
 
                 dotRef.current.set({
-                    top: (450 - y) * 96 / 25.4,
-                    left: x * 96 / 25.4,
+                    top: (310 - y) * 96 / 25.4,
+                    left: (430 + x) * 96 / 25.4,
                 });
-                canvas.renderAll();
+                console.log('DotRef : ', dotRef.current)
+                plotterCanvas.renderAll();
 
                 console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
             } else {
@@ -343,7 +341,6 @@ export const CommunicationProvider = ({ children }) => {
             const arrayBuffer = event.data;
             const uint8array = new Uint8Array(arrayBuffer)
             const text = new TextDecoder().decode(uint8array);
-            // console.log('Uint8Array : ', uint8array, 'text : ', text)
             const [key, valueStr] = text.split(':', 2);
             if (!valueStr) return;
             const value = parseInt(valueStr.trim());
@@ -437,6 +434,8 @@ export const CommunicationProvider = ({ children }) => {
                 openSocket,
                 closeSocket,
                 sendToMachine,
+                plotterCanvas, 
+                setPlotterCanvas
             }}
         >
             { children }

@@ -22,10 +22,9 @@ export default function Home() {
     saveState, 
     toolRef, 
     canvasRef, 
-    // objectValues, 
-    plotterRef 
+    plotterRef,
   } = useCanvas();
-  const { colors } = useCom()
+  const { colors, plotterCanvas, setPlotterCanvas } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
@@ -33,14 +32,6 @@ export default function Home() {
   const [ strokeColor, setStrokeColor ] = useState(colors[0].color);
   const [ element, setElement ] = useState('rectangle');
   const [ canvasObjs, setCanvasObjs ] = useState(null)
-  const [ plotterCanvas, setPlotterCanvas ] = useState(null)
-
-  // // ---- For Debug Purposes ----
-  // const { setResponse, response } = useCom();
-  // useEffect(() => {
-  //   setResponse({ ...response, pageId: 0 })
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
 
   useEffect(() => {
     if (tool === 'Plot') {
@@ -88,7 +79,6 @@ export default function Home() {
     } else if (canvas){
       canvas.renderAll()
     }
-
   }, [tool])
 
   useEditorSetup(canvas, tool, strokeColor, element, saveState, toolRef);
@@ -200,13 +190,6 @@ export default function Home() {
                 { tool === 'Plot' && <Plot plotCanvas={plotterCanvas} /> }
               </div>
             </div>
-            {/* <div className={`absolute bottom-0 ${ expanded ? 'md:w-[80%]' : 'w-full' } w-full py-2 px-4 footer transition-all duration-500 overflow-scroll no-scrollbar`}>
-                <div><p>X : { objectValues.x }</p></div>
-                <div><p>Y : { objectValues.y }</p></div>
-                <div><p>scaleX : { objectValues.scaleX }</p></div>
-                <div><p>scaleY : { objectValues.scaleY }</p></div>
-                <div><p>angle : { objectValues.rotateAngle }</p></div>
-            </div> */}
         </div>
         </div>
       </section>

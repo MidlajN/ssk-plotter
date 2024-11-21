@@ -104,10 +104,10 @@ export const convertToGcode = async (svgElements, colors, config) => {
         let settings = {
             zOffset: config.zOffset,
             feedRate: config.feedRate,
-            seekRate: config.seekRate,
+            // seekRate: config.seekRate,
             zValue: color.zValue,
             tolerance: 0.1,
-            ignoreNegative: true,
+            quadrant: 2,
             minimumArea: 2.5,
             bedSize: {
                 width: 420,

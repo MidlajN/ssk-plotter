@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
@@ -15,7 +16,6 @@ export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
     const plotterRef = useRef(null)
     const [ canvas, setCanvas ] = useState(null);
-    const [ objectValues, setObjectValues ] = useState({ x: 0, y: 0, scaleX: 1, scaleY: 1, rotateAngle: 0 });
     const [ copiedObject, setCopiedObject ] = useState(null);
     const [ canvasConfig, setCanvasConfig ] = useState({
         width: 300,
@@ -27,9 +27,6 @@ export const CanvasProvider = ({ children }) => {
     const toolRef = useRef('Select')
     const [ undoStack, setUndoStack ] = useState([])
     const [ redoStack, setRedoStack ] = useState([])
-    
-    // let undoStack = [];
-    // let redoStack = [];
     let isUndoRedo = false;
 
     useEffect(() => {
@@ -41,8 +38,6 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.noScaleCache = true;
         FabricObject.ownDefaults.strokeUniform = true;
         FabricObject.customProperties = ['name'];
-        // FabricObject.ownDefaults.centeredRotation = true;
-
          
         const fabricCanvas = new Canvas(canvasRef.current, {
             width: util.parseUnit(`${ canvasConfig.width }mm`),
@@ -58,51 +53,6 @@ export const CanvasProvider = ({ children }) => {
         return () => fabricCanvas.dispose();
     }, []);
 
-    useEffect(() => {
-        if (!canvas) return;
-
-        const updateObjectVals = () => {
-            const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                const x = parseFloat(activeObject.left.toFixed(2));
-                const y = parseFloat(activeObject.top.toFixed(2));
-                const scaleX = parseFloat(activeObject.scaleX.toFixed(2));
-                const scaleY = parseFloat(activeObject.scaleY.toFixed(2));
-                const angle = parseFloat(activeObject.angle.toFixed(2));
-
-                setObjectValues({ x: x, y: y, scaleX: scaleX, scaleY: scaleY, rotateAngle: angle });
-            }
-        }
-
-        canvas.on('object:modified', updateObjectVals);
-        return () => canvas.off('object:modified', updateObjectVals);
-    }, [canvas]);
-
-    useEffect(() => {
-        if (!canvas) return;
-        const activeObject = canvas.getActiveObject();
-
-        if (activeObject) {
-            activeObject.set({
-                left: objectValues.x, 
-                top: objectValues.y, 
-                scaleX: objectValues.scaleX, 
-                scaleY: objectValues.scaleY, 
-                angle: objectValues.rotateAngle
-            })
-            canvas.renderAll();
-        }
-
-    }, [canvas, objectValues]);
-
-    // const saveState = () => {
-    //     if (isUndoRedo) return;
-    //     // redoStack = [];
-    //     console.log('State Triggered :: ', undoStack)
-    //     const currentState = JSON.stringify(canvas);
-    //     undoStack.push(currentState);
-    //     if (undoStack.length > 25) undoStack.shift()
-    // }
     const saveState = () => {
         if (isUndoRedo) return;
         setRedoStack([]);
@@ -115,44 +65,12 @@ export const CanvasProvider = ({ children }) => {
         });
     }
 
-    useEffect(() => {
-        console.log('UndoStack :', undoStack)
-        console.log('RedoStack :', redoStack)
-    }, [ undoStack, redoStack ])
-
-    // const undo = () => {
-    //     if (undoStack.length > 1) {
-    //         const currentState = undoStack.pop();
-    //         redoStack.push(currentState)
-    //         isUndoRedo = true
-
-    //         canvas.loadFromJSON(undoStack[undoStack.length - 1]).then(() => {
-    //             const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
-    //             if (object) {
-    //                 object.set({
-    //                     selectable: false
-    //                 })
-    //             }
-    //             if (toolRef.current === 'Lines') {
-    //                 canvas.getObjects().forEach(obj => {
-    //                     obj.set({
-    //                         selectable: false
-    //                     });
-    //                 });
-    //             }
-    //             canvas.renderAll();
-    //             isUndoRedo = false;
-    //         })
-    //     }
-    // }
     const undo = () => {
-        console.log('Undo RAN INITIAL');
         setUndoStack((prevStack) => {
             if (prevStack.length > 1) {
                 const currentState = prevStack.pop();
                 setRedoStack((prev) => [...prev, currentState]);
                 isUndoRedo = true;
-                console.log('Undo RAN')
 
                 canvas.loadFromJSON(prevStack[prevStack.length - 1]).then(() => {
                     const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
@@ -178,31 +96,6 @@ export const CanvasProvider = ({ children }) => {
         })
     }
 
-    // const redo = () => {
-    //     if (redoStack.length > 0) {
-    //         const stateToRedo = redoStack.pop();
-    //         undoStack.push(stateToRedo);
-    //         isUndoRedo = true
-            
-    //         canvas.loadFromJSON(stateToRedo).then(() => {
-    //             const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
-    //             if (object) {
-    //                 object.set({
-    //                     selectable: false
-    //                 })
-    //             }
-    //             if (toolRef.current === 'Lines') {
-    //                 canvas.getObjects().forEach(obj => {
-    //                     obj.set({
-    //                         selectable: false
-    //                     });
-    //                 });
-    //             }
-    //             canvas.renderAll();
-    //             isUndoRedo = false;
-    //         })
-    //     }
-    // }
     const redo = () => {
         setRedoStack((prevStack) => {
             if (prevStack.length > 0) {
@@ -273,12 +166,9 @@ export const CanvasProvider = ({ children }) => {
             }
         }
 
-        // window.addEventListener('keydown', handleKeyDown( copiedObject, setCopiedObject, canvas, undo, redo ));
         window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
 
-        return () => { 
-            window.removeEventListener('keydown', handleKey);
-        };
     }, [canvas, copiedObject]);
 
     return (
@@ -288,8 +178,6 @@ export const CanvasProvider = ({ children }) => {
                 canvasRef,
                 canvasConfig, 
                 setCanvasConfig,
-                objectValues, 
-                setObjectValues, 
                 saveState,
                 toolRef,
                 plotterRef
