@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FabricObject, Canvas, util } from "fabric";
 import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "../util/functions";
 
@@ -53,7 +53,19 @@ export const CanvasProvider = ({ children }) => {
         return () => fabricCanvas.dispose();
     }, []);
 
-    const saveState = () => {
+    // const saveState = () => {
+    //     if (isUndoRedo) return;
+    //     setRedoStack([]);
+
+    //     setUndoStack((prev) => {
+    //         const currentState = JSON.stringify(canvas);
+    //         const newStack = [ ...prev, currentState ];
+    //         if (newStack.length > 25) newStack.shift();
+    //         return newStack;
+    //     });
+    //     console.log('SaveState Function Called')
+    // }
+    const saveState = useCallback(() => {
         if (isUndoRedo) return;
         setRedoStack([]);
 
@@ -63,7 +75,8 @@ export const CanvasProvider = ({ children }) => {
             if (newStack.length > 25) newStack.shift();
             return newStack;
         });
-    }
+        console.log('SaveState Function Called')
+    }, [canvas, setRedoStack, setUndoStack])
 
     const undo = () => {
         setUndoStack((prevStack) => {
@@ -140,7 +153,7 @@ export const CanvasProvider = ({ children }) => {
             canvas.off('object:modified', saveState);
             canvas.off('object:removed', saveState);
         }
-    }, [canvas])
+    }, [canvas, saveState])
 
     useEffect(() => {
         const handleKey = (e) => {

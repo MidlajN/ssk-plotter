@@ -17,13 +17,7 @@ import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
-  const { 
-    canvas, 
-    saveState, 
-    toolRef, 
-    canvasRef, 
-    plotterRef,
-  } = useCanvas();
+  const { canvas, canvasRef, plotterRef } = useCanvas();
   const { colors, plotterCanvas, setPlotterCanvas } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
@@ -81,7 +75,7 @@ export default function Home() {
     }
   }, [tool])
 
-  useEditorSetup(canvas, tool, strokeColor, element, saveState, toolRef);
+  useEditorSetup(tool, strokeColor, element);
 
   return (
     <>
@@ -190,7 +184,7 @@ export default function Home() {
                 { tool === 'Plot' && <Plot plotCanvas={plotterCanvas} /> }
               </div>
             </div>
-        </div>
+          </div>
         </div>
       </section>
     </>

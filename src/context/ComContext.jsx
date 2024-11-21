@@ -306,10 +306,9 @@ export const CommunicationProvider = ({ children }) => {
                     top: (310 - y) * 96 / 25.4,
                     left: (430 + x) * 96 / 25.4,
                 });
-                console.log('DotRef : ', dotRef.current)
                 plotterCanvas.renderAll();
 
-                console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
+                // console.log(`Status: ${status}\nX: ${x} Y: ${y} Z: ${z} Feed: ${feed}\n`);
             } else {
                 if (message.includes('/job.gcode job sent')) {
                     console.log('The Indicator found', job);

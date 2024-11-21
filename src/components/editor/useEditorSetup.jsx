@@ -3,8 +3,10 @@ import { useEffect } from "react";
 import { Line, PencilBrush, Rect, Ellipse, Triangle } from "fabric";
 import { PenTool, Pencil } from "lucide-react";
 import ReactDOMServer from 'react-dom/server'
+import useCanvas from "../../context/CanvasContext";
 
-export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, toolRef) => {
+export const useEditorSetup = (tool, strokeColor, element) => {
+  const { canvas, saveState, toolRef } = useCanvas()
 
   const componentToUrl = (Component, rotationAngle = 0) => {
       let svgString = ReactDOMServer.renderToStaticMarkup(<Component size={20} strokeWidth={1.5} color={'#4b5563'}  />)
@@ -83,7 +85,7 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
       let mouseDown = false;
 
       const setPointer = (event) => {
-        canvas.off('object:added', saveState)
+        canvas.off('object:added', saveState);
         const pointer = canvas.getPointer(event.e);
 
         if (!mouseDown) {
@@ -116,7 +118,7 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
       const finishLine = () => {
         line.setCoords();
         mouseDown = false;
-        canvas.on('object:added', saveState)
+        canvas.on('object:added', saveState);
         canvas.fire('object:modified', { target: line });
       }
 
@@ -206,5 +208,5 @@ export const useEditorSetup = (canvas, tool, strokeColor, element, saveState, to
 
       return () => resetCanvas(setUpElement, drawElement, finishElement);
     }
-  }, [canvas, element, saveState, strokeColor, tool])
+  }, [canvas, element, tool])
 }
