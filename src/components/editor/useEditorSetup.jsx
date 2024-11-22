@@ -87,7 +87,7 @@ export const useEditorSetup = (tool, strokeColor, element) => {
       const setPointer = (event) => {
         canvas.off('object:added', saveState);
         const pointer = canvas.getPointer(event.e);
-
+        
         if (!mouseDown) {
           mouseDown = true;
           line = new Line([pointer.x, pointer.y, pointer.x, pointer.y], {

@@ -43,8 +43,9 @@ const returnObjs = (objects) => {
 }
 
 export const returnGroupedObjects = (canvas) => {
-    // const objects = returnObjs(canvas.getObjects());
-
+    canvas.discardActiveObject();
+    canvas.renderAll();
+    
     return returnObjs(canvas.getObjects()).reduce((acc, object) => {
         const stroke = tinycolor(object.stroke).toHexString();
         acc[stroke] = acc[stroke] || [];
@@ -53,7 +54,6 @@ export const returnGroupedObjects = (canvas) => {
         return acc
     }, {});
 }
-
 
 export const returnSvgElements = (objects, width, height) => {
     const svgElements = []
@@ -120,10 +120,11 @@ export const convertToGcode = async (svgElements, colors, config) => {
         const [ code ] = await converter.convert(element.svg);
         const gCodeLines = code.split('\n');
 
+        console.log('From NPM :',gCodeLines)
         const filteredGcodes = gCodeLines.filter(command => command !== `G1 F${config.feedRate}`);
 
         const cleanedGcodeLines = filteredGcodes.slice(0, -1);
-        cleanedGcodeLines.splice(0, 4);
+        // cleanedGcodeLines.splice(0, 4);
         cleanedGcodeLines.splice(1, 1);
 
         return color.penPick.join('\n') + '\n' + cleanedGcodeLines.join('\n') + color.penDrop.join('\n');

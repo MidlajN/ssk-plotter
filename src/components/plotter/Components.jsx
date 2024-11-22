@@ -430,10 +430,6 @@ export const ActionButtonsComponent = ({ canvas }) => {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const plot =  async () => {
-        console.log(
-            'Canvas : ', canvas.toSVG()
-        )
-
 
         setProgress({ uploading: false, converting: true, progress: 10 });
         setJob({ ...job, connected: true });

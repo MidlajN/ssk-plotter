@@ -185,92 +185,6 @@ export const CommunicationProvider = ({ children }) => {
     },[sendToMachine])
 
     useEffect(() => {
-        if (response.pageId === '') return;
-
-        sendToMachine('$Report/interval=50');
-
-        // The Current Undo/Redo Changes the behaviour of this dotRef, ToDO : Rework this method to a different approach
-        dotRef.current = new Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
-            fill: '#223265de',
-            originX: 'center',
-            originY: 'center',
-            lockMovementX: true,
-            lockMovementY: true,
-            lockScalingX: true,
-            lockScalingY: true,
-            lockRotation: true,
-            top: 310 * 96 / 25.4,
-            left: 430 * 96 / 25.4,
-            name: 'ToolHead',
-            selectable: false,
-            hoverCursor: 'auto'
-        });
-
-        let snapped = false;
-
-        plotterCanvas.on('object:moving', (e) => {
-
-            const movingObject = e.target;
-            const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = movingObject.getCoords();
-            const dotCenter = dotRef.current.getCenterPoint();
-
-            const calculateDist = (point, centerX, centerY) => {
-                const dx = point.x - centerX;
-                const dy = point.y - centerY;
-                return Math.sqrt(dx * dx + dy * dy);
-            }
-
-            const topLeftDistance = calculateDist(mTopLeft, dotCenter.x, dotCenter.y);
-            const topRightDistance = calculateDist(mTopRight, dotCenter.x, dotCenter.y);
-            const bottomLeftDistance = calculateDist(mBottomLeft, dotCenter.x, dotCenter.y);
-            const bottomRightDistance = calculateDist(mBottomRight, dotCenter.x, dotCenter.y);
-
-            const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
-
-            if (!snapped && shortestDistance < 80) {
-                const horizontalD = mTopRight.x - mTopLeft.x;
-                const verticalD = mBottomLeft.y - mTopLeft.y;
-
-                if (shortestDistance === topLeftDistance) {
-                    movingObject.set({
-                        left: dotCenter.x,
-                        top: dotCenter.y
-                    })
-                }
-                else if (shortestDistance === topRightDistance) {
-                    movingObject.set({
-                        left: dotCenter.x - horizontalD,
-                        top: dotCenter.y
-                    })
-                }
-                else if (shortestDistance === bottomLeftDistance){
-                    movingObject.set({
-                        left: dotCenter.x,
-                        top: dotCenter.y - verticalD
-                    })
-                }
-                else if (shortestDistance === bottomRightDistance) {
-                    movingObject.set({
-                        left: dotCenter.x - horizontalD,
-                        top: dotCenter.y - verticalD
-                    })
-                }  
-                movingObject.setCoords();
-                setTimeout(() => { snapped = true }, 500)
-            } else {
-                setTimeout(() => { snapped = false }, 500)
-            }
-        });
-
-
-        plotterCanvas.add(dotRef.current);
-        plotterCanvas.renderAll();
-        return () => {
-            plotterCanvas.remove(dotRef.current);    
-        }
-    }, [response.pageId])
-
-    useEffect(() => {
         if (!ws) return;
 
         const handleSocketOpen = () => {
@@ -434,7 +348,8 @@ export const CommunicationProvider = ({ children }) => {
                 closeSocket,
                 sendToMachine,
                 plotterCanvas, 
-                setPlotterCanvas
+                setPlotterCanvas,
+                dotRef
             }}
         >
             { children }

@@ -75,7 +75,6 @@ export const CanvasProvider = ({ children }) => {
             if (newStack.length > 25) newStack.shift();
             return newStack;
         });
-        console.log('SaveState Function Called')
     }, [canvas, setRedoStack, setUndoStack])
 
     const undo = () => {

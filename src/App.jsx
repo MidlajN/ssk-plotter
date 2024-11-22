@@ -18,7 +18,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
   const { canvas, canvasRef, plotterRef } = useCanvas();
-  const { colors, plotterCanvas, setPlotterCanvas } = useCom()
+  const { colors, plotterCanvas, setPlotterCanvas, dotRef } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
@@ -63,6 +63,9 @@ export default function Home() {
         })
       })
 
+      // if (dotRef.current) {
+      //   plotCanvas.add(dotRef.current)
+      // }
       plotCanvas.renderAll()
 
       return () => {
