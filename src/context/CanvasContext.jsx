@@ -53,18 +53,6 @@ export const CanvasProvider = ({ children }) => {
         return () => fabricCanvas.dispose();
     }, []);
 
-    // const saveState = () => {
-    //     if (isUndoRedo) return;
-    //     setRedoStack([]);
-
-    //     setUndoStack((prev) => {
-    //         const currentState = JSON.stringify(canvas);
-    //         const newStack = [ ...prev, currentState ];
-    //         if (newStack.length > 25) newStack.shift();
-    //         return newStack;
-    //     });
-    //     console.log('SaveState Function Called')
-    // }
     const saveState = useCallback(() => {
         if (isUndoRedo) return;
         setRedoStack([]);
@@ -78,13 +66,16 @@ export const CanvasProvider = ({ children }) => {
     }, [canvas, setRedoStack, setUndoStack])
 
     const undo = () => {
+        // isUndoRedo = true;
         setUndoStack((prevStack) => {
             if (prevStack.length > 1) {
-                const currentState = prevStack.pop();
+                const updatedStack = [ ...prevStack ]
+                const currentState = updatedStack.pop();
                 setRedoStack((prev) => [...prev, currentState]);
+
                 isUndoRedo = true;
 
-                canvas.loadFromJSON(prevStack[prevStack.length - 1]).then(() => {
+                canvas.loadFromJSON(updatedStack[updatedStack.length - 1]).then(() => {
                     const object = canvas.getObjects().find(obj => obj.name === 'ToolHead');
                     if (object) {
                         object.set({
@@ -101,8 +92,7 @@ export const CanvasProvider = ({ children }) => {
                     canvas.renderAll();
                     isUndoRedo = false;
                 });
-
-                return [...prevStack]
+                return updatedStack;
             }
             return prevStack;
         })
@@ -111,7 +101,8 @@ export const CanvasProvider = ({ children }) => {
     const redo = () => {
         setRedoStack((prevStack) => {
             if (prevStack.length > 0) {
-                const stateToRedo = prevStack.pop();
+                const updatedStack = [ ...prevStack ]
+                const stateToRedo = updatedStack.pop();
                 setUndoStack((prev) => [...prev, stateToRedo]);
                 isUndoRedo = true
                 
@@ -132,12 +123,13 @@ export const CanvasProvider = ({ children }) => {
                     canvas.renderAll();
                     isUndoRedo = false;
                 });
-                return [ ...prevStack ]
+                return updatedStack;
             }
             return prevStack;
         });
     }
-    
+ 
+
     useEffect(() => {
         if (!canvas) return ;
 
