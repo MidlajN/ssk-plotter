@@ -4,7 +4,7 @@ import { split, group } from "../../util/functions";
 import { FreeDrawIcon, SplitSvg } from "../Icons";
 import { Line } from "./Icons";
 import './nav.css';
-import { Circle, Group, MousePointer2Icon, Square, Triangle } from "lucide-react";
+import { Circle, Group, MousePointer2Icon, Square, Triangle, Type } from "lucide-react";
 
 export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) => {
   const { canvas, saveState } = useCanvas();
@@ -62,6 +62,14 @@ export const SideNav = ({ tool, setTool, setExpanded, element,  setElement }) =>
         icon={ <Triangle size={22} strokeWidth={1.5} color={ (tool === 'Elements' && element === 'triangle') ? '#1c8096' : '#4b5563' }  /> } 
         text={'Elements'} 
         hoverText={'Triangle'}
+        setTool={setTool}
+        setExpanded={setExpanded}
+        canvasFunction={ () => setElement('triangle') }
+      />
+      <SidebarItem 
+        icon={ <Type size={22} strokeWidth={1.5} color={ tool === 'Text'  ? '#1c8096' : '#4b5563' }  /> } 
+        text={'Text'} 
+        hoverText={'Text'}
         setTool={setTool}
         setExpanded={setExpanded}
         canvasFunction={ () => setElement('triangle') }

@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { Line, PencilBrush, Rect, Ellipse, Triangle } from "fabric";
+import { Line, PencilBrush, Rect, Ellipse, Triangle, FabricText } from "fabric";
 import { PenTool, Pencil } from "lucide-react";
 import ReactDOMServer from 'react-dom/server'
 import useCanvas from "../../context/CanvasContext";
+import useCom from "../../context/ComContext";
 
 export const useEditorSetup = (tool, strokeColor, element) => {
   const { canvas, saveState, toolRef } = useCanvas()
+  const { colors } = useCom();
 
   const componentToUrl = (Component, rotationAngle = 0) => {
       let svgString = ReactDOMServer.renderToStaticMarkup(<Component size={20} strokeWidth={1.5} color={'#4b5563'}  />)
@@ -207,6 +209,30 @@ export const useEditorSetup = (tool, strokeColor, element) => {
 
 
       return () => resetCanvas(setUpElement, drawElement, finishElement);
+    }
+
+    if (tool === 'Text') {
+      const addText = (event) => {
+        const pointer = canvas.getPointer(event.e);
+        const text = new FabricText('Enter Text Here', {
+          left: pointer.x,
+          top: pointer.y,
+          fontSize: 20, 
+          stroke: colors[0].color,
+          strokeWidth: 1,
+          fill: 'transparent',
+          fontFamily: 'sans-serif'
+        })
+
+        canvas.add(text);
+        canvas.renderAll()
+      } 
+
+      canvas.on('mouse:down', addText);
+
+      return () => {
+        canvas.off('mouse:down', addText)
+      }
     }
   }, [canvas, element, tool])
 }

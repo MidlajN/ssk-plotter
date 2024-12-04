@@ -66,7 +66,6 @@ export const CanvasProvider = ({ children }) => {
     }, [canvas, setRedoStack, setUndoStack])
 
     const undo = () => {
-        // isUndoRedo = true;
         setUndoStack((prevStack) => {
             if (prevStack.length > 1) {
                 const updatedStack = [ ...prevStack ]
@@ -129,7 +128,6 @@ export const CanvasProvider = ({ children }) => {
         });
     }
  
-
     useEffect(() => {
         if (!canvas) return ;
 

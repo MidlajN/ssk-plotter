@@ -1,41 +1,52 @@
 // Conversion Related Function Which are essential for the the Gcode generation and Svg Generation from the FabricJS 
 import tinycolor from "tinycolor2";
 import { Converter } from "svg-to-gcode";
+import { parse } from "opentype.js";
+import { Path } from "fabric";
 
-// TO FIX 
 const returnObjs = (objects) => {
     const newObjects = []
-
-    // const processObject = (object, transformMatrix = null) => {
-    //     if (object.get('type') ===  'group') {
-    //         object.getObjects().forEach(innerObject => {
-    //             processObject(innerObject, object.calcTransformMatrix())
-    //         });
-    //     } else {
-    //         object.clone(clonedObject => {
-    //             if (transformMatrix) {
-    //                 const originalLeft = clonedObject.left;
-    //                 const originalTop = clonedObject.top;
-
-    //                 clonedObject.set({
-    //                     left: originalLeft * transformMatrix[0] + originalTop * transformMatrix[2] + transformMatrix[4],
-    //                     top: originalLeft * transformMatrix[1] + originalTop * transformMatrix[3] + transformMatrix[5],
-    //                     angle: clonedObject.angle + object.angle,
-    //                     scaleX: clonedObject.scaleX * object.scaleX,
-    //                     scaleY: clonedObject.scaleY * object.scaleY
-    //                 })
-    //             }
-    //             newObjects.push(clonedObject);
-    //         })  
-    //     }
-    // }
-
-    objects.forEach(obj => {
+    objects.forEach( async (obj) => {
         if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-            // console.log(obj.toSVG());
             // processObject(obj)
-            console.log(obj)
-            newObjects.push(obj)
+            if (obj.type === 'text') {
+                const text = obj.text;
+                const fontSize = obj.fontSize;
+                const fontFamily = obj.fontFamily || 'sans-serif';
+                console.log(
+                    'Obj : ', obj,
+                    '\nObj SVG : ', obj.toSVG(),
+                    '\nFont Family : ', fontFamily,
+                    '\nText : ', text,
+                    '\nFont Size : ', fontSize,
+                );
+                const fontUrl = '/Julee-Regular.ttf';
+                const fontBuffer = await fetch(fontUrl).then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch font: ${response.statusText}`);
+                    }
+                    return response.arrayBuffer();
+                }).catch((err) => {
+                    console.error("Error fetching font file:", err);
+                    return null
+                })
+
+                if (!fontBuffer) return;
+                const font = parse(fontBuffer);
+                const path = font.getPath(text, 0, 0, fontSize);
+                console.log('OpenType  : ', path.toPathData())
+                const createdPath = new Path(path.toPathData(), {
+                    left: obj.left,
+                    top: obj.top,
+                    scaleX: obj.scaleX,
+                    scaleY: obj.scaleY,
+                    stroke: obj.stroke
+                });
+                console.log(createdPath)
+                newObjects.push(createdPath)
+            } else {
+                newObjects.push(obj)
+            }
         }
     })
 
@@ -46,6 +57,7 @@ export const returnGroupedObjects = (canvas) => {
     canvas.discardActiveObject();
     canvas.renderAll();
     
+    console.log(returnObjs(canvas.getObjects()))
     return returnObjs(canvas.getObjects()).reduce((acc, object) => {
         const stroke = tinycolor(object.stroke).toHexString();
         acc[stroke] = acc[stroke] || [];
@@ -57,6 +69,7 @@ export const returnGroupedObjects = (canvas) => {
 
 export const returnSvgElements = (objects, width, height) => {
     const svgElements = []
+    console.log('obect : ', objects)
 
     for (const stroke in objects) {
         let groupSVG = '';

@@ -18,7 +18,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
   const { canvas, canvasRef, plotterRef } = useCanvas();
-  const { colors, plotterCanvas, setPlotterCanvas, dotRef } = useCom()
+  const { colors, plotterCanvas, setPlotterCanvas } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
@@ -63,9 +63,6 @@ export default function Home() {
         })
       })
 
-      // if (dotRef.current) {
-      //   plotCanvas.add(dotRef.current)
-      // }
       plotCanvas.renderAll()
 
       return () => {
@@ -75,6 +72,7 @@ export default function Home() {
       }
     } else if (canvas){
       canvas.renderAll()
+      transformRef.current.resetTransform();
     }
   }, [tool])
 
@@ -117,7 +115,7 @@ export default function Home() {
                 initialPositionY={ tool === 'Plot' ? 100 : null }
                 maxScale={3}
                 minScale={.5} 
-                limitToBounds={ false }
+                limitToBounds={ tool === 'Plot' ? false : true }
                 panning={{ excluded: ['fabricCanvas'] }}
                 // centerZoomedOut
                 centerOnInit
@@ -128,6 +126,9 @@ export default function Home() {
                     width: '100%', 
                     height: '100%', 
                     overflow:'visible', 
+                  }}
+                  contentStyle={{
+                    padding: tool === 'Plot' ? '' : '7rem'
                   }}
                 >
                   <div 

@@ -258,13 +258,6 @@ export const ColorSortComponent = () => {
     const [ drawnColors, setDrawnColors ] = useState([])
     const [ showMore, setShowMore ] = useState(null)
 
-    // const handleSort = () => {
-    //     const cloneColors = [...colors];
-    //     const temp = cloneColors[dragDiv.current]
-    //     cloneColors[dragDiv.current] = cloneColors[dragOverDiv.current];
-    //     cloneColors[dragOverDiv.current] = temp
-    //     setColors(cloneColors)
-    // }
     const handleSort = () => {
         const cloneColors = [...drawnColors];
         const temp = cloneColors[dragDiv.current]
@@ -437,6 +430,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
         await delay(500);
 
         let groupedObjects = returnGroupedObjects(canvas);
+        console.log('groupedObjects :',groupedObjects)
         const cleanedObjects = Object.fromEntries(
             Object.entries(groupedObjects).filter(([color]) => {
                 // console.log('color ::: ', color)
@@ -451,12 +445,15 @@ export const ActionButtonsComponent = ({ canvas }) => {
         await delay(500);
 
         const gcodes = await convertToGcode(svgElements, colors, config);
-        console.log('Gcode Generated : \n', gcodes.join('\n'))
+        console.log(
+            'Gcode Generated : \n', gcodes.join('\n'), 
+            // '\nSvgElements : ', canvas.toSVG()
+        )
 
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
 
-        uploadToMachine(gcodes);
+        // uploadToMachine(gcodes);
     };
 
 
@@ -479,7 +476,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
         <>
             <div className={`flex items-end w-full  gap-1 justify-center`}>
                 { !job.connected ? (
-                    <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
+                    <ActionButton label={'Ready'} Icon={Plug} onclick={ plot } bgColor={'#0e505c'}/>
                 ) : (
                     <>
                         { job.started ? (
