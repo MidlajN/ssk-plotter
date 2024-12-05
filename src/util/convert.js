@@ -4,61 +4,111 @@ import { Converter } from "svg-to-gcode";
 import { parse } from "opentype.js";
 import { Path } from "fabric";
 
-const returnObjs = (objects) => {
-    const newObjects = []
-    objects.forEach( async (obj) => {
-        if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-            // processObject(obj)
-            if (obj.type === 'text') {
-                const text = obj.text;
-                const fontSize = obj.fontSize;
-                const fontFamily = obj.fontFamily || 'sans-serif';
-                console.log(
-                    'Obj : ', obj,
-                    '\nObj SVG : ', obj.toSVG(),
-                    '\nFont Family : ', fontFamily,
-                    '\nText : ', text,
-                    '\nFont Size : ', fontSize,
-                );
-                const fontUrl = '/Julee-Regular.ttf';
-                const fontBuffer = await fetch(fontUrl).then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch font: ${response.statusText}`);
+// const returnObjs = (objects) => {
+//     const newObjects = []
+//     objects.forEach( async (obj) => {
+//         if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
+//             // processObject(obj)
+//             if (obj.type === 'text') {
+//                 const text = obj.text;
+//                 const fontSize = obj.fontSize;
+//                 const fontFamily = obj.fontFamily || 'sans-serif';
+//                 console.log(
+//                     'Obj : ', obj,
+//                     '\nObj SVG : ', obj.toSVG(),
+//                     '\nFont Family : ', fontFamily,
+//                     '\nText : ', text,
+//                     '\nFont Size : ', fontSize,
+//                 );
+//                 const fontUrl = '/Julee-Regular.ttf';
+//                 const fontBuffer = await fetch(fontUrl).then((response) => {
+//                     if (!response.ok) {
+//                         throw new Error(`Failed to fetch font: ${response.statusText}`);
+//                     }
+//                     return response.arrayBuffer();
+//                 }).catch((err) => {
+//                     console.error("Error fetching font file:", err);
+//                     return null
+//                 })
+
+//                 if (!fontBuffer) return;
+//                 const font = parse(fontBuffer);
+//                 const path = font.getPath(text, 0, 0, fontSize);
+//                 console.log('OpenType  : ', path.toPathData())
+//                 const createdPath = new Path(path.toPathData(), {
+//                     left: obj.left,
+//                     top: obj.top,
+//                     scaleX: obj.scaleX,
+//                     scaleY: obj.scaleY,
+//                     stroke: obj.stroke
+//                 });
+//                 console.log(createdPath)
+//                 newObjects.push(createdPath)
+//             } else {
+//                 newObjects.push(obj)
+//             }
+//         }
+//     })
+
+//     return newObjects
+// }
+
+const returnObjs = async (objects) => {
+    const newObjects = await Promise.all(
+        objects.map( async (obj) => {
+            if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
+                if (obj.type === 'text') {
+                    const text = obj.text;
+                    const fontSize = obj.fontSize;
+                    const fontFamily = obj.fontFamily || 'sans-serif';
+                    console.log(
+                        'Obj : ', obj,
+                        '\nObj SVG : ', obj.toSVG(),
+                        '\nFont Family : ', fontFamily,
+                        '\nText : ', text,
+                        '\nFont Size : ', fontSize,
+                    );
+
+                    const fontUrl = '/OpenSans-Regular.ttf';
+                    try {
+                        const fontBuffer = await fetch(fontUrl).then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`Failed to fetch font: ${response.statusText}`);
+                            }
+                            return response.arrayBuffer();
+                        })
+
+                        const font = parse(fontBuffer);
+                        const path = font.getPath(text, 0, 0, fontSize);
+                        console.log('OpenType  : ', path.toPathData());
+
+                        return new Path(path.toPathData(), {
+                            left: obj.left,
+                            top: obj.top,
+                            scaleX: obj.scaleX,
+                            scaleY: obj.scaleY,
+                            stroke: obj.stroke,
+                        })
+                    } catch (err) {
+                        console.error("Error processing text object:", err);
+                        return null
                     }
-                    return response.arrayBuffer();
-                }).catch((err) => {
-                    console.error("Error fetching font file:", err);
-                    return null
-                })
-
-                if (!fontBuffer) return;
-                const font = parse(fontBuffer);
-                const path = font.getPath(text, 0, 0, fontSize);
-                console.log('OpenType  : ', path.toPathData())
-                const createdPath = new Path(path.toPathData(), {
-                    left: obj.left,
-                    top: obj.top,
-                    scaleX: obj.scaleX,
-                    scaleY: obj.scaleY,
-                    stroke: obj.stroke
-                });
-                console.log(createdPath)
-                newObjects.push(createdPath)
-            } else {
-                newObjects.push(obj)
+                } else {
+                    return obj
+                }
             }
-        }
-    })
+            return null
+        })
+    )
 
-    return newObjects
+    return newObjects.filter(Boolean)
 }
 
-export const returnGroupedObjects = (canvas) => {
+export const returnGroupedObjects = async (canvas) => {
     canvas.discardActiveObject();
     canvas.renderAll();
-    
-    console.log(returnObjs(canvas.getObjects()))
-    return returnObjs(canvas.getObjects()).reduce((acc, object) => {
+    const objects = await returnObjs(canvas.getObjects());
+    return objects.reduce((acc, object) => {
         const stroke = tinycolor(object.stroke).toHexString();
         acc[stroke] = acc[stroke] || [];
         // if (!acc[stroke]) acc[stroke] = [];

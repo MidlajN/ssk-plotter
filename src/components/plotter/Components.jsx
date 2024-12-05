@@ -429,7 +429,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
         setSetupModal(true);
         await delay(500);
 
-        let groupedObjects = returnGroupedObjects(canvas);
+        let groupedObjects = await returnGroupedObjects(canvas);
         console.log('groupedObjects :',groupedObjects)
         const cleanedObjects = Object.fromEntries(
             Object.entries(groupedObjects).filter(([color]) => {
