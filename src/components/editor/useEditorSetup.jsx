@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
-import { Line, PencilBrush, Rect, Ellipse, Triangle, FabricText } from "fabric";
+import { Line, PencilBrush, Rect, Ellipse, Triangle, IText } from "fabric";
 import { PenTool, Pencil } from "lucide-react";
 import ReactDOMServer from 'react-dom/server'
 import useCanvas from "../../context/CanvasContext";
@@ -212,25 +212,46 @@ export const useEditorSetup = (tool, strokeColor, element) => {
     }
 
     if (tool === 'Text') {
-      const addText = (event) => {
+      canvas.selection = false;
+
+      const loadFont = async (fontName) => {
+        try {
+          await document.fonts.load(`1em ${fontName}`);
+          console.log(`${fontName} is loaded`);
+        } catch (error) {
+          console.error(`Error loading font: ${fontName}`, error)
+        }
+      }
+
+      const addText = async (event) => {
         const pointer = canvas.getPointer(event.e);
-        const text = new FabricText('Enter Text Here', {
+        const isIntersecting = canvas.getObjects().some((obj) => {
+          if (obj.type === 'i-text') { 
+            return obj.containsPoint(pointer); 
+          }
+          return false;
+        });
+        if (isIntersecting) return;
+
+        const fontName = 'OpenSans';
+        await loadFont(fontName)
+        const text = new IText('Enter Text Here', {
           left: pointer.x,
           top: pointer.y,
-          fontSize: 20, 
           stroke: colors[0].color,
-          strokeWidth: 1,
+          strokeWidth: 0.5,
           fill: 'transparent',
-          fontFamily: 'sans-serif'
+          fontFamily: fontName,
+          fontSize: 20,
+          padding: 0,
         })
-
         canvas.add(text);
         canvas.renderAll()
       } 
-
       canvas.on('mouse:down', addText);
 
       return () => {
+        canvas.selection = true;
         canvas.off('mouse:down', addText)
       }
     }

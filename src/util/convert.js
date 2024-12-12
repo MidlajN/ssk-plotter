@@ -53,11 +53,11 @@ import { Path } from "fabric";
 //     return newObjects
 // }
 
-const returnObjs = async (objects) => {
+const returnObjs = async (objects, canvas) => {
     const newObjects = await Promise.all(
         objects.map( async (obj) => {
             if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-                if (obj.type === 'text') {
+                if (obj.type === 'i-text') {
                     const text = obj.text;
                     const fontSize = obj.fontSize;
                     const fontFamily = obj.fontFamily || 'sans-serif';
@@ -80,15 +80,50 @@ const returnObjs = async (objects) => {
 
                         const font = parse(fontBuffer);
                         const path = font.getPath(text, 0, 0, fontSize);
+                        const textBoundingRect = obj.getBoundingRect();
                         console.log('OpenType  : ', path.toPathData());
+                        const lines = text.split('\n');
 
-                        return new Path(path.toPathData(), {
-                            left: obj.left,
-                            top: obj.top,
+                        const tolerance = 12;
+                        let lineOffset = 0 + tolerance;
+                        const lineHeight = obj.lineHeight * fontSize;
+
+                        lines.forEach((line) => {
+                            const path = font.getPath(line, 0, 0, fontSize);
+
+                            const pathFabric = new Path(path.toPathData(), {
+                                originX: 'left',
+                                originY: 'top',
+                                // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
+                                left: textBoundingRect.left,
+                                top: (textBoundingRect.top + lineOffset),
+                                // top: ( textBoundingRect.top + textBoundingRect.height / 2 ) ,
+                                scaleX: obj.scaleX,
+                                scaleY: obj.scaleY,
+                                stroke: obj.stroke,
+                                fill: 'transparent',
+                                // padding: 12
+                            });
+                            lineOffset += (lineHeight + (lineOffset === tolerance ? 0 : lineOffset + tolerance)) * obj.scaleY;
+                            canvas.add(pathFabric)
+                        })
+
+                        const pathFabric = new Path(path.toPathData(), {
+                            originX: 'left',
+                            originY: 'top',
+                            // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
+                            left: textBoundingRect.left,
+                            top: textBoundingRect.top,
+                            // top: ( textBoundingRect.top + textBoundingRect.height / 2 ) ,
                             scaleX: obj.scaleX,
                             scaleY: obj.scaleY,
                             stroke: obj.stroke,
+                            fill: 'transparent',
                         })
+                        // canvas.add(pathFabric);
+                        canvas.renderAll()
+                        return pathFabric
+
                     } catch (err) {
                         console.error("Error processing text object:", err);
                         return null
@@ -100,14 +135,13 @@ const returnObjs = async (objects) => {
             return null
         })
     )
-
     return newObjects.filter(Boolean)
 }
 
 export const returnGroupedObjects = async (canvas) => {
     canvas.discardActiveObject();
     canvas.renderAll();
-    const objects = await returnObjs(canvas.getObjects());
+    const objects = await returnObjs(canvas.getObjects(), canvas);
     return objects.reduce((acc, object) => {
         const stroke = tinycolor(object.stroke).toHexString();
         acc[stroke] = acc[stroke] || [];
