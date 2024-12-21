@@ -30,7 +30,6 @@ import { Path } from "fabric";
 //                     console.error("Error fetching font file:", err);
 //                     return null
 //                 })
-
 //                 if (!fontBuffer) return;
 //                 const font = parse(fontBuffer);
 //                 const path = font.getPath(text, 0, 0, fontSize);
@@ -49,7 +48,6 @@ import { Path } from "fabric";
 //             }
 //         }
 //     })
-
 //     return newObjects
 // }
 
@@ -84,45 +82,47 @@ const returnObjs = async (objects, canvas) => {
                         console.log('OpenType  : ', path.toPathData());
                         const lines = text.split('\n');
 
-                        const tolerance = 12;
+                        const tolerance = 3;
                         let lineOffset = 0 + tolerance;
-                        const lineHeight = obj.lineHeight * fontSize;
+                        const lineHeight = (obj.lineHeight * fontSize);
 
+                        let pathFabric = null
                         lines.forEach((line) => {
                             const path = font.getPath(line, 0, 0, fontSize);
 
-                            const pathFabric = new Path(path.toPathData(), {
+                            pathFabric = new Path(path.toPathData(), {
                                 originX: 'left',
                                 originY: 'top',
                                 // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
                                 left: textBoundingRect.left,
-                                top: (textBoundingRect.top + lineOffset),
-                                // top: ( textBoundingRect.top + textBoundingRect.height / 2 ) ,
+                                top: (textBoundingRect.top + lineOffset * obj.scaleY),
                                 scaleX: obj.scaleX,
                                 scaleY: obj.scaleY,
                                 stroke: obj.stroke,
                                 fill: 'transparent',
-                                // padding: 12
                             });
-                            lineOffset += (lineHeight + (lineOffset === tolerance ? 0 : lineOffset + tolerance)) * obj.scaleY;
+                            
+                            lineOffset += lineHeight + tolerance;
                             canvas.add(pathFabric)
+                            return pathFabric
                         })
 
-                        const pathFabric = new Path(path.toPathData(), {
-                            originX: 'left',
-                            originY: 'top',
-                            // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
-                            left: textBoundingRect.left,
-                            top: textBoundingRect.top,
-                            // top: ( textBoundingRect.top + textBoundingRect.height / 2 ) ,
-                            scaleX: obj.scaleX,
-                            scaleY: obj.scaleY,
-                            stroke: obj.stroke,
-                            fill: 'transparent',
-                        })
-                        // canvas.add(pathFabric);
+                        // const pathFabric = new Path(path.toPathData(), {
+                        //     originX: 'left',
+                        //     originY: 'top',
+                        //     // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
+                        //     left: textBoundingRect.left,
+                        //     top: textBoundingRect.top,
+                        //     // top: ( textBoundingRect.top + textBoundingRect.height / 2 ) ,
+                        //     scaleX: obj.scaleX,
+                        //     scaleY: obj.scaleY,
+                        //     stroke: obj.stroke,
+                        //     fill: 'transparent',
+                        // })
+                        // // canvas.add(pathFabric);
                         canvas.renderAll()
-                        return pathFabric
+                        // return null
+                        // return pathFabric
 
                     } catch (err) {
                         console.error("Error processing text object:", err);
