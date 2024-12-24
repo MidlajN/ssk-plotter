@@ -4,53 +4,6 @@ import { Converter } from "svg-to-gcode";
 import { parse } from "opentype.js";
 import { Path } from "fabric";
 
-// const returnObjs = (objects) => {
-//     const newObjects = []
-//     objects.forEach( async (obj) => {
-//         if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-//             // processObject(obj)
-//             if (obj.type === 'text') {
-//                 const text = obj.text;
-//                 const fontSize = obj.fontSize;
-//                 const fontFamily = obj.fontFamily || 'sans-serif';
-//                 console.log(
-//                     'Obj : ', obj,
-//                     '\nObj SVG : ', obj.toSVG(),
-//                     '\nFont Family : ', fontFamily,
-//                     '\nText : ', text,
-//                     '\nFont Size : ', fontSize,
-//                 );
-//                 const fontUrl = '/Julee-Regular.ttf';
-//                 const fontBuffer = await fetch(fontUrl).then((response) => {
-//                     if (!response.ok) {
-//                         throw new Error(`Failed to fetch font: ${response.statusText}`);
-//                     }
-//                     return response.arrayBuffer();
-//                 }).catch((err) => {
-//                     console.error("Error fetching font file:", err);
-//                     return null
-//                 })
-//                 if (!fontBuffer) return;
-//                 const font = parse(fontBuffer);
-//                 const path = font.getPath(text, 0, 0, fontSize);
-//                 console.log('OpenType  : ', path.toPathData())
-//                 const createdPath = new Path(path.toPathData(), {
-//                     left: obj.left,
-//                     top: obj.top,
-//                     scaleX: obj.scaleX,
-//                     scaleY: obj.scaleY,
-//                     stroke: obj.stroke
-//                 });
-//                 console.log(createdPath)
-//                 newObjects.push(createdPath)
-//             } else {
-//                 newObjects.push(obj)
-//             }
-//         }
-//     })
-//     return newObjects
-// }
-
 const returnObjs = async (objects, canvas) => {
     const newObjects = await Promise.all(
         objects.map( async (obj) => {
@@ -61,13 +14,13 @@ const returnObjs = async (objects, canvas) => {
                     const fontFamily = obj.fontFamily || 'sans-serif';
                     console.log(
                         'Obj : ', obj,
-                        '\nObj SVG : ', obj.toSVG(),
+                        // '\nObj SVG : ', obj.toSVG(),
                         '\nFont Family : ', fontFamily,
                         '\nText : ', text,
                         '\nFont Size : ', fontSize,
                     );
 
-                    const fontUrl = '/OpenSans-Regular.ttf';
+                    const fontUrl = '/assets/OpenSans-Regular.ttf';
                     try {
                         const fontBuffer = await fetch(fontUrl).then((response) => {
                             if (!response.ok) {
@@ -77,23 +30,21 @@ const returnObjs = async (objects, canvas) => {
                         })
 
                         const font = parse(fontBuffer);
-                        const path = font.getPath(text, 0, 0, fontSize);
+                        const path = font.getPath(`${ text }`, 0, 0, fontSize);
                         const textBoundingRect = obj.getBoundingRect();
-                        console.log('OpenType  : ', path.toPathData());
+                        console.log('OpenType  : ',path);
                         const lines = text.split('\n');
 
                         const tolerance = 3;
                         let lineOffset = 0 + tolerance;
                         const lineHeight = (obj.lineHeight * fontSize);
 
-                        let pathFabric = null
-                        lines.forEach((line) => {
+                        const pathFabricArray = [];
+                        for (const line of lines) {
                             const path = font.getPath(line, 0, 0, fontSize);
-
-                            pathFabric = new Path(path.toPathData(), {
+                            const linePath = new Path(path.toPathData(), {
                                 originX: 'left',
                                 originY: 'top',
-                                // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
                                 left: textBoundingRect.left,
                                 top: (textBoundingRect.top + lineOffset * obj.scaleY),
                                 scaleX: obj.scaleX,
@@ -101,29 +52,14 @@ const returnObjs = async (objects, canvas) => {
                                 stroke: obj.stroke,
                                 fill: 'transparent',
                             });
-                            
+
                             lineOffset += lineHeight + tolerance;
-                            canvas.add(pathFabric)
-                            return pathFabric
-                        })
-
-                        // const pathFabric = new Path(path.toPathData(), {
-                        //     originX: 'left',
-                        //     originY: 'top',
-                        //     // left: ( textBoundingRect.left + textBoundingRect.width / 2 ) ,
-                        //     left: textBoundingRect.left,
-                        //     top: textBoundingRect.top,
-                        //     // top: ( textBoundingRect.top + textBoundingRect.height / 2 ) ,
-                        //     scaleX: obj.scaleX,
-                        //     scaleY: obj.scaleY,
-                        //     stroke: obj.stroke,
-                        //     fill: 'transparent',
-                        // })
-                        // // canvas.add(pathFabric);
+                            canvas.add(linePath);
+                            pathFabricArray.push(linePath);
+                        }
                         canvas.renderAll()
-                        // return null
-                        // return pathFabric
-
+                        return pathFabricArray
+                        
                     } catch (err) {
                         console.error("Error processing text object:", err);
                         return null
@@ -135,15 +71,18 @@ const returnObjs = async (objects, canvas) => {
             return null
         })
     )
-    return newObjects.filter(Boolean)
+    return newObjects.filter(Boolean).flat();
 }
 
 export const returnGroupedObjects = async (canvas) => {
     canvas.discardActiveObject();
     canvas.renderAll();
     const objects = await returnObjs(canvas.getObjects(), canvas);
+    console.log('Object Returned : ', objects)
     return objects.reduce((acc, object) => {
+        console.log('Objectfor returnGroupedObjects : ', object)
         const stroke = tinycolor(object.stroke).toHexString();
+        console.log('Stroke : ', stroke)
         acc[stroke] = acc[stroke] || [];
         // if (!acc[stroke]) acc[stroke] = [];
         acc[stroke].push(object)
@@ -153,15 +92,14 @@ export const returnGroupedObjects = async (canvas) => {
 
 export const returnSvgElements = (objects, width, height) => {
     const svgElements = []
-    console.log('obect : ', objects)
+    // console.log('obect : ', objects)
 
     for (const stroke in objects) {
         let groupSVG = '';
         if (objects[stroke].length > 1) {
-
             objects[stroke].forEach(obj => {
                 const svg = obj.toSVG();
-                console.log('SVG FROM G : ', svg);
+                // console.log('SVG FROM G : ', svg);
                 groupSVG += svg;
             });
         } else {
@@ -177,7 +115,7 @@ export const returnSvgElements = (objects, width, height) => {
             color : stroke,
             svg : svg.outerHTML
         }
-        console.log('Svg to Be PUSHED :', svg)
+        // console.log('Svg to Be PUSHED :', svg)
         svgElements.push(data);
     }
 
