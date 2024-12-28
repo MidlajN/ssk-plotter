@@ -134,8 +134,6 @@ export const SettingsComponent = ({ openConfig, setOpenConfig }) => {
         setOpenConfig(false)
     }
 
-    
-
     useEffect(() => {
         if ( textareaRef.current ) {
             textareaRef.current.scrollTop = textareaRef.current.scrollHeight;

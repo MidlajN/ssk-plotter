@@ -38,27 +38,51 @@ export const CanvasProvider = ({ children }) => {
         FabricObject.ownDefaults.noScaleCache = true;
         FabricObject.ownDefaults.strokeUniform = true;
         FabricObject.customProperties = ['name'];
-         
+
+        if (!canvasRef.current) return;
+
         const fabricCanvas = new Canvas(canvasRef.current, {
             width: util.parseUnit(`${ canvasConfig.width }mm`),
             height: util.parseUnit(`${ canvasConfig.height }mm`),
-            backgroundColor: "white",
+            backgroundColor: 'white',
             fireRightClick: true,
             stopContextMenu: true,
             centeredRotation: true,
         });
-        fabricCanvas.renderAll()
+
+        const savedCanvas = localStorage.getItem('fabricCanvas');
+        if (savedCanvas) {
+            console.log('SavedState : ', savedCanvas);
+            fabricCanvas.loadFromJSON(JSON.parse(savedCanvas), fabricCanvas.renderAll.bind(fabricCanvas));
+        }
 
         setCanvas(fabricCanvas);
-        return () => fabricCanvas.dispose();
+
+        const saveCanvasState = () => {
+            const canvasState = fabricCanvas.toJSON();
+            localStorage.setItem('fabricCanvas', JSON.stringify(canvasState));
+        };
+
+        window.addEventListener('beforeunload', saveCanvasState);
+
+        return () => {
+            window.removeEventListener('beforeunload', saveCanvasState);
+            fabricCanvas.dispose();
+        };
     }, []);
+
+    useEffect(() => {
+        if (!canvas) return;
+        console.log('Canvas State : ', canvas.toJSON());
+    }, [canvas])
 
     const saveState = useCallback(() => {
         if (isUndoRedo) return;
         setRedoStack([]);
-
+        canvas.renderAll();
         setUndoStack((prev) => {
             const currentState = JSON.stringify(canvas);
+            console.log('Current State ', JSON.parse(currentState))
             const newStack = [ ...prev, currentState ];
             if (newStack.length > 25) newStack.shift();
             return newStack;
@@ -142,7 +166,7 @@ export const CanvasProvider = ({ children }) => {
             canvas.off('object:modified', saveState);
             canvas.off('object:removed', saveState);
         }
-    }, [canvas, saveState])
+    }, [canvas])
 
     useEffect(() => {
         const handleKey = (e) => {

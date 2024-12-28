@@ -20,7 +20,7 @@ const returnObjs = async (objects, canvas) => {
                         '\nFont Size : ', fontSize,
                     );
 
-                    const fontUrl = '/assets/OpenSans-Regular.ttf';
+                    const fontUrl = 'assets/OpenSans-Regular.ttf';
                     try {
                         const fontBuffer = await fetch(fontUrl).then((response) => {
                             if (!response.ok) {
@@ -92,14 +92,12 @@ export const returnGroupedObjects = async (canvas) => {
 
 export const returnSvgElements = (objects, width, height) => {
     const svgElements = []
-    // console.log('obect : ', objects)
 
     for (const stroke in objects) {
         let groupSVG = '';
         if (objects[stroke].length > 1) {
             objects[stroke].forEach(obj => {
                 const svg = obj.toSVG();
-                // console.log('SVG FROM G : ', svg);
                 groupSVG += svg;
             });
         } else {
@@ -115,7 +113,6 @@ export const returnSvgElements = (objects, width, height) => {
             color : stroke,
             svg : svg.outerHTML
         }
-        // console.log('Svg to Be PUSHED :', svg)
         svgElements.push(data);
     }
 
@@ -150,12 +147,12 @@ export const convertToGcode = async (svgElements, colors, config) => {
             }
         }
 
-        console.log('Element From to convertToGcode : ', element.svg)
+        // console.log('Element From to convertToGcode : ', element.svg)
         const converter = new Converter(settings);
         const [ code ] = await converter.convert(element.svg);
         const gCodeLines = code.split('\n');
 
-        console.log('From NPM :',gCodeLines)
+        // console.log('From NPM :',gCodeLines)
         const filteredGcodes = gCodeLines.filter(command => command !== `G1 F${config.feedRate}`);
 
         const cleanedGcodeLines = filteredGcodes.slice(0, -1);
