@@ -33,3 +33,25 @@ export const RotateLeft = (props) => (
     />
   </svg>
 );
+
+export const ControlPanel = (props) => (
+  <svg
+    width={65}
+    height={110}
+    viewBox="0 0 65 110"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <g filter="url(#filter0_d_1888_29)">
+      <path
+        d="M61.6429 29.7C61.6429 25.4474 58.1955 22 53.9429 22H1.64295V110H61.6429V29.7Z"
+        fill="white"
+      />
+      <path
+        d="M1.71442 52.0366L56.6427 22.4999L5.64278 6.00001L1.5983 6L1.59814 11.8484L1.71442 52.0366Z"
+        fill="white"
+      />
+    </g>
+  </svg>
+);

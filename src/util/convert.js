@@ -8,65 +8,65 @@ const returnObjs = async (objects, canvas) => {
     const newObjects = await Promise.all(
         objects.map( async (obj) => {
             if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-                if (obj.type === 'i-text') {
-                    const text = obj.text;
-                    const fontSize = obj.fontSize;
-                    const fontFamily = obj.fontFamily || 'sans-serif';
-                    console.log(
-                        'Obj : ', obj,
-                        // '\nObj SVG : ', obj.toSVG(),
-                        '\nFont Family : ', fontFamily,
-                        '\nText : ', text,
-                        '\nFont Size : ', fontSize,
-                    );
+                // if (obj.type === 'i-text') {
+                //     const text = obj.text;
+                //     const fontSize = obj.fontSize;
+                //     const fontFamily = obj.fontFamily || 'sans-serif';
+                //     console.log(
+                //         'Obj : ', obj,
+                //         // '\nObj SVG : ', obj.toSVG(),
+                //         '\nFont Family : ', fontFamily,
+                //         '\nText : ', text,
+                //         '\nFont Size : ', fontSize,
+                //     );
 
-                    const fontUrl = 'assets/OpenSans-Regular.ttf';
-                    try {
-                        const fontBuffer = await fetch(fontUrl).then((response) => {
-                            if (!response.ok) {
-                                throw new Error(`Failed to fetch font: ${response.statusText}`);
-                            }
-                            return response.arrayBuffer();
-                        })
+                //     const fontUrl = 'assets/OpenSans-Regular.ttf';
+                //     try {
+                //         const fontBuffer = await fetch(fontUrl).then((response) => {
+                //             if (!response.ok) {
+                //                 throw new Error(`Failed to fetch font: ${response.statusText}`);
+                //             }
+                //             return response.arrayBuffer();
+                //         })
 
-                        const font = parse(fontBuffer);
-                        const path = font.getPath(`${ text }`, 0, 0, fontSize);
-                        const textBoundingRect = obj.getBoundingRect();
-                        console.log('OpenType  : ',path);
-                        const lines = text.split('\n');
+                //         const font = parse(fontBuffer);
+                //         const path = font.getPath(`${ text }`, 0, 0, fontSize);
+                //         const textBoundingRect = obj.getBoundingRect();
+                //         console.log('OpenType  : ',path);
+                //         const lines = text.split('\n');
 
-                        const tolerance = 3;
-                        let lineOffset = 0 + tolerance;
-                        const lineHeight = (obj.lineHeight * fontSize);
+                //         const tolerance = 3.3;
+                //         let lineOffset = 0 + tolerance;
+                //         const lineHeight = (obj.lineHeight * fontSize);
 
-                        const pathFabricArray = [];
-                        for (const line of lines) {
-                            const path = font.getPath(line, 0, 0, fontSize);
-                            const linePath = new Path(path.toPathData(), {
-                                originX: 'left',
-                                originY: 'top',
-                                left: textBoundingRect.left,
-                                top: (textBoundingRect.top + lineOffset * obj.scaleY),
-                                scaleX: obj.scaleX,
-                                scaleY: obj.scaleY,
-                                stroke: obj.stroke,
-                                fill: 'transparent',
-                            });
+                //         const pathFabricArray = [];
+                //         for (const line of lines) {
+                //             const path = font.getPath(line, 0, 0, fontSize);
+                //             const linePath = new Path(path.toPathData(), {
+                //                 originX: 'left',
+                //                 originY: 'top',
+                //                 left: textBoundingRect.left,
+                //                 top: (textBoundingRect.top + lineOffset * obj.scaleY),
+                //                 scaleX: obj.scaleX,
+                //                 scaleY: obj.scaleY,
+                //                 stroke: obj.stroke,
+                //                 fill: 'transparent',
+                //             });
 
-                            lineOffset += lineHeight + tolerance;
-                            canvas.add(linePath);
-                            pathFabricArray.push(linePath);
-                        }
-                        canvas.renderAll()
-                        return pathFabricArray
+                //             lineOffset += lineHeight + tolerance;
+                //             canvas.add(linePath);
+                //             pathFabricArray.push(linePath);
+                //         }
+                //         canvas.renderAll()
+                //         return pathFabricArray
                         
-                    } catch (err) {
-                        console.error("Error processing text object:", err);
-                        return null
-                    }
-                } else {
+                //     } catch (err) {
+                //         console.error("Error processing text object:", err);
+                //         return null
+                //     }
+                // } else {
                     return obj
-                }
+                // }
             }
             return null
         })

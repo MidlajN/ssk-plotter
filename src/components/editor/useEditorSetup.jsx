@@ -246,6 +246,7 @@ export const useEditorSetup = (tool, strokeColor, element) => {
           padding: 0,
         })
         canvas.add(text);
+        text.initDimensions();
         canvas.renderAll()
       } 
       canvas.on('mouse:down', addText);

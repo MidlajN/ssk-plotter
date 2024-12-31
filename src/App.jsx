@@ -12,12 +12,13 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
-import { Canvas, FabricObject, util } from "fabric";
+import { Canvas, FabricObject, Path, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
+import { parse } from "opentype.js";
 
 export default function Home() {
-  const { canvas, canvasRef, plotterRef } = useCanvas();
+  const { canvas, canvasRef, plotterRef, canvasObjs, setCanvasObjs } = useCanvas();
   const { colors, plotterCanvas, setPlotterCanvas } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
@@ -25,7 +26,6 @@ export default function Home() {
   const [ hideSideBar, setHideSideBar ] = useState(false);
   const [ strokeColor, setStrokeColor ] = useState(colors[0].color);
   const [ element, setElement ] = useState('rectangle');
-  const [ canvasObjs, setCanvasObjs ] = useState(null)
 
   useEffect(() => {
     if (tool === 'Plot') {
@@ -43,23 +43,72 @@ export default function Home() {
         centeredRotation: true,
         selectionDashArray: [10],
         selectionBorderColor: '#095262',
-        selectionColor: '',
+        selectionColor: '#4666ce40',
         controlsAboveOverlay: false
       });
 
       setPlotterCanvas(plotCanvas)
       const objects = canvas.getObjects();
       objects.forEach((obj) => {
-        obj.clone().then(clonedObj => {
-          clonedObj.set({
-            lockRotation: true,
-            lockScalingX: true,
-            lockScalingY: true,
-            borderDashArray: [13],
-            cornerSize: 0,
-            hasControls: false
-          })
-          plotCanvas.add(clonedObj)
+        obj.clone().then(async (clonedObj) => {
+          if (clonedObj.type === 'i-text') {
+            const text = clonedObj.text;
+            const fontSize = clonedObj.fontSize;
+            // const fontFamily = clonedObj.fontFamily;
+            const fontUrl = 'assets/OpenSans-Regular.ttf';
+
+            try {
+              const fontBuffer = await fetch(fontUrl).then((response) => {
+                if (!response.ok) {
+                  throw new Error(`Failed to Fetch Font: ${ response.statusText }`);
+                }
+                return response.arrayBuffer();
+              });
+
+              const font = parse(fontBuffer);
+              // const path = font.getPath(`${ text }`, 0, 0, fontSize);
+              const textBoundingRect = clonedObj.getBoundingRect();
+              const lines = text.split('\n');
+
+              const tolerance = 3.3;
+              let lineOffset = 0 + tolerance;
+              const lineHeight = clonedObj.lineHeight * fontSize;
+              
+              for (const line of lines) {
+                const path = font.getPath(line, 0, 0, fontSize);
+                const linePath = new Path(path.toPathData(), {
+                  left: textBoundingRect.left,
+                  top: textBoundingRect.top + lineOffset * clonedObj.scaleY,
+                  scaleX: clonedObj.scaleX,
+                  scaleY: clonedObj.scaleY,
+                  stroke: clonedObj.stroke,
+                  fill: 'transparent',
+                  lockRotation: true,
+                  lockScalingX: true,
+                  lockScalingY: true,
+                  borderDashArray: [13],
+                  cornerSize: 0,
+                  hasControls: false
+                });
+
+                lineOffset += lineHeight + tolerance;
+                plotCanvas.add(linePath);
+              }
+              plotCanvas.add(clonedObj)
+            } catch (err) {
+              console.error('Error Processing Text Object : ', err);
+            }
+          } else {
+            clonedObj.set({
+              lockRotation: true,
+              lockScalingX: true,
+              lockScalingY: true,
+              borderDashArray: [13],
+              cornerSize: 0,
+              hasControls: false
+            });
+            plotCanvas.add(clonedObj);
+          }
         })
       })
 
@@ -135,9 +184,19 @@ export default function Home() {
                     className="machine-outer"
                     style={{ display: tool === 'Plot' ? 'block' : 'none' }}
                   >
+                    <div className="left-corner"></div>
+                    <div className="right-corner"></div>
                     <div className="machine-inner">
                       <div className="machine-bed">
-                        <canvas ref={ plotterRef } className="fabricCanvas"></canvas>
+                        <div className="machine-bed-outer">
+                          <div className="lt-corner"></div>
+                          <div className="rt-corner"></div>
+                          <div className="lb-corner"></div>
+                          <div className="rb-corner"></div>
+                          <canvas ref={ plotterRef } className="fabricCanvas"></canvas>
+                        </div>
+                        <div className="triangle-left"></div>
+                        <div className="triangle-right"></div>
                       </div>
                     </div>
                   </div>

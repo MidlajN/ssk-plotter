@@ -16,6 +16,7 @@ export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
     const plotterRef = useRef(null)
     const [ canvas, setCanvas ] = useState(null);
+    const [ canvasObjs, setCanvasObjs ] = useState(null)
     const [ copiedObject, setCopiedObject ] = useState(null);
     const [ canvasConfig, setCanvasConfig ] = useState({
         width: 300,
@@ -53,7 +54,9 @@ export const CanvasProvider = ({ children }) => {
         const savedCanvas = localStorage.getItem('fabricCanvas');
         if (savedCanvas) {
             console.log('SavedState : ', savedCanvas);
-            fabricCanvas.loadFromJSON(JSON.parse(savedCanvas), fabricCanvas.renderAll.bind(fabricCanvas));
+            fabricCanvas.loadFromJSON(JSON.parse(savedCanvas), fabricCanvas.renderAll.bind(fabricCanvas)).then(() => {
+                setCanvasObjs([...fabricCanvas.getObjects()])
+            });
         }
 
         setCanvas(fabricCanvas);
@@ -206,7 +209,9 @@ export const CanvasProvider = ({ children }) => {
                 setCanvasConfig,
                 saveState,
                 toolRef,
-                plotterRef
+                plotterRef,
+                canvasObjs, 
+                setCanvasObjs
             }}
         >
             { children }

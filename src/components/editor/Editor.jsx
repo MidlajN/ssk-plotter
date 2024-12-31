@@ -20,7 +20,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
 
     useEffect(() => {
         if (canvas) {
-            
+
             const handleObject = () => {
                 const activeObject = canvas.getActiveObjects();
                 if (activeObject.length === 1) {
@@ -39,7 +39,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
 
                     // const angle = parseFloat((activeObject[0].get('angle') * 25.4) / 96).toFixed(2);
                     const angle = activeObject[0].get('angle');
-                    setDimensions({ width: mmWidth, height: mmHeight, angle: angle, active: true });
+                    setDimensions({ width: mmWidth, height: mmHeight, angle: angle, active: activeObject[0].type === 'i-text' ? false : true });
                 } else {
                     setDimensions({ ...dimension, active: false })
                 }
@@ -84,7 +84,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
             setCanvasObjs([...canvas.getObjects()])
             const object = canvas.getActiveObject()
             if (!object) {
-                setDimensions({ width: 0, height: 0, angle: 0, active: false })
+                setDimensions({ width: 0, height: 0, angle: 0, active: false})
             }
         }
 
@@ -120,7 +120,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
         }
         canvas.discardActiveObject();
         canvas.setActiveObject(object);
-        canvas.renderAll()
+        canvas.renderAll();
     }
 
     return (
