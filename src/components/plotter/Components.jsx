@@ -28,7 +28,7 @@ import { AnimatePresence } from "framer-motion";
 import { PenIcon } from "../Icons";
 
 export const DimensionComponent = ({ plotCanvas }) => {
-    const [ dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [ dimensions, setDimensions] = useState({ width: 0, height: 0, xPos:0, yPos: 0 });
 
     useEffect(() => {
         if (!plotCanvas) return;
@@ -37,27 +37,34 @@ export const DimensionComponent = ({ plotCanvas }) => {
             const activeObject = plotCanvas.getActiveObject();
             let width = null;
             let height = null;
+            let xPos = null;
+            let yPos = null;
             // let angle = null;
             if (activeObject && activeObject.type === 'activeSelection') {
                 const boundingRect = activeObject.getBoundingRect(true); // true for absolute coordinates
                 width = parseFloat(boundingRect.width * 25.4 / 96).toFixed(2); 
                 height = parseFloat(boundingRect.height * 25.4 / 96).toFixed(2); 
-    
+                xPos = parseFloat(activeObject.left * 25.4 / 96).toFixed(2);
+                yPos = parseFloat(activeObject.top * 25.4 / 96).toFixed(2);
             } else if (activeObject) {
                 width = parseFloat(activeObject.getScaledWidth() * 25.4 / 96).toFixed(2);
                 height = parseFloat(activeObject.getScaledHeight() * 25.4 / 96).toFixed(2);
+                xPos = parseFloat(activeObject.left * 25.4 / 96).toFixed(2);
+                yPos = parseFloat(activeObject.top * 25.4 / 96).toFixed(2);
             }
-            setDimensions({ width: width ? width : 0, height: height ? height: 0 });
+            setDimensions({ width: width ? width : 0, height: height ? height: 0, xPos: xPos ? xPos: 0, yPos: yPos ? yPos: 0});
         };
           
         plotCanvas.on('selection:created', getSelectionDimensions);
         plotCanvas.on('selection:updated', getSelectionDimensions);
         plotCanvas.on('selection:cleared', getSelectionDimensions);
+        plotCanvas.on('object:moving', getSelectionDimensions);
 
         return () => {
             plotCanvas.off('selection:created', getSelectionDimensions);
             plotCanvas.off('selection:updated', getSelectionDimensions);
             plotCanvas.off('selection:cleared', getSelectionDimensions);
+            plotCanvas.on('object:moving', getSelectionDimensions);
         }
           
     }, [plotCanvas])
@@ -74,10 +81,14 @@ export const DimensionComponent = ({ plotCanvas }) => {
                     <p className="min-w-14">Height</p>
                     <p>{ dimensions.height } <span className="text-xs text-gray-500">mm</span></p>
                 </div>
-                {/* <div className="flex gap-6">
-                    <p className="min-w-14">Angle</p>
-                    <p>0 <span className="text-xs text-gray-500">deg</span></p>
-                </div> */}
+                <div className="flex gap-6 pb-2 mt-2">
+                    <p className="min-w-14">X <span className="text-sm text-gray-500">pos.</span></p>
+                    <p>{ dimensions.xPos } <span className="text-xs text-gray-500">mm</span></p>
+                </div>
+                <div className="flex gap-6 pb-2">
+                    <p className="min-w-14">Y <span className="text-sm text-gray-500">pos.</span></p>
+                    <p>{ dimensions.yPos } <span className="text-xs text-gray-500">mm</span></p>
+                </div>
             </div>
         </>
     )

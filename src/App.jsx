@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
-import { Canvas, FabricObject, Path, util } from "fabric";
+import { Canvas, FabricObject, Group, Path, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { parse } from "opentype.js";
@@ -49,6 +49,11 @@ export default function Home() {
 
       setPlotterCanvas(plotCanvas)
       const objects = canvas.getObjects();
+      const group = new Group([], {
+        subTargetCheck: false,
+        interactive: false
+      })
+
       objects.forEach((obj) => {
         obj.clone().then(async (clonedObj) => {
           if (clonedObj.type === 'i-text') {
@@ -93,11 +98,17 @@ export default function Home() {
 
                 lineOffset += lineHeight + tolerance;
                 plotCanvas.add(linePath);
+                group.add(linePath);
               }
-              plotCanvas.add(clonedObj)
+              // group.add(clonedObj);
+              // plotCanvas.add(clonedObj)
             } catch (err) {
               console.error('Error Processing Text Object : ', err);
             }
+          } else if (clonedObj.type === 'group') {
+            const groupObjects = [...clonedObj.removeAll()]
+            plotCanvas.add(...groupObjects);
+            group.add(...groupObjects);
           } else {
             clonedObj.set({
               lockRotation: true,
@@ -108,10 +119,11 @@ export default function Home() {
               hasControls: false
             });
             plotCanvas.add(clonedObj);
+            group.add(clonedObj);
           }
         })
       })
-
+      plotCanvas.add(group);
       plotCanvas.renderAll()
 
       return () => {
@@ -159,8 +171,8 @@ export default function Home() {
           >
             <div className={`canvas ${ expanded ? 'lg:w-[83%]' : 'w-[100%]' }`}>
               <TransformWrapper
-                initialScale={ tool === 'Plot' ? 0.5 : 0.6 } 
-                initialPositionX={ tool === 'Plot' ? 200 : null }
+                initialScale={ tool === 'Plot' ? 0.44 : 0.6 } 
+                initialPositionX={ tool === 'Plot' ? 300 : null }
                 initialPositionY={ tool === 'Plot' ? 100 : null }
                 maxScale={3}
                 minScale={.5} 
@@ -239,7 +251,7 @@ export default function Home() {
             <div 
               className={`
                 ${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500
-                lg:border-l-2 ${ tool === 'Plot' ? 'border-[#9c3c6e7c]' : 'border-[#1c7f969c]' }
+                lg:border-l-2 ${ tool === 'Plot' ? 'border-[#1f5c98c2]' : 'border-[#1c7f969c]' }
               `}
             >
               <div className={ `h-full transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
