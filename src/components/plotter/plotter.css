@@ -129,3 +129,13 @@
 .responses textarea::-webkit-scrollbar {
     display: none;
 }
+
+/* Component.jsx */
+.dimensions div input {
+    width: 5rem;
+    border-radius: 5px;
+    padding: 2px 4px 2px 10px ;
+    font-size: 15px;
+    font-weight: 400;
+    outline: none;
+}

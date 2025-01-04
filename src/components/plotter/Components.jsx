@@ -26,9 +26,10 @@ import { motion } from "framer-motion";
 import './plotter.css'
 import { AnimatePresence } from "framer-motion";
 import { PenIcon } from "../Icons";
+import { util } from "fabric";
 
 export const DimensionComponent = ({ plotCanvas }) => {
-    const [ dimensions, setDimensions] = useState({ width: 0, height: 0, xPos:0, yPos: 0 });
+    const [ dimensions, setDimensions] = useState({ width: 0, height: 0, left:0, top: 0 });
 
     useEffect(() => {
         if (!plotCanvas) return;
@@ -37,22 +38,22 @@ export const DimensionComponent = ({ plotCanvas }) => {
             const activeObject = plotCanvas.getActiveObject();
             let width = null;
             let height = null;
-            let xPos = null;
-            let yPos = null;
+            let left = null;
+            let top = null;
             // let angle = null;
             if (activeObject && activeObject.type === 'activeSelection') {
                 const boundingRect = activeObject.getBoundingRect(true); // true for absolute coordinates
                 width = parseFloat(boundingRect.width * 25.4 / 96).toFixed(2); 
                 height = parseFloat(boundingRect.height * 25.4 / 96).toFixed(2); 
-                xPos = parseFloat(activeObject.left * 25.4 / 96).toFixed(2);
-                yPos = parseFloat(activeObject.top * 25.4 / 96).toFixed(2);
+                left = parseFloat(activeObject.left * 25.4 / 96).toFixed(2);
+                top = parseFloat(activeObject.top * 25.4 / 96).toFixed(2);
             } else if (activeObject) {
                 width = parseFloat(activeObject.getScaledWidth() * 25.4 / 96).toFixed(2);
                 height = parseFloat(activeObject.getScaledHeight() * 25.4 / 96).toFixed(2);
-                xPos = parseFloat(activeObject.left * 25.4 / 96).toFixed(2);
-                yPos = parseFloat(activeObject.top * 25.4 / 96).toFixed(2);
+                left = parseFloat(activeObject.left * 25.4 / 96).toFixed(2);
+                top = parseFloat(activeObject.top * 25.4 / 96).toFixed(2);
             }
-            setDimensions({ width: width ? width : 0, height: height ? height: 0, xPos: xPos ? xPos: 0, yPos: yPos ? yPos: 0});
+            setDimensions({ width: width ? width : 0, height: height ? height: 0, left: left ? left: 0, top: top ? top: 0});
         };
           
         plotCanvas.on('selection:created', getSelectionDimensions);
@@ -69,10 +70,18 @@ export const DimensionComponent = ({ plotCanvas }) => {
           
     }, [plotCanvas])
 
+    const changePos = (name, pos) => {
+        setDimensions(prev => ({ ...prev, [name]: pos}))
+        const activeObject = plotCanvas.getActiveObject();
+        activeObject.set({
+            [name]: util.parseUnit(`${pos}mm`)
+        });
+        plotCanvas.renderAll()
+    }
 
     return (
         <>
-            <div className="p-5">
+            <div className="p-5 dimensions">
                 <div className="flex gap-6 pb-2">
                     <p className="min-w-14">Width</p>
                     <p>{ dimensions.width } <span className="text-xs text-gray-500">mm</span></p>
@@ -83,11 +92,23 @@ export const DimensionComponent = ({ plotCanvas }) => {
                 </div>
                 <div className="flex gap-6 pb-2 mt-2">
                     <p className="min-w-14">X <span className="text-sm text-gray-500">pos.</span></p>
-                    <p>{ dimensions.xPos } <span className="text-xs text-gray-500">mm</span></p>
+                    <input 
+                        type="number"
+                        className="bg-gray-100" 
+                        value={ dimensions.left } 
+                        onInput={(e) => changePos('left', e.target.value)} 
+                        min={0}
+                    />
                 </div>
                 <div className="flex gap-6 pb-2">
                     <p className="min-w-14">Y <span className="text-sm text-gray-500">pos.</span></p>
-                    <p>{ dimensions.yPos } <span className="text-xs text-gray-500">mm</span></p>
+                    <input 
+                        type="number" 
+                        className="bg-gray-100"
+                        value={ dimensions.top } 
+                        onInput={(e) => changePos('top', e.target.value)} 
+                        min={0}
+                    />
                 </div>
             </div>
         </>
