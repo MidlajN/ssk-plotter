@@ -27,6 +27,48 @@ export default function Home() {
   const [ strokeColor, setStrokeColor ] = useState(colors[0].color);
   const [ element, setElement ] = useState('rectangle');
 
+  const fetchFont = async (fontUrl) => {
+    const response = await fetch(fontUrl)
+    if (!response.ok) throw new Error(`Failed Fetch Font: ${ response.statusText }`);
+    return response.arrayBuffer();
+  }
+
+  const processTextObject = async (obj, fontUrl, group) => {
+    const text = obj.text;
+    const fontSize = obj.fontSize;
+    const textBoundingRect = obj.getBoundingRect();
+    const lines = text.split('\n');
+
+    const fontBuffer = await fetchFont(fontUrl);
+    const font = parse(fontBuffer);
+
+    const tolerance = 3.3;
+    let lineOffset = 0 + tolerance;
+    const lineHeight = obj.lineHeight * fontSize;
+
+    for (const line of lines) {
+      const path = font.getPath(line, 0, 0, fontSize);
+      const linePath = new Path(path.toPathData(), {
+        left: textBoundingRect.left, 
+        top: textBoundingRect.top + lineOffset * obj.scaleY,
+        scaleX: obj.scaleX,
+        scaleY: obj.scaleY,
+        stroke: obj.stroke,
+        fill: 'transparent',
+        lockRotation: true,
+        lockScalingX: true,
+        lockScalingY: true,
+        borderDashArray: [13],
+        cornerSize: 0,
+        hasControls: false
+      });
+
+      lineOffset += lineHeight + tolerance;
+      group.add(linePath);
+    }
+  }
+
+
   useEffect(() => {
     if (tool === 'Plot') {
       if (transformRef.current) transformRef.current.resetTransform();
@@ -46,85 +88,40 @@ export default function Home() {
         selectionColor: '#4666ce40',
         controlsAboveOverlay: false
       });
+      setPlotterCanvas(plotCanvas);
 
-      setPlotterCanvas(plotCanvas)
-      const objects = canvas.getObjects();
-      const group = new Group([], {
-        subTargetCheck: false,
-        interactive: false
-      })
+      const fontUrl = 'assets/OpenSans-Regular.ttf';
 
-      objects.forEach((obj) => {
-        obj.clone().then(async (clonedObj) => {
-          if (clonedObj.type === 'i-text') {
-            const text = clonedObj.text;
-            const fontSize = clonedObj.fontSize;
-            // const fontFamily = clonedObj.fontFamily;
-            const fontUrl = 'assets/OpenSans-Regular.ttf';
+      const createGroupFromCanvas = async () => {
+        const objects = canvas.getObjects();
+        const clonedObjects = await Promise.all(objects.map((obj) => obj.clone()));
+        const group = new Group([], { interactive: false });
 
-            try {
-              const fontBuffer = await fetch(fontUrl).then((response) => {
-                if (!response.ok) {
-                  throw new Error(`Failed to Fetch Font: ${ response.statusText }`);
-                }
-                return response.arrayBuffer();
-              });
-
-              const font = parse(fontBuffer);
-              // const path = font.getPath(`${ text }`, 0, 0, fontSize);
-              const textBoundingRect = clonedObj.getBoundingRect();
-              const lines = text.split('\n');
-
-              const tolerance = 3.3;
-              let lineOffset = 0 + tolerance;
-              const lineHeight = clonedObj.lineHeight * fontSize;
-              
-              for (const line of lines) {
-                const path = font.getPath(line, 0, 0, fontSize);
-                const linePath = new Path(path.toPathData(), {
-                  left: textBoundingRect.left,
-                  top: textBoundingRect.top + lineOffset * clonedObj.scaleY,
-                  scaleX: clonedObj.scaleX,
-                  scaleY: clonedObj.scaleY,
-                  stroke: clonedObj.stroke,
-                  fill: 'transparent',
-                  lockRotation: true,
-                  lockScalingX: true,
-                  lockScalingY: true,
-                  borderDashArray: [13],
-                  cornerSize: 0,
-                  hasControls: false
-                });
-
-                lineOffset += lineHeight + tolerance;
-                plotCanvas.add(linePath);
-                group.add(linePath);
-              }
-              // group.add(clonedObj);
-              // plotCanvas.add(clonedObj)
-            } catch (err) {
-              console.error('Error Processing Text Object : ', err);
-            }
-          } else if (clonedObj.type === 'group') {
-            const groupObjects = [...clonedObj.removeAll()]
-            plotCanvas.add(...groupObjects);
-            group.add(...groupObjects);
+        for (const obj of clonedObjects) {
+          if (obj.type === 'i-text') {
+            await processTextObject(obj, fontUrl, group);
+          } else if (obj.type === 'group') {
+            const groupObjects = [ ...obj.removeAll() ];
+            group.add(...groupObjects)
           } else {
-            clonedObj.set({
-              lockRotation: true,
+            obj.set({
+              lockRotation: true, 
               lockScalingX: true,
               lockScalingY: true,
               borderDashArray: [13],
               cornerSize: 0,
               hasControls: false
             });
-            plotCanvas.add(clonedObj);
-            group.add(clonedObj);
+            group.add(obj)
           }
-        })
-      })
-      plotCanvas.add(group);
-      plotCanvas.renderAll()
+        }
+
+        plotCanvas.add(group);
+        group.setCoords();
+        plotCanvas.renderAll();
+      }
+
+      createGroupFromCanvas()
 
       return () => {
         plotCanvas.dispose();
@@ -176,8 +173,8 @@ export default function Home() {
                 initialPositionY={ tool === 'Plot' ? 100 : null }
                 maxScale={3}
                 minScale={.5} 
-                limitToBounds={ tool === 'Plot' ? false : true }
-                panning={{ excluded: ['fabricCanvas'] }}
+                // limitToBounds={ tool === 'Plot' ? false : true }
+                panning={{ excluded: ['fabricCanvas'], disabled: tool !== 'Plot' ? false : true }}
                 // centerZoomedOut
                 centerOnInit
                 ref={transformRef}

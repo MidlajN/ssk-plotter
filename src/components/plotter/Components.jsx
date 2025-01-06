@@ -47,21 +47,20 @@ export const DimensionComponent = ({ plotCanvas }) => {
             const canvasHeight = plotCanvas.getHeight();
             const boundingBox = activeObject.getBoundingRect(true);
             const objWidth = boundingBox.width;
-            const objHeight = boundingBox.height;
+            const objHeight = activeObject.height;
+            console.log('bounding Rect : ', activeObject.getBoundingRect(true))
 
-            console.log(boundingBox)
             // Enforce boundaries
-            if (boundingBox.left < 0) {
-                // activeObject.left = 0; // Prevent moving past the left edge
-                activeObject.left -= boundingBox.left;
+            if (activeObject.left < 0) {
+                activeObject.left = 0; // Prevent moving past the left edge
             }
-            if (boundingBox.top < 0) {
+            if (activeObject.top < 0) {
                 activeObject.top = 0; // Prevent moving past the top edge
             }
-            if (boundingBox.left + objWidth > canvasWidth) {
+            if (activeObject.left + objWidth > canvasWidth) {
                 activeObject.left = canvasWidth - objWidth; // Prevent moving past the right edge
             }
-            if (boundingBox.top + objHeight > canvasHeight) {
+            if (activeObject.top + objHeight > canvasHeight) {
                 activeObject.top = canvasHeight - objHeight; // Prevent moving past the bottom edge
             }
             plotCanvas.renderAll();
@@ -110,7 +109,7 @@ export const DimensionComponent = ({ plotCanvas }) => {
             position = position = posInPX < 0 ? 0 : posInPX > canvasHeight - objHeight ? canvasHeight - objHeight : posInPX
         }
 
-        setDimensions(prev => ({ ...prev, [name]: position * 25.4 / 96}))
+        setDimensions(prev => ({ ...prev, [name]: parseFloat(position * 25.4 / 96).toFixed(2) }))
         activeObject.set({
             [name]: position
         });
