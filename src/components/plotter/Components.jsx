@@ -36,10 +36,36 @@ export const DimensionComponent = ({ plotCanvas }) => {
 
         const getSelectionDimensions = () => {
             const activeObject = plotCanvas.getActiveObject();
+            if (!activeObject) return;
+
             let width = null;
             let height = null;
             let left = null;
             let top = null;
+
+            const canvasWidth = plotCanvas.getWidth();
+            const canvasHeight = plotCanvas.getHeight();
+            const boundingBox = activeObject.getBoundingRect(true);
+            const objWidth = boundingBox.width;
+            const objHeight = boundingBox.height;
+
+            console.log(boundingBox)
+            // Enforce boundaries
+            if (boundingBox.left < 0) {
+                // activeObject.left = 0; // Prevent moving past the left edge
+                activeObject.left -= boundingBox.left;
+            }
+            if (boundingBox.top < 0) {
+                activeObject.top = 0; // Prevent moving past the top edge
+            }
+            if (boundingBox.left + objWidth > canvasWidth) {
+                activeObject.left = canvasWidth - objWidth; // Prevent moving past the right edge
+            }
+            if (boundingBox.top + objHeight > canvasHeight) {
+                activeObject.top = canvasHeight - objHeight; // Prevent moving past the bottom edge
+            }
+            plotCanvas.renderAll();
+
             // let angle = null;
             if (activeObject && activeObject.type === 'activeSelection') {
                 const boundingRect = activeObject.getBoundingRect(true); // true for absolute coordinates
@@ -71,10 +97,22 @@ export const DimensionComponent = ({ plotCanvas }) => {
     }, [plotCanvas])
 
     const changePos = (name, pos) => {
-        setDimensions(prev => ({ ...prev, [name]: pos}))
         const activeObject = plotCanvas.getActiveObject();
+        const canvasWidth = plotCanvas.getWidth();
+        const canvasHeight = plotCanvas.getHeight();
+        const objWidth = activeObject.width;
+        const objHeight = activeObject.height;
+        const posInPX = util.parseUnit(`${pos}mm`)
+        let position = null
+        if (name === 'left') {
+            position = posInPX < 0 ? 0 : posInPX > canvasWidth - objWidth ? canvasWidth - objWidth : posInPX
+        } else if (name === 'top') {
+            position = position = posInPX < 0 ? 0 : posInPX > canvasHeight - objHeight ? canvasHeight - objHeight : posInPX
+        }
+
+        setDimensions(prev => ({ ...prev, [name]: position * 25.4 / 96}))
         activeObject.set({
-            [name]: util.parseUnit(`${pos}mm`)
+            [name]: position
         });
         plotCanvas.renderAll()
     }
