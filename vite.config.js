@@ -7,4 +7,13 @@ export default defineConfig({
     react(),
 
   ],
+  // build: {
+  //   rollupOptions: {
+  //     output: {
+  //       assetFileNames: 'ui/assets/[name].[hash][extname]',
+  //       chunkFileNames: 'ui/assets/[name].[hash].js',
+  //       entryFileNames: 'ui/assets/[name].[hash].js',
+  //     },
+  //   },
+  // },
 })

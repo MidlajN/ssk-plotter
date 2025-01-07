@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import { loadSVGFromString, util, Path, Line, ActiveSelection, Group } from 'fabric';
+import { ArchiveIcon } from 'lucide-react';
 // import { object } from 'framer-motion/client';
 
 /**
@@ -365,4 +366,41 @@ export const info = (canvas) => {
     const activeObject = canvas.getActiveObject();
     console.log('SVG ::: ', activeObject.toSVG())
     canvas.renderAll();
+}
+
+
+export function enforeBoundaries(activeObject, canvasWidth, canvasHeight) {
+    const objWidth = activeObject.width;
+    const objHeight = activeObject.height;
+    const objectAngle = parseInt(activeObject.angle);
+    
+    if (activeObject.left < 0) activeObject.left = 0;
+    if (activeObject.top < 0) activeObject.top = 0;
+
+    switch (objectAngle) {
+        case -90:
+            if (activeObject.top < objWidth) activeObject.top = objWidth;
+            if (activeObject.top > canvasHeight) activeObject.top = canvasHeight;
+            if (activeObject.left + objHeight > canvasWidth) activeObject.left = canvasWidth - objHeight;
+            break;
+
+        case 90:
+            if (activeObject.left - objHeight < 0) activeObject.left = objHeight;
+            if (activeObject.left > canvasWidth) activeObject.left = canvasWidth;
+            if (activeObject.top + objWidth > canvasHeight) activeObject.top = canvasHeight - objWidth;
+            break;
+
+        case 180:
+        case -180:
+            if (activeObject.left - objWidth < 0) activeObject.left = objWidth;
+            if (activeObject.left > canvasWidth) activeObject.left = canvasWidth;
+            if (activeObject.top - objHeight < 0) activeObject.top = objHeight;
+            if (activeObject.top > canvasHeight) activeObject.top = canvasHeight;
+            break;
+        
+        case 0: 
+            if (activeObject.left + objWidth > canvasWidth) activeObject.left = canvasWidth - objWidth;
+            if (activeObject.top + objHeight > canvasHeight) activeObject.top = canvasHeight - objHeight;
+            break;
+    }
 }

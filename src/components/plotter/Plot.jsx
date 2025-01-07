@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { Settings } from "lucide-react";
+import { Rotate3dIcon, Settings } from "lucide-react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
 import { SetupModal } from "./Modal";
@@ -118,11 +118,9 @@ export const Plot = ({ plotCanvas }) => {
     }, [ response.pageId, job.connected, plotCanvas ])
 
     const handleRotation = (angle) => {
-        const activeObjects = plotCanvas.getActiveObjects()
-        const group = new Group(activeObjects)
-        plotCanvas.remove(...activeObjects)
-        group.rotate(angle)
-        plotCanvas.add(...group.removeAll());
+        const activeObject = plotCanvas.getActiveObject()
+        const rotation = activeObject.angle + angle;
+        activeObject.rotate(Math.abs(rotation) === 270 ? (rotation < 0 ? 90 : -90) : rotation );
         plotCanvas.renderAll();
     }
 

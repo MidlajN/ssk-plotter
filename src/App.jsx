@@ -68,7 +68,6 @@ export default function Home() {
     }
   }
 
-
   useEffect(() => {
     if (tool === 'Plot') {
       if (transformRef.current) transformRef.current.resetTransform();
@@ -175,7 +174,7 @@ export default function Home() {
                 minScale={.5} 
                 // limitToBounds={ tool === 'Plot' ? false : true }
                 panning={{ excluded: ['fabricCanvas'], disabled: tool !== 'Plot' ? false : true }}
-                // centerZoomedOut
+                centerZoomedOut
                 centerOnInit
                 ref={transformRef}
               >

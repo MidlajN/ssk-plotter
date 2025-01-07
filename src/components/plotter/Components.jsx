@@ -27,6 +27,7 @@ import './plotter.css'
 import { AnimatePresence } from "framer-motion";
 import { PenIcon } from "../Icons";
 import { util } from "fabric";
+import { enforeBoundaries } from "../../util/functions";
 
 export const DimensionComponent = ({ plotCanvas }) => {
     const [ dimensions, setDimensions] = useState({ width: 0, height: 0, left:0, top: 0 });
@@ -45,27 +46,9 @@ export const DimensionComponent = ({ plotCanvas }) => {
 
             const canvasWidth = plotCanvas.getWidth();
             const canvasHeight = plotCanvas.getHeight();
-            const boundingBox = activeObject.getBoundingRect(true);
-            const objWidth = boundingBox.width;
-            const objHeight = activeObject.height;
-            console.log('bounding Rect : ', activeObject.getBoundingRect(true))
-
-            // Enforce boundaries
-            if (activeObject.left < 0) {
-                activeObject.left = 0; // Prevent moving past the left edge
-            }
-            if (activeObject.top < 0) {
-                activeObject.top = 0; // Prevent moving past the top edge
-            }
-            if (activeObject.left + objWidth > canvasWidth) {
-                activeObject.left = canvasWidth - objWidth; // Prevent moving past the right edge
-            }
-            if (activeObject.top + objHeight > canvasHeight) {
-                activeObject.top = canvasHeight - objHeight; // Prevent moving past the bottom edge
-            }
+            enforeBoundaries(activeObject, canvasWidth, canvasHeight);
             plotCanvas.renderAll();
 
-            // let angle = null;
             if (activeObject && activeObject.type === 'activeSelection') {
                 const boundingRect = activeObject.getBoundingRect(true); // true for absolute coordinates
                 width = parseFloat(boundingRect.width * 25.4 / 96).toFixed(2); 
