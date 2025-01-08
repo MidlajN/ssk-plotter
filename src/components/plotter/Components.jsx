@@ -112,23 +112,30 @@ export const DimensionComponent = ({ plotCanvas }) => {
                 </div>
                 <div className="flex gap-6 pb-2 mt-2">
                     <p className="min-w-14">X <span className="text-sm text-gray-500">pos.</span></p>
-                    <input 
-                        type="number"
-                        className="bg-gray-100" 
-                        value={ dimensions.left } 
-                        onInput={(e) => changePos('left', e.target.value)} 
-                        min={0}
-                    />
+                    <div className="flex items-end gap-1">
+                        <input 
+                            type="number"
+                            className="bg-gray-100" 
+                            value={ dimensions.left } 
+                            onInput={(e) => changePos('left', e.target.value)} 
+                            min={0}
+                        />
+                        <span className="text-xs text-gray-500"> mm</span>
+                    </div>
                 </div>
                 <div className="flex gap-6 pb-2">
                     <p className="min-w-14">Y <span className="text-sm text-gray-500">pos.</span></p>
-                    <input 
-                        type="number" 
-                        className="bg-gray-100"
-                        value={ dimensions.top } 
-                        onInput={(e) => changePos('top', e.target.value)} 
-                        min={0}
-                    />
+                    <div className="flex items-end gap-1">
+                        <input 
+                            type="number" 
+                            className="bg-gray-100"
+                            value={ dimensions.top } 
+                            onInput={(e) => changePos('top', e.target.value)} 
+                            min={0}
+                        />
+                        <span className="text-xs text-gray-500">mm</span>
+                    </div>
+                    
                 </div>
             </div>
         </>

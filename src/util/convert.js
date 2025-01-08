@@ -1,88 +1,35 @@
 // Conversion Related Function Which are essential for the the Gcode generation and Svg Generation from the FabricJS 
 import tinycolor from "tinycolor2";
 import { Converter } from "svg-to-gcode";
-import { parse } from "opentype.js";
-import { Path } from "fabric";
 
-const returnObjs = async (objects, canvas) => {
-    const newObjects = await Promise.all(
-        objects.map( async (obj) => {
+const returnObjs = async (objects) => {
+    const clonedObjs = await Promise.all(
+        objects.map((obj) => {
             if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-                // if (obj.type === 'i-text') {
-                //     const text = obj.text;
-                //     const fontSize = obj.fontSize;
-                //     const fontFamily = obj.fontFamily || 'sans-serif';
-                //     console.log(
-                //         'Obj : ', obj,
-                //         // '\nObj SVG : ', obj.toSVG(),
-                //         '\nFont Family : ', fontFamily,
-                //         '\nText : ', text,
-                //         '\nFont Size : ', fontSize,
-                //     );
-
-                //     const fontUrl = 'assets/OpenSans-Regular.ttf';
-                //     try {
-                //         const fontBuffer = await fetch(fontUrl).then((response) => {
-                //             if (!response.ok) {
-                //                 throw new Error(`Failed to fetch font: ${response.statusText}`);
-                //             }
-                //             return response.arrayBuffer();
-                //         })
-
-                //         const font = parse(fontBuffer);
-                //         const path = font.getPath(`${ text }`, 0, 0, fontSize);
-                //         const textBoundingRect = obj.getBoundingRect();
-                //         console.log('OpenType  : ',path);
-                //         const lines = text.split('\n');
-
-                //         const tolerance = 3.3;
-                //         let lineOffset = 0 + tolerance;
-                //         const lineHeight = (obj.lineHeight * fontSize);
-
-                //         const pathFabricArray = [];
-                //         for (const line of lines) {
-                //             const path = font.getPath(line, 0, 0, fontSize);
-                //             const linePath = new Path(path.toPathData(), {
-                //                 originX: 'left',
-                //                 originY: 'top',
-                //                 left: textBoundingRect.left,
-                //                 top: (textBoundingRect.top + lineOffset * obj.scaleY),
-                //                 scaleX: obj.scaleX,
-                //                 scaleY: obj.scaleY,
-                //                 stroke: obj.stroke,
-                //                 fill: 'transparent',
-                //             });
-
-                //             lineOffset += lineHeight + tolerance;
-                //             canvas.add(linePath);
-                //             pathFabricArray.push(linePath);
-                //         }
-                //         canvas.renderAll()
-                //         return pathFabricArray
-                        
-                //     } catch (err) {
-                //         console.error("Error processing text object:", err);
-                //         return null
-                //     }
-                // } else {
-                    return obj
-                // }
+                return obj.clone()
             }
             return null
         })
-    )
-    return newObjects.filter(Boolean).flat();
+    );
+    const filteredObjs = clonedObjs.filter(Boolean);
+
+    const newObjs = filteredObjs.flatMap((obj) => {
+        if (obj.type === 'group') {
+            return obj.removeAll()
+        } else {
+            return obj
+        }
+    })
+    
+    return [...newObjs];
 }
 
 export const returnGroupedObjects = async (canvas) => {
     canvas.discardActiveObject();
     canvas.renderAll();
-    const objects = await returnObjs(canvas.getObjects(), canvas);
-    console.log('Object Returned : ', objects)
+    const objects = await returnObjs(canvas.getObjects());
     return objects.reduce((acc, object) => {
-        console.log('Objectfor returnGroupedObjects : ', object)
         const stroke = tinycolor(object.stroke).toHexString();
-        console.log('Stroke : ', stroke)
         acc[stroke] = acc[stroke] || [];
         // if (!acc[stroke]) acc[stroke] = [];
         acc[stroke].push(object)

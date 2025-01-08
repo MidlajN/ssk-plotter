@@ -373,9 +373,6 @@ export function enforeBoundaries(activeObject, canvasWidth, canvasHeight) {
     const objWidth = activeObject.width;
     const objHeight = activeObject.height;
     const objectAngle = parseInt(activeObject.angle);
-    
-    if (activeObject.left < 0) activeObject.left = 0;
-    if (activeObject.top < 0) activeObject.top = 0;
 
     switch (objectAngle) {
         case -90:
@@ -403,4 +400,7 @@ export function enforeBoundaries(activeObject, canvasWidth, canvasHeight) {
             if (activeObject.top + objHeight > canvasHeight) activeObject.top = canvasHeight - objHeight;
             break;
     }
+    
+    if (activeObject.left < 0) activeObject.left = 0;
+    if (activeObject.top < 0) activeObject.top = 0;
 }
