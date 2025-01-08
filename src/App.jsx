@@ -167,14 +167,14 @@ export default function Home() {
           >
             <div className={`canvas ${ expanded ? 'lg:w-[83%]' : 'w-[100%]' }`}>
               <TransformWrapper
-                initialScale={ tool === 'Plot' ? 0.44 : 0.6 } 
+                initialScale={ tool === 'Plot' ? 0.43 : 0.6 } 
                 initialPositionX={ tool === 'Plot' ? 300 : null }
                 initialPositionY={ tool === 'Plot' ? 100 : null }
                 maxScale={3}
-                minScale={.5} 
-                // limitToBounds={ tool === 'Plot' ? false : true }
+                minScale={ tool === 'Plot' ? 0.43 : 0.5 } 
+                limitToBounds={ tool === 'Plot' ? false : true }
                 panning={{ excluded: ['fabricCanvas'], disabled: tool !== 'Plot' ? false : true }}
-                centerZoomedOut
+                // centerZoomedOut
                 centerOnInit
                 ref={transformRef}
               >

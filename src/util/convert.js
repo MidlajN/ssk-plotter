@@ -4,24 +4,12 @@ import { Converter } from "svg-to-gcode";
 
 const returnObjs = async (objects) => {
     const clonedObjs = await Promise.all(
-        objects.map((obj) => {
-            if (obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize') {
-                return obj.clone()
-            }
-            return null
-        })
+        objects
+            .filter((obj) => obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize')
+            .map(((obj) => obj.clone()))
     );
-    const filteredObjs = clonedObjs.filter(Boolean);
 
-    const newObjs = filteredObjs.flatMap((obj) => {
-        if (obj.type === 'group') {
-            return obj.removeAll()
-        } else {
-            return obj
-        }
-    })
-    
-    return [...newObjs];
+    return clonedObjs.flatMap( (obj) => obj.type === 'group' ? obj.removeAll() : obj )
 }
 
 export const returnGroupedObjects = async (canvas) => {
@@ -106,7 +94,7 @@ export const convertToGcode = async (svgElements, colors, config) => {
         // cleanedGcodeLines.splice(0, 4);
         cleanedGcodeLines.splice(1, 1);
 
-        return color.penPick.join('\n') + '\n' + cleanedGcodeLines.join('\n') + color.penDrop.join('\n');
+        return '\n' + color.penPick.join('\n')  + cleanedGcodeLines.join('\n') + '\n' + color.penDrop.join('\n');
     }));
 
     return [

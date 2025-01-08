@@ -1,19 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
-import { Path } from "fabric";
-
-// import useCanvas from "./CanvasContext";
+import { 
+    createContext, 
+    useContext, 
+    useEffect, 
+    useRef, 
+    useState, 
+    useCallback 
+} from "react";
 
 const ComContext = createContext(null);
-
 export default function useCom() {
     return useContext(ComContext);
 }
 
 export const CommunicationProvider = ({ children }) => {
-    // const { canvas } = useCanvas()
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false, percentage: null });
     const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
@@ -32,72 +34,71 @@ export const CommunicationProvider = ({ children }) => {
         { 
             color: '#ffff00', 
             name: 'Yellow', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y50', 'G53 X799.9Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y50', 'G53 X799.9Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y50' ],
+            zValue: -25, 
+            penPick: [ '; Yellow' ],
+            penDrop: [ '; Yellow Finished' ],
             skipped: false
         },
         { 
             color: '#008000', 
             name: 'Green', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X763.3Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X763.3Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Green' ],
+            penDrop: [ '; Green Finished' ],
             skipped: false
         },
         { 
             color: '#227fe3', 
             name: 'Blue', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X687.3Z-26.3', 'G53 Y1.2', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X687.3Z-16', 'G53 Y1.2', 'G53 Z-26.3', 'G53 Y60' ] ,
+            zValue: -25, 
+            penPick: [ '; Blue' ],
+            penDrop: [ '; Blue Finished' ],
             skipped: false
         },
         { 
             color: '#a020f0', 
             name: 'Purple', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X650.9Z-26.3', 'G53 Y2.6', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X650.9Z-16', 'G53 Y2.6', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Purple' ],
+            penDrop: [ '; Purple Finished' ],
             skipped: false
         },
         { 
             color: '#ffc0cb', 
             name: 'Pink', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X612.8Z-26.3', 'G53 Y2.6', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X612.8Z-16', 'G53 Y2.6', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Pink' ],
+            penDrop: [ '; Pink Finished' ],
             skipped: false
         },
         { 
             color: '#ffa500', 
             name: 'Orange', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X574.7Z-26.3', 'G53 Y2.8', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X574.7Z-16', 'G53 Y2.8', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Orange' ],
+            penDrop: [ '; Orange Finished' ],
             skipped: false
         },
         { 
             color: '#ff0000', 
             name: 'Red', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X536.6Z-26.3', 'G53 Y2.9', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X536.6Z-16', 'G53 Y2.9', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Red' ],
+            penDrop: [ '; Red Finished' ],
             skipped: false
         },
         { 
             color: '#ff0000', 
             name: 'Red', 
-            zValue: -33.4, 
-            penPick: [ 'G53 Y60', 'G53 X536.6Z-26.3', 'G53 Y2.9', 'G53 Z-16', 'G53 Y60', 'G53 X420' ],
-            penDrop: [ 'G53 Y60', 'G53 X536.6Z-16', 'G53 Y2.9', 'G53 Z-26.3', 'G53 Y60' ],
+            zValue: -25, 
+            penPick: [ '; Red' ],
+            penDrop: [ '; Red Finished' ],
             skipped: true
         },
     ]);
     const [ config, setConfig ] = useState({
         url: window.location.hostname,
-        // url: '192.168.0.1',
-        feedRate: 10000,
+        feedRate: 15000,
         jogSpeed: 12000,
         zOffset: 24,
         open: false
