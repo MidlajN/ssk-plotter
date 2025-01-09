@@ -17,7 +17,8 @@ import {
     Info,
     CheckCheck,
     ArrowUp,
-    MoreVertical
+    MoreVertical,
+    PrinterIcon
 } from "lucide-react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
@@ -28,6 +29,7 @@ import { AnimatePresence } from "framer-motion";
 import { PenIcon } from "../Icons";
 import { util } from "fabric";
 import { enforeBoundaries } from "../../util/functions";
+import ReactModal from "react-modal";
 
 export const DimensionComponent = ({ plotCanvas }) => {
     const [ dimensions, setDimensions] = useState({ width: 0, height: 0, left:0, top: 0 });
@@ -444,6 +446,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
         config, job, setJob, colors, setSetupModal, setProgress,  
         openSocket, closeSocket, sendToMachine
     } = useCom();
+    const [ show, setShow ] = useState(false)
 
     const uploadToMachine = async (gcode) => {
         const blob = new Blob([gcode.join('\n')], { type: 'text/plain '});
@@ -480,7 +483,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const plot =  async () => {
-
+        setShow(false);
         setProgress({ uploading: false, converting: true, progress: 10 });
         setJob({ ...job, connected: true });
         setSetupModal(true);
@@ -562,13 +565,69 @@ export const ActionButtonsComponent = ({ canvas }) => {
                             </>
                         ): (
                             <>
-                                <ActionButton label='Plot' Icon={Pencil} bgColor='#0e505c' onclick={plot}/>
+                                <ActionButton label='Plot' Icon={Pencil} bgColor='#0e505c' onclick={ () => setShow(true) }/>
                                 <ActionButton label='Disconnect' Icon={Power} bgColor='#d41d1d' onclick={closeSocket}/>
                             </>
                         )}
                     </>
                 )}
             </div>
+            { show && <ShowPrompt plot={plot} setShow={ setShow } /> }
+        </>
+    )
+}
+
+export const ShowPrompt = ({ plot, setShow }) => {
+
+    return (
+        <>
+            <motion.div
+                className="fixed inset-0 z-50 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            >
+                <motion.div
+                    className="absolute w-fit bg-white rounded-xl overflow-hidden shadow-lg border border-[#cfcfcf7c]"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                        duration: 0.4,
+                        scale: { type: 'spring', visualDuration: 0.4, bounce: 0.5 }
+                    }}
+                    exit={{ scale: 0, opacity: 0 }}
+                >
+                    <div className="flex flex-col gap-4 pt-6 pb-4 ps-6 pr-5">
+                        <div className="flex gap-5 justify-center items-center">
+                            <div className="p-5 border w-fit h-fit rounded-full">
+                                <PrinterIcon />
+                            </div>
+                            <p className=" max-w-[25rem]">
+                                <span className="text-lg font-medium ">Plotting is about to start!</span><br />
+                                <span className=" text-gray-600">Please confirm that the paper is loaded correctly and press Proceed to start</span>
+                            </p>
+                        </div>
+                        <div className="ml-auto">
+                            <button 
+                                className="
+                                    me-2 bg-gray-200 border border-gray-200 py-1 px-4 font-medium rounded-md hover:border-gray-300
+                                    transition-all duration-300 focus:bg-gray-300
+                                "
+                                onClick={ () => setShow(false) }
+                            >
+                            Cancel</button>
+                            <button 
+                                className="
+                                    py-1 px-4 font-medium border bg-green-200 border-green-200 text-green-950 rounded-md
+                                    hover:border-green-400 transition-all duration-300 focus:bg-green-300
+                                "
+                                onClick={ plot }
+                            >
+                            Proceed</button>
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
         </>
     )
 }
