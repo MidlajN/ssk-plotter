@@ -18,7 +18,7 @@ export default function useCom() {
 export const CommunicationProvider = ({ children }) => {
     const [ response, setResponse ] = useState({ pageId: '', message: '' });
     const [ job, setJob ] = useState({ connecting: false, connected: false, started: false, paused: false, percentage: null });
-    const [ progress, setProgress ] = useState({ uploading: false, converting: false, progress: 0 })
+    const [ progress, setProgress ] = useState({ uploading: false , converting: false, progress: 0 })
     const [ setupModal, setSetupModal ] = useState(false);
     const [ ws, setWs ] = useState(null);
     const [ plotterCanvas, setPlotterCanvas ] = useState(null)

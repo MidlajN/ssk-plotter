@@ -1,7 +1,7 @@
 /* ################ Modal.jsx ################## */
 .setupModal {
-    box-shadow: rgb(123 123 123) 0px 0px 5px 1px;
-    margin: 1rem;
+    /* box-shadow: rgb(123 123 123) 0px 0px 5px 1px; */
+    /* margin: 1rem; */
 }
 .setupModal .config {
     line-height: normal;
