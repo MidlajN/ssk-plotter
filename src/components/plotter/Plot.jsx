@@ -35,7 +35,8 @@ export const Plot = ({ plotCanvas }) => {
     useEffect(() => {
         if (!plotCanvas) return
         if ( response.pageId === '' && !job.connected ) return;
-        sendToMachine('$Report/interval=50');
+        console.log('Effect triggered:', { responsePageId: response.pageId, jobConnected: job.connected, plotCanvas });
+        sendToMachine('$Report/interval=50', response.pageId);
 
         dotRef.current = new Path('M50 25L33.0449 23.598L29 21L26.6495 17.4012L25 0L23.5202 17.4012L21 21L16.9526 23.598L0 25L16.9526 26.7276L21 29.5L23.5203 33.5116L25 50L26.6495 33.4929L29 29.5L33.0449 26.7276L50 25Z', {
             fill: '#223265de',
@@ -46,8 +47,8 @@ export const Plot = ({ plotCanvas }) => {
             lockScalingX: true,
             lockScalingY: true,
             lockRotation: true,
-            top: 310 * 96 / 25.4,
-            left: 430 * 96 / 25.4,
+            top: 300 * 96 / 25.4,
+            left: 420 * 96 / 25.4,
             name: 'ToolHead',
             selectable: false,
             hoverCursor: 'auto'
@@ -58,8 +59,16 @@ export const Plot = ({ plotCanvas }) => {
         plotCanvas.on('object:moving', (e) => {
 
             const movingObject = e.target;
-            const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = movingObject.getCoords();
+            console.log('getCoords() : ', movingObject.getCoords(), '\ngetBoundingRect() : ', movingObject.getBoundingRect())
             const dotCenter = dotRef.current.getCenterPoint();
+            const boundRect = movingObject.getBoundingRect();
+            const mTopLeft = { x: boundRect.left, y: boundRect.top };
+            const mTopRight = { x: boundRect.left + boundRect.width, y: boundRect.top }
+            const mBottomLeft = { x: boundRect.left, y: boundRect.top + boundRect.height };
+            const mBottomRight = { x: boundRect.left + boundRect.width, y: boundRect.top + boundRect.height };
+            console.log(mTopLeft, mTopRight, mBottomLeft, mBottomRight)
+            // const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = [boundRect.left, boundRect.left + boundRect.width, ]
+
 
             const calculateDist = (point, centerX, centerY) => {
                 const dx = point.x - centerX;
@@ -113,6 +122,7 @@ export const Plot = ({ plotCanvas }) => {
         plotCanvas.add(dotRef.current);
         plotCanvas.renderAll();
         return () => {
+            console.log('OBJECT EFFECT REMOVED')
             plotCanvas.remove(dotRef.current);    
         }
     }, [ response.pageId, job.connected, plotCanvas ])

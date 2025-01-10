@@ -73,7 +73,7 @@ export const convertToGcode = async (svgElements, colors, config) => {
             feedRate: config.feedRate,
             // seekRate: config.seekRate,
             zValue: color.zValue,
-            tolerance: 0.1,
+            tolerance: 0.3,
             quadrant: 2,
             minimumArea: 2.5,
             bedSize: {

@@ -137,11 +137,11 @@ export const CommunicationProvider = ({ children }) => {
         setWs(null);
     }, [ws])
 
-    const sendToMachine = useCallback((gcode) => {
+    const sendToMachine = useCallback((gcode, pageId = null) => {
         let url = `http://${ config.url }/command?commandText=`;
 
         console.log(' Clicked : ', gcode);
-        fetch(url + encodeURI(gcode) + `&PAGEID=${pageIdRef.current}`)
+        fetch(url + encodeURI(gcode) + `&PAGEID=${ pageId ? pageId : pageIdRef.current }`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Http Error Status : ', response.status);
@@ -218,8 +218,8 @@ export const CommunicationProvider = ({ children }) => {
                 // );
 
                 dotRef.current.set({
-                    top: (310 - y) * 96 / 25.4,
-                    left: (430 + x) * 96 / 25.4,
+                    top: (300 - y) * 96 / 25.4,
+                    left: (420 + x) * 96 / 25.4,
                 });
                 plotterCanvas.renderAll();
 

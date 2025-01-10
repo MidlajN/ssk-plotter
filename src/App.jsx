@@ -16,6 +16,7 @@ import { Canvas, FabricObject, Group, Path, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { parse } from "opentype.js";
+import fontTTF from './ui/assets/OpenSans-Regular.ttf';
 
 export default function Home() {
   const { canvas, canvasRef, plotterRef, canvasObjs, setCanvasObjs } = useCanvas();
@@ -76,8 +77,8 @@ export default function Home() {
       FabricObject.ownDefaults.borderDashArray = [15];
 
       const plotCanvas = new Canvas(plotterRef.current, {
-        width: util.parseUnit(`430mm`),
-        height: util.parseUnit(`310mm`),
+        width: util.parseUnit(`420mm`),
+        height: util.parseUnit(`300mm`),
         backgroundColor: "white",
         fireRightClick: true,
         stopContextMenu: true,
@@ -89,7 +90,7 @@ export default function Home() {
       });
       setPlotterCanvas(plotCanvas);
 
-      const fontUrl = 'assets/OpenSans-Regular.ttf';
+      const fontUrl = fontTTF;
 
       const createGroupFromCanvas = async () => {
         const objects = canvas.getObjects();

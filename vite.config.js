@@ -7,13 +7,19 @@ export default defineConfig({
     react(),
 
   ],
-  // build: {
-  //   rollupOptions: {
-  //     output: {
-  //       assetFileNames: 'ui/assets/[name].[hash][extname]',
-  //       chunkFileNames: 'ui/assets/[name].[hash].js',
-  //       entryFileNames: 'ui/assets/[name].[hash].js',
-  //     },
-  //   },
-  // },
+  build: {
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name][extname]'
+      }
+    }
+    // rollupOptions: {
+    //   output: {
+    //     assetFileNames: 'ui/assets/[name].[hash][extname]',
+    //     chunkFileNames: 'ui/assets/[name].[hash].js',
+    //     entryFileNames: 'ui/assets/[name].[hash].js',
+    //   },
+    // },
+  },
 })

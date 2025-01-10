@@ -505,7 +505,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
 
         const gcodes = await convertToGcode(svgElements, colors, config);
         console.log(
-            // 'Gcode Generated : \n', gcodes.join('\n'), 
+            'Gcode Generated : \n', gcodes.join('\n'), 
             // '\nSvgElements : ', canvas.toSVG()
         )
 
