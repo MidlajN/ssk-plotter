@@ -19,11 +19,11 @@ export const CanvasProvider = ({ children }) => {
     const [ canvasObjs, setCanvasObjs ] = useState(null)
     const [ copiedObject, setCopiedObject ] = useState(null);
     const [ canvasConfig, setCanvasConfig ] = useState({
-        width: 300,
-        height: 300,
+        width: 210,
+        height: 297,
         orientation: 'vertical',
-        maxWidth: 330,
-        maxHeight: 430
+        maxWidth: 298,
+        maxHeight: 420
     })
     const toolRef = useRef('Select')
     const [ undoStack, setUndoStack ] = useState([])

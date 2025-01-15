@@ -95,7 +95,7 @@ export default function Home() {
       const createGroupFromCanvas = async () => {
         const objects = canvas.getObjects();
         const clonedObjects = await Promise.all(objects.map((obj) => obj.clone()));
-        const group = new Group([], { interactive: false });
+        const group = new Group([], { interactive: false, width: canvas.width, height: canvas.height });
 
         for (const obj of clonedObjects) {
           if (obj.type === 'i-text') {
@@ -116,8 +116,15 @@ export default function Home() {
           }
         }
 
+        group.set({
+          width: canvas.width,
+          height: canvas.height,
+          top: 0,
+          left: 0
+        })
+        group.setCoords()
         plotCanvas.add(group);
-        group.setCoords();
+        // group.setCoords();
         plotCanvas.renderAll();
       }
 
