@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
-import { Canvas, FabricObject, Group, Path, util } from "fabric";
+import { Canvas, FabricObject, Group, Path, Rect, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { parse } from "opentype.js";
@@ -95,7 +95,22 @@ export default function Home() {
       const createGroupFromCanvas = async () => {
         const objects = canvas.getObjects();
         const clonedObjects = await Promise.all(objects.map((obj) => obj.clone()));
-        const group = new Group([], { interactive: false, width: canvas.width, height: canvas.height });
+        const canvasBackground = new Rect({
+          left: 0,
+          top: 0,
+          width: canvas.width,
+          height: canvas.height,
+          fill: 'transparent', 
+          selectable: false,   
+          evented: false,
+          originX: 'left',
+          originY: 'top',
+          name: 'background',
+          strokeWidth: 2,
+          stroke: '#d3d3d3'
+        });
+
+        const group = new Group([canvasBackground], { interactive: false, originX: 'left', originY: 'top' });
 
         for (const obj of clonedObjects) {
           if (obj.type === 'i-text') {
@@ -115,16 +130,8 @@ export default function Home() {
             group.add(obj)
           }
         }
-
-        group.set({
-          width: canvas.width,
-          height: canvas.height,
-          top: 0,
-          left: 0
-        })
-        group.setCoords()
-        plotCanvas.add(group);
-        // group.setCoords();
+        plotCanvas.add(group);       
+        group.setCoords();
         plotCanvas.renderAll();
       }
 

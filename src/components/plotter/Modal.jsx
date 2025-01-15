@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 import ReactModal from "react-modal";
 import { Triangle } from "react-loader-spinner";
-import { X } from "lucide-react";
+// import { X } from "lucide-react";
 import useCom from "../../context/ComContext";
 import { PlotSvg } from "../Icons";
 import { motion } from "framer-motion";

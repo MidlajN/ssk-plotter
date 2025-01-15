@@ -5,7 +5,7 @@ import { Converter } from "svg-to-gcode";
 const returnObjs = async (objects) => {
     const clonedObjs = await Promise.all(
         objects
-            .filter((obj) => obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize')
+            .filter((obj) => obj.get('name') !== 'ToolHead' && obj.get('name') !== 'BedSize' && obj.get('name') !== 'background')
             .map(((obj) => obj.clone()))
     );
 

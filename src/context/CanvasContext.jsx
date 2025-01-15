@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { FabricObject, Canvas, util } from "fabric";
+import { FabricObject, Canvas, util, config } from "fabric";
 import { selectAllObject, group, deleteObject, copyObject, pasteObject } from "../util/functions";
 
 const CanvasContext = createContext(null);
@@ -14,7 +14,8 @@ export default function useCanvas() {
 
 export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
-    const plotterRef = useRef(null)
+    const plotterRef = useRef(null);
+    const configRef = useRef(null);
     const [ canvas, setCanvas ] = useState(null);
     const [ canvasObjs, setCanvasObjs ] = useState(null)
     const [ copiedObject, setCopiedObject ] = useState(null);
@@ -29,6 +30,10 @@ export const CanvasProvider = ({ children }) => {
     const [ undoStack, setUndoStack ] = useState([])
     const [ redoStack, setRedoStack ] = useState([])
     let isUndoRedo = false;
+
+    useEffect(() => {
+        configRef.current = canvasConfig
+    }, [canvasConfig])
 
     useEffect(() => {
         FabricObject.ownDefaults.cornerStyle = 'circle';
@@ -53,16 +58,23 @@ export const CanvasProvider = ({ children }) => {
 
         const savedCanvas = localStorage.getItem('fabricCanvas');
         if (savedCanvas) {
-            console.log('SavedState : ', savedCanvas);
-            fabricCanvas.loadFromJSON(JSON.parse(savedCanvas), fabricCanvas.renderAll.bind(fabricCanvas)).then(() => {
-                setCanvasObjs([...fabricCanvas.getObjects()])
+            const canvasJSON = JSON.parse(savedCanvas)
+            setCanvasConfig(prev => ({ ...prev, orientation: canvasJSON.orientation, width: canvasJSON.width, height: canvasJSON.height }))
+            fabricCanvas.loadFromJSON(canvasJSON, fabricCanvas.renderAll.bind(fabricCanvas)).then(() => {
+                setCanvasObjs([...fabricCanvas.getObjects()]);
             });
         }
 
         setCanvas(fabricCanvas);
 
         const saveCanvasState = () => {
-            const canvasState = fabricCanvas.toJSON();
+            const canvasState = {
+                ...fabricCanvas.toJSON(),
+                width: configRef.current.width,
+                height: configRef.current.height,
+                orientation: configRef.current.orientation,
+            };
+
             localStorage.setItem('fabricCanvas', JSON.stringify(canvasState));
         };
 
@@ -74,10 +86,6 @@ export const CanvasProvider = ({ children }) => {
         };
     }, []);
 
-    useEffect(() => {
-        if (!canvas) return;
-        console.log('Canvas State : ', canvas.toJSON());
-    }, [canvas])
 
     const saveState = useCallback(() => {
         if (isUndoRedo) return;
