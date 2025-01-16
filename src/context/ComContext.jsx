@@ -97,7 +97,8 @@ export const CommunicationProvider = ({ children }) => {
         },
     ]);
     const [ config, setConfig ] = useState({
-        url: window.location.hostname,
+        // url: window.location.hostname,
+        url: 'plotter.local',
         feedRate: 15000,
         jogSpeed: 12000,
         zOffset: 24,

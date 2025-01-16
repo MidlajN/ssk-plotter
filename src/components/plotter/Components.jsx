@@ -512,7 +512,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
         setProgress({ uploading: false, converting: true, progress: 80 });
         await delay(500);
 
-        // uploadToMachine(gcodes);
+        uploadToMachine(gcodes);
     };
 
 
@@ -535,7 +535,7 @@ export const ActionButtonsComponent = ({ canvas }) => {
         <>
             <div className={`flex items-end w-full  gap-1 justify-center`}>
                 { !job.connected ? (
-                    <ActionButton label={'Ready'} Icon={Plug} onclick={ plot } bgColor={'#0e505c'}/>
+                    <ActionButton label={'Ready'} Icon={Plug} onclick={ openSocket } bgColor={'#0e505c'}/>
                 ) : (
                     <>
                         { job.started ? (

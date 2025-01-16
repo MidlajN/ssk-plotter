@@ -59,17 +59,15 @@ export const Plot = ({ plotCanvas }) => {
         plotCanvas.on('object:moving', (e) => {
 
             const movingObject = e.target;
-            console.log('getCoords() : ', movingObject.getCoords(), '\ngetBoundingRect() : ', movingObject.getBoundingRect())
             const dotCenter = dotRef.current.getCenterPoint();
             const boundRect = movingObject.getBoundingRect();
+            const angle = movingObject.angle;
+            
             const mTopLeft = { x: boundRect.left, y: boundRect.top };
             const mTopRight = { x: boundRect.left + boundRect.width, y: boundRect.top }
             const mBottomLeft = { x: boundRect.left, y: boundRect.top + boundRect.height };
             const mBottomRight = { x: boundRect.left + boundRect.width, y: boundRect.top + boundRect.height };
-            console.log(mTopLeft, mTopRight, mBottomLeft, mBottomRight)
-            // const [ mTopLeft, mTopRight, mBottomRight, mBottomLeft ] = [boundRect.left, boundRect.left + boundRect.width, ]
-
-
+            
             const calculateDist = (point, centerX, centerY) => {
                 const dx = point.x - centerX;
                 const dy = point.y - centerY;
@@ -83,32 +81,61 @@ export const Plot = ({ plotCanvas }) => {
 
             const shortestDistance = Math.min(topLeftDistance, topRightDistance, bottomLeftDistance, bottomRightDistance);
 
-            if (!snapped && shortestDistance < 80) {
-                const horizontalD = mTopRight.x - mTopLeft.x;
-                const verticalD = mBottomLeft.y - mTopLeft.y;
 
-                if (shortestDistance === topLeftDistance) {
+            if (!snapped && shortestDistance < 80) {
+                const horizontalD = boundRect.width;
+                const verticalD = boundRect.height
+
+                if (shortestDistance >= topLeftDistance) {
+                    let position = null;
+
+                    if (angle === 90) position = { x: dotCenter.x + horizontalD , y: dotCenter.y}
+                    else if (angle === -90) position = { x: dotCenter.x, y: dotCenter.y + verticalD }
+                    else if (Math.abs(angle) === 180) position = { x: dotCenter.x + horizontalD, y: dotCenter.y + verticalD }
+                    else position = { x: dotCenter.x, y: dotCenter.y }
+
                     movingObject.set({
-                        left: dotCenter.x,
-                        top: dotCenter.y
+                        left: position.x,
+                        top: position.y
                     })
                 }
-                else if (shortestDistance === topRightDistance) {
+                else if (shortestDistance >= topRightDistance) {
+                    let position = null;
+
+                    if (angle === 90) position = { x: dotCenter.x, y: dotCenter.y };
+                    else if (angle === -90) position = { x: dotCenter.x - horizontalD, y: dotCenter.y + verticalD };
+                    else if (Math.abs(angle) === 180) position = { x: dotCenter.x, y: dotCenter.y + verticalD };
+                    else position = { x: dotCenter.x - horizontalD, y: dotCenter.y }
+
                     movingObject.set({
-                        left: dotCenter.x - horizontalD,
-                        top: dotCenter.y
+                        left: position.x,
+                        top: position.y
                     })
                 }
-                else if (shortestDistance === bottomLeftDistance){
+                else if (shortestDistance >= bottomLeftDistance){
+                    let position = null;
+
+                    if (angle === 90) position = { x: dotCenter.x + horizontalD, y: dotCenter.y - verticalD };
+                    else if (angle === -90) position = { x: dotCenter.x, y: dotCenter.y };
+                    else if (Math.abs(angle) === 180) position = { x: dotCenter.x + horizontalD, y: dotCenter.y };
+                    else position = { x: dotCenter.x, y: dotCenter.y - verticalD }
+
                     movingObject.set({
-                        left: dotCenter.x,
-                        top: dotCenter.y - verticalD
+                        left: position.x,
+                        top: position.y
                     })
                 }
-                else if (shortestDistance === bottomRightDistance) {
+                else if (shortestDistance >= bottomRightDistance) {
+                    let position = null;
+
+                    if (angle === 90) position = { x: dotCenter.x, y: dotCenter.y - verticalD };
+                    else if (angle === -90) position = { x: dotCenter.x - horizontalD, y: dotCenter.y };
+                    else if (Math.abs(angle) === 180) position = { x: dotCenter.x, y: dotCenter.y };
+                    else position = { x: dotCenter.x - horizontalD, y: dotCenter.y - verticalD };
+
                     movingObject.set({
-                        left: dotCenter.x - horizontalD,
-                        top: dotCenter.y - verticalD
+                        left: position.x,
+                        top: position.y
                     })
                 }  
                 movingObject.setCoords();
@@ -122,7 +149,6 @@ export const Plot = ({ plotCanvas }) => {
         plotCanvas.add(dotRef.current);
         plotCanvas.renderAll();
         return () => {
-            console.log('OBJECT EFFECT REMOVED')
             plotCanvas.remove(dotRef.current);    
         }
     }, [ response.pageId, job.connected, plotCanvas ])
