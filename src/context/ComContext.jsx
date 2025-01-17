@@ -71,30 +71,6 @@ export const CommunicationProvider = ({ children }) => {
             penDrop: [ '; Pink Finished' ],
             skipped: false
         },
-        { 
-            color: '#ffa500', 
-            name: 'Orange', 
-            zValue: -25, 
-            penPick: [ '; Orange' ],
-            penDrop: [ '; Orange Finished' ],
-            skipped: false
-        },
-        { 
-            color: '#ff0000', 
-            name: 'Red', 
-            zValue: -25, 
-            penPick: [ '; Red' ],
-            penDrop: [ '; Red Finished' ],
-            skipped: false
-        },
-        { 
-            color: '#ff0000', 
-            name: 'Red', 
-            zValue: -25, 
-            penPick: [ '; Red' ],
-            penDrop: [ '; Red Finished' ],
-            skipped: true
-        },
     ]);
     const [ config, setConfig ] = useState({
         // url: window.location.hostname,

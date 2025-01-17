@@ -57,7 +57,7 @@ export const ManageColors = ({ isOpen, setIsOpen, strokeColor, setStrokeColor })
                         onClick={ togglePopup }
                     >
                         <motion.div
-                            className="absolute right-[18%] w-fit bg-white rounded-xl shadow-lg border border-[#1c7f969c]"
+                            className="absolute right-[19%] w-fit bg-white rounded-xl shadow-lg border border-[#1c7f969c]"
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.8, opacity: 0 }}

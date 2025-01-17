@@ -15,7 +15,6 @@ export default function useCanvas() {
 export const CanvasProvider = ({ children }) => {
     const canvasRef = useRef(null);
     const plotterRef = useRef(null);
-    const configRef = useRef(null);
     const [ canvas, setCanvas ] = useState(null);
     const [ canvasObjs, setCanvasObjs ] = useState(null)
     const [ copiedObject, setCopiedObject ] = useState(null);
@@ -26,6 +25,7 @@ export const CanvasProvider = ({ children }) => {
         maxWidth: 298,
         maxHeight: 420
     })
+    const configRef = useRef(canvasConfig);
     const toolRef = useRef('Select')
     const [ undoStack, setUndoStack ] = useState([])
     const [ redoStack, setRedoStack ] = useState([])

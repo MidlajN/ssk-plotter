@@ -62,7 +62,7 @@ export const Plot = ({ plotCanvas }) => {
             const dotCenter = dotRef.current.getCenterPoint();
             const boundRect = movingObject.getBoundingRect();
             const angle = movingObject.angle;
-            
+
             const mTopLeft = { x: boundRect.left, y: boundRect.top };
             const mTopRight = { x: boundRect.left + boundRect.width, y: boundRect.top }
             const mBottomLeft = { x: boundRect.left, y: boundRect.top + boundRect.height };
@@ -145,12 +145,11 @@ export const Plot = ({ plotCanvas }) => {
             }
         });
 
-
         plotCanvas.add(dotRef.current);
         plotCanvas.renderAll();
-        return () => {
-            plotCanvas.remove(dotRef.current);    
-        }
+        
+        return () => plotCanvas.remove(dotRef.current);
+
     }, [ response.pageId, job.connected, plotCanvas ])
 
     const handleRotation = (angle) => {

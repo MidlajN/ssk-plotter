@@ -172,7 +172,7 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                                     className="rounded-md mx-auto cursor-pointer w-full overflow-hidden p-1" 
                                     onClick={ () => { setStrokeColor(color.color)}}
                                 >
-                                    <div className="p-4 mx-2 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
+                                    <div className="px-4 py-6 mx-2 border-4 border-white rounded-md" style={{ backgroundColor: color.color, boxShadow: strokeColor === color.color ? '#1f7f9481 0px 0px 1px 3px' : '' }}></div>
                                     <p className={`text-center text-sm pt-1 truncate ${ color.color === strokeColor ? 'text-black  font-medium' : 'text-gray-500'  }`}>{ color.name }</p>
                                 </div>
                             ))}

@@ -213,7 +213,7 @@ export const SettingsComponent = ({ openConfig, setOpenConfig }) => {
                         onClick={ handlePopUp }
                     >
                         <motion.div
-                            className="absolute right-[18%] w-fit bg-white rounded-xl overflow-hidden shadow-lg border border-[#cfcfcf7c]"
+                            className="absolute right-[19%] w-fit bg-white rounded-xl overflow-hidden shadow-lg border border-[#cfcfcf7c]"
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.8, opacity: 0 }}

@@ -77,8 +77,8 @@ export const convertToGcode = async (svgElements, colors, config) => {
             quadrant: 2,
             minimumArea: 2.5,
             bedSize: {
-                width: 420,
-                height: 297
+                width: 430,
+                height: 300
             }
         }
 

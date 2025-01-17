@@ -20,7 +20,7 @@ import fontTTF from './ui/assets/OpenSans-Regular.ttf';
 
 export default function Home() {
   const { canvas, canvasRef, plotterRef, canvasObjs, setCanvasObjs } = useCanvas();
-  const { colors, plotterCanvas, setPlotterCanvas } = useCom()
+  const { colors, plotterCanvas, setPlotterCanvas, config } = useCom()
   const transformRef = useRef()
   const [ tool, setTool ] = useState('Select');
   const [ expanded, setExpanded ] = useState(true);
@@ -107,10 +107,10 @@ export default function Home() {
           originY: 'top',
           name: 'background',
           strokeWidth: 2,
-          stroke: '#d3d3d3'
+          stroke: '#d3d3d3',
         });
 
-        const group = new Group([canvasBackground], { interactive: false, originX: 'left', originY: 'top' });
+        const group = new Group([canvasBackground], { interactive: false, originX: 'left', originY: 'top',  });
 
         for (const obj of clonedObjects) {
           if (obj.type === 'i-text') {
@@ -130,6 +130,8 @@ export default function Home() {
             group.add(obj)
           }
         }
+
+        group.set({ top: 3, left: 3 })
         plotCanvas.add(group);       
         group.setCoords();
         plotCanvas.renderAll();
@@ -147,6 +149,17 @@ export default function Home() {
       transformRef.current.resetTransform();
     }
   }, [tool])
+
+  useEffect(() => {
+    const fetchPenConfig = async () => {
+      const response = await fetch(`http://${config.url}/penconfig`)
+      if (response.ok) {
+        const res = await response.json();
+        console.log(res)
+      }
+    }
+    fetchPenConfig()
+  }, [])
 
   useEditorSetup(tool, strokeColor, element);
 
@@ -261,11 +274,11 @@ export default function Home() {
 
             <div 
               className={`
-                ${ expanded ? 'w-[45%] lg:w-[17%]' : 'w-[0]' } bg-white transition-all duration-500
+                ${ expanded ? 'w-[45%] lg:w-[19%]' : 'w-[0]' } bg-white transition-all duration-500
                 lg:border-l-2 ${ tool === 'Plot' ? 'border-[#1f5c98c2]' : 'border-[#1c7f969c]' }
               `}
             >
-              <div className={ `h-full transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
+              <div className={ `sidebar h-full  transition-all duration-[2s] ${ expanded ? 'opacity-100 ' : 'opacity-0'}`}>
                 { tool !== 'Plot' &&  <Editor setTool={setTool} strokeColor={strokeColor} setStrokeColor={setStrokeColor} canvasObjs={canvasObjs} setCanvasObjs={setCanvasObjs} />}
                 { tool === 'Plot' && <Plot plotCanvas={plotterCanvas} /> }
               </div>
