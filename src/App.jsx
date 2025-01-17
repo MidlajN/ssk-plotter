@@ -12,11 +12,12 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
-import { Canvas, FabricObject, Group, Path, Rect, util } from "fabric";
+import { Canvas, FabricImage, FabricObject, Group, Path, Pattern, Rect, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { parse } from "opentype.js";
 import fontTTF from './ui/assets/OpenSans-Regular.ttf';
+import { pattern } from "framer-motion/client";
 
 export default function Home() {
   const { canvas, canvasRef, plotterRef, canvasObjs, setCanvasObjs } = useCanvas();
@@ -76,6 +77,47 @@ export default function Home() {
       FabricObject.ownDefaults.hasControls = false;
       FabricObject.ownDefaults.borderDashArray = [15];
 
+      const setCanvasBackground = (canvas) => {
+        const color =  ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 1)']
+        const gridSize = 37.8;
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        const patternCanvas = document.createElement('canvas');
+        patternCanvas.width = canvasWidth;
+        patternCanvas.height = canvasHeight;
+        const patternCtx = patternCanvas.getContext('2d');
+
+        patternCtx.fillStyle = '#3565ff85';
+        patternCtx.fillRect(0,0, canvasWidth, canvasHeight);
+
+        patternCtx.strokeStyle = '#FFFFFF';
+        patternCtx.lineWidth = 1;
+
+        for (let x = 0; x < canvasWidth; x += gridSize) {
+          patternCtx.beginPath();
+          patternCtx.moveTo(x, 0);
+          patternCtx.lineTo(x, canvasHeight);
+          const colorIndex = Math.floor(Math.round((x / gridSize)) % 2);
+          patternCtx.strokeStyle = color[colorIndex];
+          patternCtx.stroke();
+        }
+
+        for (let y = 0; y < canvasHeight; y += gridSize) {
+          patternCtx.beginPath();
+          patternCtx.moveTo(0, y);
+          patternCtx.lineTo(canvasWidth, y);
+          const colorIndex = Math.floor(Math.round((y / gridSize)) % 2);
+          patternCtx.strokeStyle = color[colorIndex];
+          patternCtx.stroke();
+        }
+        const patternDataUrl = patternCanvas.toDataURL('image/png');
+        FabricImage.fromURL(patternDataUrl).then((img) => {
+          canvas.backgroundImage = img;
+          canvas.renderAll()
+        })
+      }
+
       const plotCanvas = new Canvas(plotterRef.current, {
         width: util.parseUnit(`420mm`),
         height: util.parseUnit(`300mm`),
@@ -86,8 +128,10 @@ export default function Home() {
         selectionDashArray: [10],
         selectionBorderColor: '#095262',
         selectionColor: '#4666ce40',
-        controlsAboveOverlay: false
+        controlsAboveOverlay: false,
       });
+
+      setCanvasBackground(plotCanvas);
       setPlotterCanvas(plotCanvas);
 
       const fontUrl = fontTTF;
@@ -109,8 +153,7 @@ export default function Home() {
           strokeWidth: 2,
           stroke: '#d3d3d3',
         });
-
-        const group = new Group([canvasBackground], { interactive: false, originX: 'left', originY: 'top',  });
+        const group = new Group([canvasBackground], { interactive: false, originX: 'left', originY: 'top', backgroundColor: '#fff' });
 
         for (const obj of clonedObjects) {
           if (obj.type === 'i-text') {
@@ -151,14 +194,14 @@ export default function Home() {
   }, [tool])
 
   useEffect(() => {
-    const fetchPenConfig = async () => {
-      const response = await fetch(`http://${config.url}/penconfig`)
-      if (response.ok) {
-        const res = await response.json();
-        console.log(res)
-      }
-    }
-    fetchPenConfig()
+    // const fetchPenConfig = async () => {
+    //   const response = await fetch(`http://${config.url}/penconfig`)
+    //   if (response.ok) {
+    //     const res = await response.json();
+    //     console.log(res)
+    //   }
+    // }
+    // fetchPenConfig()
   }, [])
 
   useEditorSetup(tool, strokeColor, element);
