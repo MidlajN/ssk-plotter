@@ -120,26 +120,35 @@ export const ObjectAlignComponent = () => {
         const activeObjects = canvas.getActiveObject();
         if (!activeObjects) return;
 
+        const boundingLeft = activeObjects.getBoundingRect().left;
+        const boundingTop = activeObjects.getBoundingRect().top;
+        const boundingWidth = activeObjects.getBoundingRect().width;
+        const boundingHeight = activeObjects.getBoundingRect().height;
+        const left = activeObjects.left;
+        const top = activeObjects.top;
+        const offsetLeft = boundingLeft - left;
+        const offsetTop = boundingTop - top;
         const canvasWidth = canvas.getWidth();
         const canvasHeight = canvas.getHeight();
+
         switch (alignment) {
             case 'left':
-                activeObjects.left = 2;
+                activeObjects.left = 2 - offsetLeft;
                 break;
             case 'right':
-                activeObjects.left = (canvasWidth - activeObjects.width * activeObjects.scaleX) - 5 ;
+                activeObjects.left = (canvasWidth - boundingWidth) - offsetLeft - 5 ;
                 break;
             case 'top':
-                activeObjects.top = 2;
+                activeObjects.top = 2 - offsetTop;
                 break;
             case 'centerH':
-                activeObjects.left = (canvasWidth - activeObjects.width * activeObjects.scaleX) / 2;
+                activeObjects.left = ((canvasWidth - boundingWidth) / 2) - offsetLeft;
                 break;
             case 'centerV':
-                activeObjects.top = (canvasHeight - activeObjects.height * activeObjects.scaleY) / 2;
+                activeObjects.top = ((canvasHeight - boundingHeight) / 2) - offsetTop;
                 break;
             case 'bottom':
-                activeObjects.top = (canvasHeight - activeObjects.height * activeObjects.scaleY) - 5;
+                activeObjects.top = (canvasHeight - boundingHeight) - offsetTop - 5;
                 break;
             default:
                 break;
@@ -152,7 +161,7 @@ export const ObjectAlignComponent = () => {
         return (
             <>
                 <div 
-                    className="hover:bg-gray-200 active:bg-gray-300 p-2 rounded-xl cursor-pointer transition-all duration-300"
+                    className="hover:bg-gray-200 active:bg-gray-300 p-3 rounded-xl cursor-pointer transition-all duration-300"
                     onClick={handleClick}
                 >
                     <Icon size={18} strokeWidth={1.5} />

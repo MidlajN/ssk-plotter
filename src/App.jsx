@@ -12,12 +12,11 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { handleFile } from "./util/functions.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import './App.css'
-import { Canvas, FabricImage, FabricObject, Group, Path, Pattern, Rect, util } from "fabric";
+import { Canvas, FabricImage, FabricObject, Group, Path, Rect, util } from "fabric";
 import useCom from "./context/ComContext.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { parse } from "opentype.js";
 import fontTTF from './ui/assets/OpenSans-Regular.ttf';
-import { pattern } from "framer-motion/client";
 
 export default function Home() {
   const { canvas, canvasRef, plotterRef, canvasObjs, setCanvasObjs } = useCanvas();
@@ -194,14 +193,14 @@ export default function Home() {
   }, [tool])
 
   useEffect(() => {
-    // const fetchPenConfig = async () => {
-    //   const response = await fetch(`http://${config.url}/penconfig`)
-    //   if (response.ok) {
-    //     const res = await response.json();
-    //     console.log(res)
-    //   }
-    // }
-    // fetchPenConfig()
+    const fetchPenConfig = async () => {
+      const response = await fetch(`http://${config.url}/penconfig`)
+      if (response.ok) {
+        const res = await response.json();
+        console.log(res)
+      }
+    }
+    fetchPenConfig()
   }, [])
 
   useEditorSetup(tool, strokeColor, element);

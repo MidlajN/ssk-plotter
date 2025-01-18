@@ -186,7 +186,7 @@ export const CanvasProvider = ({ children }) => {
                 copyObject(setCopiedObject, canvas);
             } else if (e.ctrlKey && keyStroke === 'v') {
                 pasteObject(copiedObject, canvas);
-            } else if (keyStroke === 'delete') {
+            } else if (keyStroke === 'delete' || keyStroke === 'backspace') {
                 deleteObject(canvas);
             } else if (e.ctrlKey && keyStroke === 'a') {
                 selectAllObject(canvas);
