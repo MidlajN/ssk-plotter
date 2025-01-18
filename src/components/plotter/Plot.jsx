@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { Rotate3dIcon, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
 import { SetupModal } from "./Modal";
 import { motion } from "framer-motion";
 import './plotter.css'
 import { RotateLeft, RotateRight } from "./Icons";
-import { Group, Path } from "fabric";
+import { Path } from "fabric";
 import { DimensionComponent, SettingsComponent, StatusComponent, ColorSortComponent, ActionButtonsComponent } from "./Components";
 
 export const Plot = ({ plotCanvas }) => {

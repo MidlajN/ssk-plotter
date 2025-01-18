@@ -54,6 +54,7 @@ export const CanvasProvider = ({ children }) => {
             fireRightClick: true,
             stopContextMenu: true,
             centeredRotation: true,
+            perPixelTargetFind: true
         });
 
         const savedCanvas = localStorage.getItem('fabricCanvas');

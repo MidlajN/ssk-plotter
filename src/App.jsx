@@ -191,18 +191,6 @@ export default function Home() {
       transformRef.current.resetTransform();
     }
   }, [tool])
-
-  useEffect(() => {
-    const fetchPenConfig = async () => {
-      const response = await fetch(`http://${config.url}/penconfig`)
-      if (response.ok) {
-        const res = await response.json();
-        console.log(res)
-      }
-    }
-    fetchPenConfig()
-  }, [])
-
   useEditorSetup(tool, strokeColor, element);
 
   return (

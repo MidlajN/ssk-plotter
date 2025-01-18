@@ -40,7 +40,7 @@ export const TopBar = () => {
     const shrinkCanvasToSelection = (canvas) => {
         let objects = canvas.getObjects();
         objects.forEach(obj => {
-            if (obj.left * 25 / 96 >= canvasConfig.width || obj.top * 25 / 96 >= canvasConfig.height) {
+            if (obj.left >= canvas.width || obj.top >= canvas.height) {
                 canvas.remove(obj)
             }
         })

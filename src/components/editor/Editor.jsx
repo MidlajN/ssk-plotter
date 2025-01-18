@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import useCanvas from "../../context/CanvasContext";
 import useCom from "../../context/ComContext";
 import { deleteObject } from "../../util/functions";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, color } from "framer-motion";
 import { ManageColors, ObjectAlignComponent } from "./Components";
 import { util } from "fabric";
 import { Trash2, Eye } from "lucide-react";
@@ -13,7 +13,7 @@ import './editor.css';
 
 export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setCanvasObjs }) {
     const { canvas } = useCanvas();
-    const { colors } = useCom()
+    const { colors, config } = useCom()
     const [ dimension, setDimensions ] = useState({ width: 0, height: 0, angle: 0, active: false })
     const [ activeObjects, setActiveObjects ] = useState(null);
     const [ isOpen, setIsOpen ] = useState(false);
@@ -103,6 +103,17 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
         }
     }, [canvas])
 
+    const fetchPenConfig = async () => {
+        const penconfig = {
+            pen: colors
+        }
+        const response = await fetch(`http://${config.url}/penconfig`, )
+        if (response.ok) {
+          const res = await response.json();
+          console.log(res)
+        }
+    }
+
     const handleDimension = (name, value) => {
         setDimensions(prev => ({
             ...prev,
@@ -177,7 +188,11 @@ export function Editor({ setTool, strokeColor, setStrokeColor,  canvasObjs, setC
                                 </div>
                             ))}
                         </div>
-                        <button className="text-sm mx-auto bg-gray-100 active:bg-gray-50 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" onClick={() => setIsOpen(true)}>Manage Colors..</button>
+                        <button 
+                            className="text-sm mx-auto bg-gray-100 active:bg-gray-50 py-0.5 px-3 rounded-full font-medium border text-[#16687a]" 
+                            // onClick={() => setIsOpen(true)}
+                            onClick={fetchPenConfig}
+                        >Manage Colors..</button>
                     </motion.div>
                     
                     <ManageColors isOpen={isOpen} setIsOpen={setIsOpen} strokeColor={strokeColor} setStrokeColor={setStrokeColor} />
